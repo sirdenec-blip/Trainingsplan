@@ -31,7 +31,7 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .l{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}
 .l span:first-child{color:var(--mu)}.l span:last-child{text-align:right}
 .x{width:auto;background:none;color:var(--mu);border:0;margin:0;padding:0 4px}
-#gate{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;padding:16px;overflow:auto}#gate[hidden]{display:none}#gate>div{max-width:520px;margin:8vh auto 0}#exm{margin-top:10px;font-size:.9rem;line-height:1.4}#gate p{color:var(--mu);line-height:1.4;font-size:.9rem}#note{color:var(--mu);font-size:.85rem;margin-top:6px}
+#gate{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;padding:16px;overflow:auto}#gate[hidden]{display:none}#gate>div{max-width:520px;margin:8vh auto 0}#exm,#imp{margin-top:10px;font-size:.9rem;line-height:1.4}.ver{text-align:center;color:var(--mu);font-size:.8rem;margin:4px 0 20px}#gate p{color:var(--mu);line-height:1.4;font-size:.9rem}#note{color:var(--mu);font-size:.85rem;margin-top:6px}
 #msg{color:#c33;font-size:.85rem;min-height:1.2em;margin-top:8px}
 </style>
 </head>
@@ -61,10 +61,15 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 
 <div class="card">
   <button id="tag" style="margin-top:0">📔 Trainingstagebuch exportieren</button>
+  <button class="sec" id="tagIn">📥 Trainingstagebuch importieren</button>
+  <div id="imp"></div>
   <button class="sec" id="exp">Als lesbaren Text herunterladen</button>
 </div>
 
+<div class="ver" id="ver"></div>
+
 <script>
+const VERSION="0.13";
 // s = Anzahl Sätze (0 = variabel), max = höchste Wiederholungszahl
 const PLAN={
   1:[{n:"Kniebeugen",s:3},{n:"Bankdrücken",s:3},{n:"Vorgebeugtes Rudern",s:3}],
@@ -100,6 +105,7 @@ function merge(fileArr){
   const all=[...seen.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
   return{all,nf,nb};
 }
+let mode="export";
 const exm=(t,bad)=>{$("exm").style.color=bad?"#c33":"var(--tx)";$("exm").textContent=t};
 async function write(h,text){const w=await h.createWritable();await w.write(text);await w.close()}
 const FSA="showSaveFilePicker" in window&&"showOpenFilePicker" in window;
@@ -122,20 +128,29 @@ async function exportOld(){
       const m=merge(unpack(await(await h.getFile()).text()));
       await write(h,pack(m.all));
       exm(done(m,m.nf,m.nb)+` Datei „${h.name}“ aktualisiert.`);
-    }else $("file").click();
+    }else{mode="export";$("file").click()}
   }catch(e){if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)}
 }
 $("file").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=()=>{try{
+    if(mode==="import"){
+      const fa=unpack(r.result),m=merge(fa);
+      data=m.all;persist();build();render();
+      const imp=$("imp");imp.style.color="var(--tx)";
+      imp.textContent=`Import: ${m.nb} neue Einträge übernommen, ${fa.length-m.nb} waren schon vorhanden. Insgesamt ${data.length} Einträge.`;
+      return;
+    }
     const m=merge(unpack(r.result));
     const msg=done(m,m.nf,m.nb);
     dl("Trainingstagebuch.json",pack(m.all),"application/json");
     exm(msg+" Dein Browser darf die Datei nicht überschreiben: die ergänzte Version wurde neu heruntergeladen – ersetze damit die alte Datei.");
-  }catch(x){exm("Fehler: "+(x.message||x),1)}};
+  }catch(x){if(mode==="import"){const imp=$("imp");imp.style.color="#c33";imp.textContent="Fehler: "+(x.message||x)}else exm("Fehler: "+(x.message||x),1)}};
   r.readAsText(f);e.target.value="";
 };
+$("tagIn").onclick=()=>{mode="import";$("imp").textContent="";$("file").click()};
+$("ver").textContent="Version "+VERSION;
 $("tag").onclick=()=>{exm("");$("gate").hidden=false};
 $("exClose").onclick=()=>{$("gate").hidden=true};
 $("exNew").onclick=exportNew;

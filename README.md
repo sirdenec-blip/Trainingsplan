@@ -1,5 +1,7 @@
 # Trainingsplan
 
+Aktuelle Version: **0.13** (steht auch unten auf der Seite)
+
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
 ## Pläne
@@ -28,5 +30,12 @@ Button **Trainingstagebuch exportieren**:
 
 Chrome/Edge am Computer überschreiben die gewählte Datei direkt. Auf dem Handy (iPhone/Safari, Chrome Android) wird die ergänzte Datei neu heruntergeladen und ersetzt die alte.
 
+### Trainingstagebuch importieren
+Button **Trainingstagebuch importieren**: wählt eine Tagebuch-Datei aus und übernimmt alle Einträge, die im Browser noch fehlen. Die Datei wird dabei nicht verändert. Bereits vorhandene Einträge werden nicht doppelt angelegt.
+
 ## Nutzung
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
+
+## Versionen
+- **0.13:** Button „Trainingstagebuch importieren“, Versionsnummer eingeführt.
+- davor (unnummeriert): Eingabe per Enter, variable Klimmzug-Sätze, Export als Trainingstagebuch mit Abgleich.
