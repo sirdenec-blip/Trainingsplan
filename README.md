@@ -18,5 +18,15 @@ Die Striche werden automatisch gesetzt, gespeichert wird z. B. `85x8-9-10`.
 
 Das Gewicht vom letzten Mal ist vorausgefüllt, Datum = heute, Einheit wechselt automatisch.
 
+## Speicherung
+Alle Einträge werden automatisch im Browser des Geräts gespeichert (localStorage), du kannst also einfach am Handy trainieren.
+
+## Trainingstagebuch (Export in Datei)
+Button **Trainingstagebuch exportieren**:
+- **Neue Datei erstellen:** schreibt alle Einträge in eine neue Datei `Trainingstagebuch.json`.
+- **Bestehende Datei auswählen:** liest die Datei ein, ergänzt fehlende Einträge in beide Richtungen (Datei → Browser und Browser → Datei) und aktualisiert die Datei. Doppelte Einträge (gleiches Datum, gleiche Einheit, gleiche Werte) werden nicht doppelt angelegt.
+
+Chrome/Edge am Computer überschreiben die gewählte Datei direkt. Auf dem Handy (iPhone/Safari, Chrome Android) wird die ergänzte Datei neu heruntergeladen und ersetzt die alte.
+
 ## Nutzung
-GitHub Pages aktivieren (*Settings → Pages → Branch `main`*). Daten liegen im Browser (localStorage); **Export** = Textdatei, **Backup** = JSON-Sicherung.
+GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).

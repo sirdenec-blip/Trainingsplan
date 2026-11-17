@@ -31,28 +31,37 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .l{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}
 .l span:first-child{color:var(--mu)}.l span:last-child{text-align:right}
 .x{width:auto;background:none;color:var(--mu);border:0;margin:0;padding:0 4px}
+#gate{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;padding:16px;overflow:auto}#gate[hidden]{display:none}#gate>div{max-width:520px;margin:8vh auto 0}#exm{margin-top:10px;font-size:.9rem;line-height:1.4}#gate p{color:var(--mu);line-height:1.4;font-size:.9rem}#note{color:var(--mu);font-size:.85rem;margin-top:6px}
 #msg{color:#c33;font-size:.85rem;min-height:1.2em;margin-top:8px}
 </style>
 </head>
 <body>
-<h1>🏋️ Trainingsplan</h1>
+<div id="gate" hidden><div class="card">
+  <h1 style="margin-top:0">Trainingstagebuch</h1>
+  <p>Exportiert deine Einträge in eine Datei. Bei einer bestehenden Datei werden fehlende Einträge in beide Richtungen ergänzt.</p>
+  <button id="exNew" style="margin-top:6px">Neue Datei erstellen</button>
+  <button class="sec" id="exOld">Bestehende Datei auswählen</button>
+  <button class="sec" id="exClose">Schließen</button>
+  <div id="exm"></div>
+</div></div>
+<input type="file" id="file" accept=".json,application/json" hidden>
 
+<h1>🏋️ Trainingsplan</h1>
 <div class="card">
   <div class="row">
     <div><label style="margin-top:0">Datum</label><input type="date" id="date"></div>
     <div><label style="margin-top:0">Einheit</label><select id="unit"><option value="1">Einheit 1</option><option value="2">Einheit 2</option></select></div>
   </div>
   <div id="fields"></div>
-  <div id="msg"></div>
+  <div id="msg"></div><div id="note"></div>
   <button id="save">Speichern</button>
 </div>
 
 <div id="hist"></div>
 
 <div class="card">
-  <button class="sec" id="exp" style="margin-top:0">Export (Textdatei)</button>
-  <button class="sec" id="bak">Backup (JSON) sichern / laden</button>
-  <input type="file" id="file" accept=".json" hidden>
+  <button id="tag" style="margin-top:0">📔 Trainingstagebuch exportieren</button>
+  <button class="sec" id="exp">Als lesbaren Text herunterladen</button>
 </div>
 
 <script>
@@ -61,13 +70,78 @@ const PLAN={
   1:[{n:"Kniebeugen",s:3},{n:"Bankdrücken",s:3},{n:"Vorgebeugtes Rudern",s:3}],
   2:[{n:"Kreuzheben",s:3},{n:"Overhead-Press",s:3},{n:"Klimmzüge",s:0,max:12,w0:"0",goal:24}]
 };
-const KEY="trainingsplan_v1";
-let data=[];
-try{data=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){}
-const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
 const $=id=>document.getElementById(id);
-let st=[]; // pro Übung: {w, reps[]}
+let data=[],st=[];
 
+// ---------- Speicher im Browser ----------
+const KEY="trainingsplan_v1";
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){$("note").textContent="⚠ Browserspeicher nicht verfügbar – bitte regelmäßig exportieren.";return false}};
+try{data=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){}
+
+// ---------- Trainingstagebuch (Datei) ----------
+const pack=d=>JSON.stringify({version:1,sessions:d},null,1);
+function unpack(t){
+  if(!t.trim())return [];
+  const j=JSON.parse(t),a=Array.isArray(j)?j:j&&j.sessions;
+  if(!Array.isArray(a))throw new Error("Das ist keine gültige Trainingsdatei.");
+  return a.filter(x=>x&&x.date&&x.unit&&x.ex&&typeof x.ex==="object");
+}
+const sig=x=>x.date+"|"+x.unit+"|"+JSON.stringify(Object.entries(x.ex).sort());
+// führt Browser-Daten und Datei-Daten zusammen
+function merge(fileArr){
+  const seen=new Map(),ids=new Set();let nf=0,nb=0;
+  const mineSig=new Set(data.map(sig)),fileSig=new Set(fileArr.map(sig));
+  [...data,...fileArr].forEach(x=>{
+    const k=sig(x);if(seen.has(k))return;
+    let id=x.id;while(!id||ids.has(id))id=Date.now()+ids.size+Math.floor(Math.random()*1e4);
+    ids.add(id);seen.set(k,{id,date:x.date,unit:+x.unit,ex:x.ex});
+    if(!fileSig.has(k))nf++;if(!mineSig.has(k))nb++;
+  });
+  const all=[...seen.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  return{all,nf,nb};
+}
+const exm=(t,bad)=>{$("exm").style.color=bad?"#c33":"var(--tx)";$("exm").textContent=t};
+async function write(h,text){const w=await h.createWritable();await w.write(text);await w.close()}
+const FSA="showSaveFilePicker" in window&&"showOpenFilePicker" in window;
+const PICK={types:[{description:"Trainingstagebuch (JSON)",accept:{"application/json":[".json"]}}]};
+
+async function exportNew(){
+  try{
+    if(FSA){const h=await showSaveFilePicker({suggestedName:"Trainingstagebuch.json",...PICK});await write(h,pack(data));exm(`Gespeichert: ${data.length} Einträge in „${h.name}“.`)}
+    else{dl("Trainingstagebuch.json",pack(data),"application/json");exm(`Heruntergeladen: Trainingstagebuch.json mit ${data.length} Einträgen.`)}
+  }catch(e){if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)}
+}
+function done(m,nf,nb){
+  data=m.all;persist();build();render();
+  return `${nb} Einträge aus der Datei im Browser ergänzt, ${nf} Browser-Einträge in der Datei ergänzt. Insgesamt ${data.length} Einträge.`;
+}
+async function exportOld(){
+  try{
+    if(FSA){
+      const[h]=await showOpenFilePicker(PICK);
+      const m=merge(unpack(await(await h.getFile()).text()));
+      await write(h,pack(m.all));
+      exm(done(m,m.nf,m.nb)+` Datei „${h.name}“ aktualisiert.`);
+    }else $("file").click();
+  }catch(e){if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)}
+}
+$("file").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{
+    const m=merge(unpack(r.result));
+    const msg=done(m,m.nf,m.nb);
+    dl("Trainingstagebuch.json",pack(m.all),"application/json");
+    exm(msg+" Dein Browser darf die Datei nicht überschreiben: die ergänzte Version wurde neu heruntergeladen – ersetze damit die alte Datei.");
+  }catch(x){exm("Fehler: "+(x.message||x),1)}};
+  r.readAsText(f);e.target.value="";
+};
+$("tag").onclick=()=>{exm("");$("gate").hidden=false};
+$("exClose").onclick=()=>{$("gate").hidden=true};
+$("exNew").onclick=exportNew;
+$("exOld").onclick=exportOld;
+
+// ---------- Eingabe ----------
 const lastW=(u,name)=>{for(let i=data.length-1;i>=0;i--)if(data[i].unit==u&&data[i].ex[name])return data[i].ex[name].split("x")[0];return null};
 const sum=a=>a.reduce((x,y)=>x+y,0);
 
@@ -95,24 +169,23 @@ function build(){
       else if(e.key==="Backspace"&&el.value===""&&st[i].reps.length){st[i].reps.pop();chips(i)}
     };
   });
-  document.querySelectorAll(".add").forEach(b=>b.onclick=()=>{commit(+b.dataset.i);});
+  document.querySelectorAll(".add").forEach(b=>b.onclick=()=>{commit(+b.dataset.i)});
 }
 const rIn=i=>document.querySelector(`.r[data-i="${i}"]`);
 
 function chips(i){
   const e=PLAN[$("unit").value][i],r=st[i].reps;
   let h=r.map((v,k)=>`<span class="chip" data-k="${k}" title="Antippen zum Entfernen">${v}</span>`).join("");
-  if(e.s) for(let k=r.length;k<e.s;k++)h+=`<span class="chip empty">–</span>`;
+  if(e.s)for(let k=r.length;k<e.s;k++)h+=`<span class="chip empty">–</span>`;
   if(!e.s&&r.length)h+=`<span class="tot">Gesamt: ${sum(r)}${e.goal?" / "+e.goal:""}</span>`;
   const c=$("c"+i);c.innerHTML=h;
   c.querySelectorAll(".chip[data-k]").forEach(ch=>ch.onclick=()=>{st[i].reps.splice(+ch.dataset.k,1);chips(i)});
 }
-
 function commit(i){
   const e=PLAN[$("unit").value][i],el=rIn(i),v=el.value.trim(),r=st[i].reps;
   $("msg").textContent="";
-  if(v===""){ if(!e.s&&r.length)next(i); return; }
-  const n=+v, max=e.max||99;
+  if(v===""){if(!e.s&&r.length)next(i);return}
+  const n=+v,max=e.max||99;
   if(!/^\d+$/.test(v)||n<1||n>max){$("msg").textContent=`${e.n}: Wiederholungen von 1 bis ${max} eingeben.`;el.select();return}
   if(e.s&&r.length>=e.s){next(i);return}
   r.push(n);el.value="";chips(i);
@@ -122,24 +195,24 @@ function next(i){
   const nx=document.querySelector(`.w[data-i="${i+1}"]`);
   if(nx)nx.focus();else $("save").focus();
 }
-
 $("unit").onchange=build;
 
 $("save").onclick=()=>{
   const u=$("unit").value,ex={};let err="";
   PLAN[u].forEach((e,i)=>{
-    const w=String(st[i].w).trim().replace(",","."),r=st[i].reps;
-    document.querySelector(`.w[data-i="${i}"]`).classList.toggle("bad",!/^\d+(\.\d+)?$/.test(w));
-    if(!/^\d+(\.\d+)?$/.test(w))err=err||`${e.n}: Gewicht fehlt (bei Körpergewicht 0).`;
+    const w=String(st[i].w).trim().replace(",","."),r=st[i].reps,ok=/^\d+(\.\d+)?$/.test(w);
+    document.querySelector(`.w[data-i="${i}"]`).classList.toggle("bad",!ok);
+    if(!ok)err=err||`${e.n}: Gewicht fehlt (bei Körpergewicht 0).`;
     else if(e.s&&r.length!==e.s)err=err||`${e.n}: ${e.s} Sätze nötig (bisher ${r.length}).`;
     else if(!e.s&&!r.length)err=err||`${e.n}: mindestens 1 Satz nötig.`;
     else ex[e.n]=(+w)+"x"+r.join("-");
   });
   $("msg").textContent=err;
   if(err)return;
-  data.push({id:Date.now(),date:$("date").value,unit:+u,ex});
-  data.sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
-  persist();$("unit").value=u==1?2:1;build();render();
+  data=[...data,{id:Date.now(),date:$("date").value,unit:+u,ex}]
+    .sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  if(persist())$("note").textContent="✔ Gespeichert.";
+  $("unit").value=u==1?2:1;build();render();
   window.scrollTo({top:0,behavior:"smooth"});
 };
 
@@ -151,27 +224,21 @@ function render(){
       const t=k==="Klimmzüge"?` <small style="color:var(--mu)">(Σ ${sum(v.split("x")[1].split("-").map(Number))})</small>`:"";
       return `<div class="l"><span>${k}</span><span>${v}${t}</span></div>`}).join("")+`</div>`).join("");
 }
-function del(id){if(confirm("Eintrag löschen?")){data=data.filter(s=>s.id!==id);persist();build();render()}}
-
+function del(id){
+  if(!confirm("Eintrag löschen?"))return;
+  data=data.filter(s=>s.id!==id);persist();build();render();
+}
 function dl(name,text,type){
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();
 }
 $("exp").onclick=()=>dl("trainingsplan.txt",
   data.map(s=>fmt(s.date)+" (Einheit "+s.unit+")\n"+Object.entries(s.ex).map(([k,v])=>k+": "+v).join("\n")).join("\n\n"),"text/plain");
-$("bak").onclick=()=>{
-  if(confirm("OK = JSON-Backup herunterladen\nAbbrechen = Backup-Datei laden"))dl("trainingsplan-backup.json",JSON.stringify(data),"application/json");
-  else $("file").click();
-};
-$("file").onchange=e=>{
-  const r=new FileReader();
-  r.onload=()=>{try{const d=JSON.parse(r.result);if(Array.isArray(d)){data=d;persist();init()}}catch(x){alert("Ungültige Datei")}};
-  r.readAsText(e.target.files[0]);
-};
 
 function init(){
   const t=new Date();$("date").value=new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
-  const l=data[data.length-1];$("unit").value=l?(l.unit==1?2:1):1;build();render();
+  const l=data[data.length-1];$("unit").value=l?(l.unit==1?2:1):1;
+  $("msg").textContent="";$("note").textContent="";build();render();
 }
 init();
 </script>
