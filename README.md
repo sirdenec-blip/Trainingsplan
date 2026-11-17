@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.14** (steht auch unten auf der Seite)
+Aktuelle Version: **0.15** (steht auch unten auf der Seite)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -33,6 +33,9 @@ Chrome/Edge am Computer überschreiben die gewählte Datei direkt. Auf dem Handy
 ### Trainingstagebuch importieren
 Button **Trainingstagebuch importieren**: wählt eine Tagebuch-Datei aus und übernimmt alle Einträge, die im Browser noch fehlen. Die Datei wird dabei nicht verändert. Bereits vorhandene Einträge werden nicht doppelt angelegt.
 
+### Einträge bearbeiten
+Im Verlauf gibt es neben dem ✕ einen Stift ✎. Antippen lädt den Eintrag ins Eingabeformular (Datum, Gewichte, Wiederholungen), das Formular wird hervorgehoben und der Button heißt „Änderung speichern“. Die Einheit ist beim Bearbeiten gesperrt. „Bearbeiten abbrechen“ verwirft die Änderung.
+
 ### Datei-Indikator
 Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Aktion und Zeitpunkt: exportiert, abgeglichen oder importiert). Ohne bisherigen Export/Import steht dort „Keine Datei verknüpft“. Die Daten selbst liegen immer im Browser, die Datei ist die zuletzt abgeglichene Sicherung.
 
@@ -40,6 +43,7 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.15:** Einträge bearbeiten (Stift-Symbol im Verlauf).
 - **0.14:** Indikator, welche Datei zuletzt verwendet wurde.
 - **0.13:** Button „Trainingstagebuch importieren“, Versionsnummer eingeführt.
 - davor (unnummeriert): Eingabe per Enter, variable Klimmzug-Sätze, Export als Trainingstagebuch mit Abgleich.

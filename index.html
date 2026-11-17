@@ -31,7 +31,7 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .l{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}
 .l span:first-child{color:var(--mu)}.l span:last-child{text-align:right}
 .x{width:auto;background:none;color:var(--mu);border:0;margin:0;padding:0 4px}
-#gate{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;padding:16px;overflow:auto}#gate[hidden]{display:none}#gate>div{max-width:520px;margin:8vh auto 0}#exm,#imp{margin-top:10px;font-size:.9rem;line-height:1.4}.fi{color:var(--mu);font-size:.85rem;margin:-6px 0 12px}.fi b{color:var(--tx);font-weight:600}.ver{text-align:center;color:var(--mu);font-size:.8rem;margin:4px 0 20px}#gate p{color:var(--mu);line-height:1.4;font-size:.9rem}#note{color:var(--mu);font-size:.85rem;margin-top:6px}
+#gate{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;padding:16px;overflow:auto}#gate[hidden]{display:none}#gate>div{max-width:520px;margin:8vh auto 0}#exm,#imp{margin-top:10px;font-size:.9rem;line-height:1.4}#editbar{color:var(--ac);font-weight:600;font-size:.9rem;margin-bottom:8px}.card.ed{border-color:var(--ac)}.fi{color:var(--mu);font-size:.85rem;margin:-6px 0 12px}.fi b{color:var(--tx);font-weight:600}.ver{text-align:center;color:var(--mu);font-size:.8rem;margin:4px 0 20px}#gate p{color:var(--mu);line-height:1.4;font-size:.9rem}#note{color:var(--mu);font-size:.85rem;margin-top:6px}
 #msg{color:#c33;font-size:.85rem;min-height:1.2em;margin-top:8px}
 </style>
 </head>
@@ -49,6 +49,7 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 <h1>🏋️ Trainingsplan</h1>
 <div class="fi" id="fileind"></div>
 <div class="card">
+  <div id="editbar" hidden></div>
   <div class="row">
     <div><label style="margin-top:0">Datum</label><input type="date" id="date"></div>
     <div><label style="margin-top:0">Einheit</label><select id="unit"><option value="1">Einheit 1</option><option value="2">Einheit 2</option></select></div>
@@ -56,6 +57,7 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
   <div id="fields"></div>
   <div id="msg"></div><div id="note"></div>
   <button id="save">Speichern</button>
+  <button class="sec" id="cancel" hidden>Bearbeiten abbrechen</button>
 </div>
 
 <div id="hist"></div>
@@ -70,7 +72,7 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 <div class="ver" id="ver"></div>
 
 <script>
-const VERSION="0.14";
+const VERSION="0.15";
 // s = Anzahl Sätze (0 = variabel), max = höchste Wiederholungszahl
 const PLAN={
   1:[{n:"Kniebeugen",s:3},{n:"Bankdrücken",s:3},{n:"Vorgebeugtes Rudern",s:3}],
@@ -239,6 +241,14 @@ $("save").onclick=()=>{
   });
   $("msg").textContent=err;
   if(err)return;
+  if(editId!==null){
+    data=data.map(x=>x.id===editId?{id:x.id,date:$("date").value,unit:+u,ex}:x)
+      .sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+    const ok=persist();exitEdit();
+    if(ok)$("note").textContent="✔ Änderung gespeichert.";
+    window.scrollTo({top:0,behavior:"smooth"});
+    return;
+  }
   data=[...data,{id:Date.now(),date:$("date").value,unit:+u,ex}]
     .sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
   if(persist())$("note").textContent="✔ Gespeichert.";
@@ -246,17 +256,38 @@ $("save").onclick=()=>{
   window.scrollTo({top:0,behavior:"smooth"});
 };
 
+let editId=null;
+function edit(id){
+  const e=data.find(x=>x.id===id);if(!e)return;
+  editId=id;$("date").value=e.date;$("unit").value=e.unit;$("unit").disabled=true;build();
+  PLAN[e.unit].forEach((p,i)=>{
+    const v=e.ex[p.n];if(!v)return;
+    const[w,r]=v.split("x");
+    st[i].w=w;st[i].reps=r.split("-").map(Number);
+    document.querySelector(`.w[data-i="${i}"]`).value=w;chips(i);
+  });
+  $("editbar").textContent=`✎ Bearbeite Eintrag vom ${fmt(e.date)} (Einheit ${e.unit})`;
+  $("editbar").hidden=false;$("cancel").hidden=false;$("save").textContent="Änderung speichern";
+  $("msg").textContent="";$("note").textContent="";
+  render();window.scrollTo({top:0,behavior:"smooth"});
+}
+function exitEdit(){
+  editId=null;$("unit").disabled=false;$("editbar").hidden=true;$("cancel").hidden=true;
+  $("save").textContent="Speichern";init();
+}
+$("cancel").onclick=exitEdit;
 const fmt=d=>d.split("-").reverse().join(".");
 function render(){
   $("hist").innerHTML=[...data].reverse().map(s=>
-    `<div class="card"><div class="h"><span>${fmt(s.date)} <small>Einheit ${s.unit}</small></span><button class="x" onclick="del(${s.id})">✕</button></div>`+
+    `<div class="card${s.id===editId?" ed":""}"><div class="h"><span>${fmt(s.date)} <small>Einheit ${s.unit}</small></span><span><button class="x" onclick="edit(${s.id})" title="Bearbeiten">✎</button><button class="x" onclick="del(${s.id})" title="Löschen">✕</button></span></div>`+
     Object.entries(s.ex).map(([k,v])=>{
       const t=k==="Klimmzüge"?` <small style="color:var(--mu)">(Σ ${sum(v.split("x")[1].split("-").map(Number))})</small>`:"";
       return `<div class="l"><span>${k}</span><span>${v}${t}</span></div>`}).join("")+`</div>`).join("");
 }
 function del(id){
   if(!confirm("Eintrag löschen?"))return;
-  data=data.filter(s=>s.id!==id);persist();build();render();
+  data=data.filter(s=>s.id!==id);persist();
+  if(id===editId)exitEdit();else{if(editId===null)build();render()}
 }
 function dl(name,text,type){
   const a=document.createElement("a");
