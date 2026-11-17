@@ -7,17 +7,16 @@ Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine In
 - **Einheit 2:** Kreuzheben, Overhead-Press, Klimmzüge
 
 ## Eingabe
-Pro Übung ein Feld: `Gewicht x Wdh-Wdh-Wdh`
+Pro Übung: **Gewicht eintippen → Enter → Wiederholungen eintippen → Enter** (wiederholen pro Satz).
+Die Striche werden automatisch gesetzt, gespeichert wird z. B. `85x8-9-10`.
 
-| Eingabe | Bedeutung |
-|---|---|
-| `85x8-9-10` | 85 kg, Sätze mit 8, 9, 10 Wdh. |
-| `82,5x8-9-10` | Dezimalgewicht |
-| `85 8 9 10` | Kurzform ohne x und - |
-| `0x8-7-6` | Körpergewicht (z. B. Klimmzüge) |
+- Kniebeugen, Bankdrücken, Rudern, Kreuzheben, Overhead-Press: genau 3 Sätze. Nach dem 3. Satz springt der Cursor zur nächsten Übung.
+- Klimmzüge: beliebig viele Sätze (1–12 Wdh. je Satz), z. B. `0x8-6-3-2-1-1-1-1-1-1`. Fertig mit Enter auf leerem Feld. Die Gesamtzahl wird angezeigt (Ziel 24 = 3x8).
+- Gewicht 0 = Körpergewicht, bei Klimmzügen Zusatzgewicht eintragen.
+- Falsche Zahl? Auf die Zahl antippen entfernt sie, Backspace im leeren Feld löscht die letzte.
+- Am Handy ohne Enter-Taste: Button ＋ neben dem Feld.
 
-Datum ist standardmäßig heute, die Einheit wechselt automatisch (1 → 2 → 1 …). Die Werte vom letzten Mal stehen als Platzhalter im Feld.
+Das Gewicht vom letzten Mal ist vorausgefüllt, Datum = heute, Einheit wechselt automatisch.
 
 ## Nutzung
-GitHub Pages aktivieren (*Settings → Pages → Branch `main`*) und die Seite am Handy öffnen.
-Die Daten liegen im Browser (localStorage). Mit **Export** bekommst du eine Textdatei, mit **Backup** eine JSON-Sicherung zum Wiedereinspielen.
+GitHub Pages aktivieren (*Settings → Pages → Branch `main`*). Daten liegen im Browser (localStorage); **Export** = Textdatei, **Backup** = JSON-Sicherung.

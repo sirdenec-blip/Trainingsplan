@@ -11,16 +11,25 @@
 body{margin:0;padding:16px;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;max-width:520px;margin:auto}
 h1{font-size:1.3rem;margin:.2rem 0 1rem}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
-label{display:block;font-size:.85rem;color:var(--mu);margin:10px 0 4px}
+label{display:block;font-size:.85rem;color:var(--mu);margin:12px 0 4px}
 input,select,button{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
 input.bad{border-color:#c33}
 button{background:var(--ac);color:#fff;border:0;margin-top:14px;font-weight:600}
 button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);margin-top:8px;font-weight:400}
 .row{display:flex;gap:8px}.row>*{flex:1}
+.in{display:flex;gap:8px;align-items:center}
+.in .w{flex:0 0 84px;text-align:center}
+.in .r{flex:1}
+.in span{color:var(--mu);white-space:nowrap}
+.in .add{flex:0 0 48px;margin:0;padding:10px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:32px;align-items:center}
+.chip{background:var(--ac);color:#fff;border-radius:16px;padding:4px 12px;font-weight:600;cursor:pointer}
+.chip.empty{background:transparent;color:var(--mu);border:1px dashed var(--bd);font-weight:400;cursor:default}
+.tot{color:var(--mu);font-size:.85rem;margin-left:4px}
 .h{display:flex;justify-content:space-between;font-weight:600;margin-bottom:6px}
 .h small{color:var(--mu);font-weight:400}
-.l{display:flex;justify-content:space-between;padding:3px 0;font-variant-numeric:tabular-nums}
-.l span:first-child{color:var(--mu)}
+.l{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}
+.l span:first-child{color:var(--mu)}.l span:last-child{text-align:right}
 .x{width:auto;background:none;color:var(--mu);border:0;margin:0;padding:0 4px}
 #msg{color:#c33;font-size:.85rem;min-height:1.2em;margin-top:8px}
 </style>
@@ -30,8 +39,8 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 
 <div class="card">
   <div class="row">
-    <div><label>Datum</label><input type="date" id="date"></div>
-    <div><label>Einheit</label><select id="unit"><option value="1">Einheit 1</option><option value="2">Einheit 2</option></select></div>
+    <div><label style="margin-top:0">Datum</label><input type="date" id="date"></div>
+    <div><label style="margin-top:0">Einheit</label><select id="unit"><option value="1">Einheit 1</option><option value="2">Einheit 2</option></select></div>
   </div>
   <div id="fields"></div>
   <div id="msg"></div>
@@ -42,58 +51,107 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 
 <div class="card">
   <button class="sec" id="exp" style="margin-top:0">Export (Textdatei)</button>
-  <button class="sec" id="bak">Backup (JSON) laden / sichern</button>
+  <button class="sec" id="bak">Backup (JSON) sichern / laden</button>
   <input type="file" id="file" accept=".json" hidden>
 </div>
 
 <script>
-const PLAN={1:["Kniebeugen","Bankdrücken","Vorgebeugtes Rudern"],2:["Kreuzheben","Overhead-Press","Klimmzüge"]};
+// s = Anzahl Sätze (0 = variabel), max = höchste Wiederholungszahl
+const PLAN={
+  1:[{n:"Kniebeugen",s:3},{n:"Bankdrücken",s:3},{n:"Vorgebeugtes Rudern",s:3}],
+  2:[{n:"Kreuzheben",s:3},{n:"Overhead-Press",s:3},{n:"Klimmzüge",s:0,max:12,w0:"0",goal:24}]
+};
 const KEY="trainingsplan_v1";
 let data=[];
 try{data=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
 const $=id=>document.getElementById(id);
+let st=[]; // pro Übung: {w, reps[]}
 
-// "85x8-9-10" | "85 8 9 10" | "82,5x8-9-10" -> "85x8-9-10" oder null
-function parse(s){
-  const n=s.trim().replace(/(\d),(\d)/g,"$1.$2").match(/\d+(\.\d+)?/g);
-  if(!n||n.length!==4) return null;
-  return n[0]+"x"+n.slice(1).join("-");
-}
-const last=(u,ex)=>{for(let i=data.length-1;i>=0;i--)if(data[i].unit==u&&data[i].ex[ex])return data[i].ex[ex]; return ""};
+const lastW=(u,name)=>{for(let i=data.length-1;i>=0;i--)if(data[i].unit==u&&data[i].ex[name])return data[i].ex[name].split("x")[0];return null};
+const sum=a=>a.reduce((x,y)=>x+y,0);
 
 function build(){
   const u=$("unit").value;
-  $("fields").innerHTML=PLAN[u].map((e,i)=>
-    `<label>${e}</label><input id="e${i}" inputmode="text" autocomplete="off" placeholder="${last(u,e)||"85x8-9-10"}">`).join("");
+  st=PLAN[u].map(e=>({w:lastW(u,e.n)??e.w0??"",reps:[]}));
+  $("fields").innerHTML=PLAN[u].map((e,i)=>`
+    <label>${e.n}${e.s?"":" (beliebig viele Sätze, Enter ohne Zahl = fertig)"}</label>
+    <div class="in">
+      <input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg"><span>kg ×</span>
+      <input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off">
+      <button class="add" data-i="${i}" type="button">＋</button>
+    </div>
+    <div class="chips" id="c${i}"></div>`).join("");
+  PLAN[u].forEach((_,i)=>chips(i));
+  document.querySelectorAll(".w").forEach(el=>{
+    el.onfocus=()=>el.select();
+    el.oninput=()=>st[el.dataset.i].w=el.value;
+    el.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();rIn(el.dataset.i).focus()}};
+  });
+  document.querySelectorAll(".r").forEach(el=>{
+    el.onkeydown=e=>{
+      const i=+el.dataset.i;
+      if(e.key==="Enter"){e.preventDefault();commit(i)}
+      else if(e.key==="Backspace"&&el.value===""&&st[i].reps.length){st[i].reps.pop();chips(i)}
+    };
+  });
+  document.querySelectorAll(".add").forEach(b=>b.onclick=()=>{commit(+b.dataset.i);});
 }
-function init(){
-  const t=new Date();$("date").value=new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
-  const l=data[data.length-1];$("unit").value=l?(l.unit==1?2:1):1;build();render();
+const rIn=i=>document.querySelector(`.r[data-i="${i}"]`);
+
+function chips(i){
+  const e=PLAN[$("unit").value][i],r=st[i].reps;
+  let h=r.map((v,k)=>`<span class="chip" data-k="${k}" title="Antippen zum Entfernen">${v}</span>`).join("");
+  if(e.s) for(let k=r.length;k<e.s;k++)h+=`<span class="chip empty">–</span>`;
+  if(!e.s&&r.length)h+=`<span class="tot">Gesamt: ${sum(r)}${e.goal?" / "+e.goal:""}</span>`;
+  const c=$("c"+i);c.innerHTML=h;
+  c.querySelectorAll(".chip[data-k]").forEach(ch=>ch.onclick=()=>{st[i].reps.splice(+ch.dataset.k,1);chips(i)});
 }
+
+function commit(i){
+  const e=PLAN[$("unit").value][i],el=rIn(i),v=el.value.trim(),r=st[i].reps;
+  $("msg").textContent="";
+  if(v===""){ if(!e.s&&r.length)next(i); return; }
+  const n=+v, max=e.max||99;
+  if(!/^\d+$/.test(v)||n<1||n>max){$("msg").textContent=`${e.n}: Wiederholungen von 1 bis ${max} eingeben.`;el.select();return}
+  if(e.s&&r.length>=e.s){next(i);return}
+  r.push(n);el.value="";chips(i);
+  if(e.s&&r.length===e.s)next(i);else el.focus();
+}
+function next(i){
+  const nx=document.querySelector(`.w[data-i="${i+1}"]`);
+  if(nx)nx.focus();else $("save").focus();
+}
+
 $("unit").onchange=build;
 
 $("save").onclick=()=>{
-  const u=$("unit").value,ex={};let ok=true;
+  const u=$("unit").value,ex={};let err="";
   PLAN[u].forEach((e,i)=>{
-    const el=$("e"+i),p=parse(el.value);
-    el.classList.toggle("bad",!p);
-    if(p)ex[e]=p;else ok=false;
+    const w=String(st[i].w).trim().replace(",","."),r=st[i].reps;
+    document.querySelector(`.w[data-i="${i}"]`).classList.toggle("bad",!/^\d+(\.\d+)?$/.test(w));
+    if(!/^\d+(\.\d+)?$/.test(w))err=err||`${e.n}: Gewicht fehlt (bei Körpergewicht 0).`;
+    else if(e.s&&r.length!==e.s)err=err||`${e.n}: ${e.s} Sätze nötig (bisher ${r.length}).`;
+    else if(!e.s&&!r.length)err=err||`${e.n}: mindestens 1 Satz nötig.`;
+    else ex[e.n]=(+w)+"x"+r.join("-");
   });
-  $("msg").textContent=ok?"":"Bitte jede Übung im Format 85x8-9-10 eingeben.";
-  if(!ok)return;
+  $("msg").textContent=err;
+  if(err)return;
   data.push({id:Date.now(),date:$("date").value,unit:+u,ex});
   data.sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
-  save();$("unit").value=u==1?2:1;build();render();
+  persist();$("unit").value=u==1?2:1;build();render();
+  window.scrollTo({top:0,behavior:"smooth"});
 };
 
 const fmt=d=>d.split("-").reverse().join(".");
 function render(){
   $("hist").innerHTML=[...data].reverse().map(s=>
     `<div class="card"><div class="h"><span>${fmt(s.date)} <small>Einheit ${s.unit}</small></span><button class="x" onclick="del(${s.id})">✕</button></div>`+
-    Object.entries(s.ex).map(([k,v])=>`<div class="l"><span>${k}</span><span>${v}</span></div>`).join("")+`</div>`).join("");
+    Object.entries(s.ex).map(([k,v])=>{
+      const t=k==="Klimmzüge"?` <small style="color:var(--mu)">(Σ ${sum(v.split("x")[1].split("-").map(Number))})</small>`:"";
+      return `<div class="l"><span>${k}</span><span>${v}${t}</span></div>`}).join("")+`</div>`).join("");
 }
-function del(id){if(confirm("Eintrag löschen?")){data=data.filter(s=>s.id!==id);save();build();render()}}
+function del(id){if(confirm("Eintrag löschen?")){data=data.filter(s=>s.id!==id);persist();build();render()}}
 
 function dl(name,text,type){
   const a=document.createElement("a");
@@ -107,9 +165,14 @@ $("bak").onclick=()=>{
 };
 $("file").onchange=e=>{
   const r=new FileReader();
-  r.onload=()=>{try{const d=JSON.parse(r.result);if(Array.isArray(d)){data=d;save();init()}}catch(x){alert("Ungültige Datei")}};
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(Array.isArray(d)){data=d;persist();init()}}catch(x){alert("Ungültige Datei")}};
   r.readAsText(e.target.files[0]);
 };
+
+function init(){
+  const t=new Date();$("date").value=new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+  const l=data[data.length-1];$("unit").value=l?(l.unit==1?2:1):1;build();render();
+}
 init();
 </script>
 </body>
