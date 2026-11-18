@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.16** (steht auch unten auf der Seite)
+Aktuelle Version: **0.17** (steht auch unten auf der Seite)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -33,6 +33,9 @@ Chrome/Edge am Computer überschreiben die gewählte Datei direkt. Auf dem Handy
 ### Trainingstagebuch importieren
 Button **Trainingstagebuch importieren**: wählt eine Tagebuch-Datei aus und übernimmt alle Einträge, die im Browser noch fehlen. Die Datei wird dabei nicht verändert. Bereits vorhandene Einträge werden nicht doppelt angelegt.
 
+### Anzeige
+Eingabe: Jeder Satz hat eine Nummer (Satz 1, 2, 3 …), der nächste Satz ist farbig markiert und das Eingabefeld nennt ihn („Satz 2: Wdh.“). Verlauf: pro Übung das Gewicht in kg und darunter die Wiederholungen je Satz als kleine Felder; bei Klimmzügen zusätzlich die Summe.
+
 ### Eindeutige IDs und Abgleich
 Jeder Eintrag hat eine eindeutige ID und einen Änderungszeitpunkt. Beim Abgleich gilt: gleiche ID = gleicher Eintrag, die **neuere Änderung gewinnt**. So bleibt nach dem Bearbeiten kein alter Eintrag stehen. Gelöschte Einträge bleiben als „gelöscht“ markiert in Browser und Datei (unsichtbar), damit eine Löschung beim Abgleich nicht rückgängig gemacht wird. Bearbeitete Einträge zeigen ein ⓘ (antippen = Zeitpunkt der letzten Änderung).
 Alt-Einträge (vor 0.16) bekommen beim ersten Start eine ID, die aus ihrem Inhalt berechnet wird. Duplikate aus früheren Versionen (alter und bearbeiteter Eintrag) müssen einmalig von Hand gelöscht werden.
@@ -47,6 +50,7 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.17:** Satz-Nummern in der Eingabe, kompaktere Verlaufsansicht mit kg und Sätzen.
 - **0.16:** Eindeutige IDs, Abgleich von Änderungen und Löschungen, ⓘ bei bearbeiteten Einträgen. Dateiformat Version 2.
 - **0.15:** Einträge bearbeiten (Stift-Symbol im Verlauf).
 - **0.14:** Indikator, welche Datei zuletzt verwendet wurde.
