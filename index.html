@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trainingsplan</title>
 <style>
-:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--u1:#9ad9b6;--u1t:#0f2a1d;--u2:#1d6b4f;--u2t:#fff;--bd:#ddd}
-@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--u1:#2f7d5c;--u1t:#fff;--u2:#7ee2b8;--u2t:#0b2a1e;--bd:#3a3a38}}
+:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--dn:#b4533a;--u1:#9ad9b6;--u1t:#0f2a1d;--u2:#1d6b4f;--u2t:#fff;--bd:#ddd}
+@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--dn:#e8866d;--u1:#2f7d5c;--u1t:#fff;--u2:#7ee2b8;--u2t:#0b2a1e;--bd:#3a3a38}}
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;max-width:520px;margin:auto}
 h1{font-size:1.3rem;margin:.2rem 0 1rem}
@@ -43,11 +43,15 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .d.today{outline:2px solid var(--tx);outline-offset:-2px}
 .leg{display:flex;gap:14px;font-size:.8rem;color:var(--mu);margin-top:10px;flex-wrap:wrap}
 .leg i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.fl{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.dw{font-size:.8rem;color:var(--mu);white-space:nowrap}.dw b{font-weight:600}
+.up{color:var(--ac)}.dn{color:var(--dn)}
+.df{font-size:.72rem;margin-left:5px;font-weight:600}
 .sat{color:var(--mu);font-size:.8rem;margin-right:2px}
 .chip i{font-style:normal;font-size:.7rem;opacity:.75;margin-right:6px}
 .chip.empty.nx{border-color:var(--ac);color:var(--ac)}
 .ex{padding:7px 0;border-top:1px solid var(--bd)}.ex:first-of-type{border-top:0}
-.en{color:var(--mu);font-size:.85rem}.ln{display:flex;align-items:center;gap:10px;margin-top:3px}.ln b{flex:0 0 6.8rem;font-variant-numeric:tabular-nums}
+.en{color:var(--mu);font-size:.85rem}.ln{display:flex;align-items:center;gap:10px;margin-top:3px}.ln b{flex:0 0 8rem;font-variant-numeric:tabular-nums}
 .sets{display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex:1}
 .sets small{color:var(--mu);font-size:.75rem}
 .sets span{background:var(--bg);border:1px solid var(--bd);border-radius:10px;min-width:28px;text-align:center;padding:1px 8px;font-size:.85rem;font-variant-numeric:tabular-nums}
@@ -100,7 +104,7 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 <div class="ver" id="ver"></div>
 
 <script>
-const VERSION="0.19";
+const VERSION="0.20";
 // s = Anzahl Sätze (0 = variabel), max = höchste Wiederholungszahl
 const PLAN={
   1:[{n:"Kniebeugen",s:3},{n:"Bankdrücken",s:3},{n:"Vorgebeugtes Rudern",s:3}],
@@ -229,17 +233,17 @@ function build(){
   const u=$("unit").value;
   st=PLAN[u].map(e=>({w:lastW(u,e.n)??e.w0??"",reps:[]}));
   $("fields").innerHTML=PLAN[u].map((e,i)=>`
-    <label>${e.n}${e.s?"":" (beliebig viele Sätze, Enter ohne Zahl = fertig)"}</label>
+    <label class="fl"><span>${e.n}${e.s?"":" (beliebig viele Sätze, Enter ohne Zahl = fertig)"}</span><small class="dw" id="dw${i}"></small></label>
     <div class="in">
       <input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg"><span>kg ×</span>
       <input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off">
       <button class="add" data-i="${i}" type="button">＋</button>
     </div>
     <div class="chips" id="c${i}"></div>`).join("");
-  PLAN[u].forEach((_,i)=>chips(i));
+  PLAN[u].forEach((_,i)=>{chips(i);updateDw(i)});
   document.querySelectorAll(".w").forEach(el=>{
     el.onfocus=()=>el.select();
-    el.oninput=()=>st[el.dataset.i].w=el.value;
+    el.oninput=()=>{st[el.dataset.i].w=el.value;updateDw(+el.dataset.i)};
     el.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();rIn(el.dataset.i).focus()}};
   });
   document.querySelectorAll(".r").forEach(el=>{
@@ -317,7 +321,7 @@ function edit(id){
     const v=e.ex[p.n];if(!v)return;
     const[w,r]=v.split("x");
     st[i].w=w;st[i].reps=r.split("-").map(Number);
-    document.querySelector(`.w[data-i="${i}"]`).value=w;chips(i);
+    document.querySelector(`.w[data-i="${i}"]`).value=w;chips(i);updateDw(i);
   });
   $("editbar").textContent=`✎ Bearbeite Eintrag vom ${fmt(e.date)} (Einheit ${e.unit})`;
   $("editbar").hidden=false;$("cancel").hidden=false;$("editbar").parentElement.classList.add("editing");$("save").textContent="Änderung speichern";
@@ -331,6 +335,33 @@ function exitEdit(){
 $("cancel").onclick=exitEdit;
 const wd=d=>new Date(d+"T12:00").toLocaleDateString("de-DE",{weekday:"short"}).replace(".","");
 const fmt=d=>d.split("-").reverse().join(".");
+// Gewichtsvergleich
+function dinfo(a,b){
+  if(b==null||isNaN(a))return null;
+  const d=Math.round((a-b)*100)/100;if(!d)return null;
+  return{t:(d>0?"+":"−")+String(Math.abs(d)).replace(".",","),c:d>0?"up":"dn"};
+}
+// Gewicht dieser Übung in der vorangegangenen Einheit derselben Nummer
+function prevW(entry,name){
+  const L=live(),i=L.findIndex(x=>x.id===entry.id);
+  for(let j=i-1;j>=0;j--)if(L[j].unit==entry.unit&&L[j].ex[name])return parseFloat(L[j].ex[name].split("x")[0]);
+  return null;
+}
+// Eingabe: Vergleichswert = letzte gleiche Einheit (beim Bearbeiten: die davor)
+function baseW(name){
+  const u=$("unit").value,L=live();let end=L.length;
+  if(editId!==null){const k=L.findIndex(x=>x.id===editId);if(k>=0)end=k}
+  for(let i=end-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[name])return parseFloat(L[i].ex[name].split("x")[0]);
+  return null;
+}
+function updateDw(i){
+  const e=PLAN[$("unit").value][i],el=document.querySelector(`.w[data-i="${i}"]`),out=$("dw"+i);
+  if(!el||!out)return;
+  const p=baseW(e.n);
+  if(p==null){out.innerHTML="";return}
+  const t=el.value.trim().replace(",","."),di=/^\d+(\.\d+)?$/.test(t)?dinfo(+t,p):null;
+  out.innerHTML=`zuletzt ${String(p).replace(".",",")} kg`+(di?` <b class="${di.c}">${di.t}</b>`:"");
+}
 let cal=null;
 function calMove(n){const d=new Date(cal.y,cal.m+n,1);cal={y:d.getFullYear(),m:d.getMonth()};renderCal()}
 function renderCal(){
@@ -361,8 +392,8 @@ function render(){
     `<div class="card${s.id===editId?" ed":""}${s.id===ref?" ref":""}"><div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>Einheit ${s.unit}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}</span><span><button class="x" onclick="edit('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="del('${s.id}')" title="Löschen">✕</button></span></div>`+
     Object.entries(s.ex).map(([k,v])=>{
       const[w,rs]=v.split("x"),reps=rs.split("-").map(Number);
-      const wg=w.replace(".",","),kg=k==="Klimmzüge"?(+w?`+${wg} kg`:"Körpergewicht"):`${wg} kg`;
-      return `<div class="ex"><div class="en">${k}</div><div class="ln"><b>${kg}</b><div class="sets"><small>Wdh.</small>${reps.map(x=>`<span>${x}</span>`).join("")}${k==="Klimmzüge"?`<small>Σ ${sum(reps)}</small>`:""}</div></div></div>`}).join("")+`</div>`).join("");
+      const pw=prevW(s,k),di=dinfo(+w,pw),df=di?`<small class="df ${di.c}">${di.t}</small>`:"",wg=w.replace(".",","),kg=k==="Klimmzüge"?(+w?`+${wg} kg`:"Körpergewicht"):`${wg} kg`;
+      return `<div class="ex"><div class="en">${k}</div><div class="ln"><b>${kg}${df}</b><div class="sets"><small>Wdh.</small>${reps.map(x=>`<span>${x}</span>`).join("")}${k==="Klimmzüge"?`<small>Σ ${sum(reps)}</small>`:""}</div></div></div>`}).join("")+`</div>`).join("");
 }
 function del(id){
   if(!confirm("Eintrag löschen?"))return;
