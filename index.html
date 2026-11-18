@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trainingsplan</title>
 <style>
-:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--dn:#b4533a;--u1:#9ad9b6;--u1t:#0f2a1d;--u2:#1d6b4f;--u2t:#fff;--bd:#ddd}
-@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--dn:#e8866d;--u1:#2f7d5c;--u1t:#fff;--u2:#7ee2b8;--u2t:#0b2a1e;--bd:#3a3a38}}
+:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--dn:#b4533a;--u1:#c7ecd3;--u1t:#0f2a1d;--u2:#9bdcb2;--u2t:#0f2a1d;--u3:#6cc790;--u3t:#0f2a1d;--u4:#3fa86c;--u4t:#fff;--u5:#2a7f50;--u5t:#fff;--u6:#17573a;--u6t:#fff;--bd:#ddd}
+@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--dn:#e8866d;--u1:#1f5a40;--u1t:#fff;--u2:#2c7a57;--u2t:#fff;--u3:#3b9c70;--u3t:#fff;--u4:#5cbf91;--u4t:#0b2a1e;--u5:#8adbb2;--u5t:#0b2a1e;--u6:#bdf0d6;--u6t:#0b2a1e;--bd:#3a3a38}}
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;max-width:520px;margin:auto}
 h1{font-size:1.3rem;margin:.2rem 0 1rem}
@@ -38,7 +38,7 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
 .cal .wd{color:var(--mu);font-size:.75rem}
 .cal .d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:.85rem;font-variant-numeric:tabular-nums}
-.d.u1{background:var(--u1);color:var(--u1t)}.d.u2{background:var(--u2);color:var(--u2t)}
+.d.u1{background:var(--u1);color:var(--u1t)}.d.u2{background:var(--u2);color:var(--u2t)}.d.u3{background:var(--u3);color:var(--u3t)}.d.u4{background:var(--u4);color:var(--u4t)}.d.u5{background:var(--u5);color:var(--u5t)}.d.u6{background:var(--u6);color:var(--u6t)}
 .d.both{background:linear-gradient(135deg,var(--u1) 50%,var(--u2) 50%);color:#fff;text-shadow:0 0 3px rgba(0,0,0,.7)}
 .d.today{outline:2px solid var(--tx);outline-offset:-2px}
 .leg{display:flex;gap:14px;font-size:.8rem;color:var(--mu);margin-top:10px;flex-wrap:wrap}
@@ -47,6 +47,18 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .dw{font-size:.8rem;color:var(--mu);white-space:nowrap}.dw b{font-weight:600}
 .up{color:var(--ac)}.dn{color:var(--dn)}
 .df{font-size:.72rem;margin-left:5px;font-weight:600}
+details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12px}
+.calw{position:relative}
+.cal .d[data-d]{cursor:pointer}
+.pop{position:absolute;z-index:5;width:max-content;max-width:100%;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.28);padding:8px 10px;font-size:.8rem;line-height:1.45}
+.pop .ph{font-weight:600;margin:0 0 3px}.pop .ph:not(:first-child){margin-top:8px}
+.pop .pl{display:flex;justify-content:space-between;gap:14px}.pop .pl span:first-child{color:var(--mu)}
+#pw{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;padding:16px;overflow:auto}#pw[hidden]{display:none}#pw>div{max-width:520px;margin:4vh auto}
+.wu{border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:12px}.wh{font-weight:600}
+.we{padding:8px 0;border-top:1px solid var(--bd)}.we .in input{flex:1}.we .x{font-size:1rem}
+.wx{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px;font-size:.9rem}.wx select{width:auto}
+.wx label{margin:0;display:flex;gap:6px;align-items:center;color:var(--tx)}.wx input[type=checkbox]{width:auto}
+#wzm{color:#c33;font-size:.85rem;min-height:1.2em;margin-top:8px}#planind{margin-bottom:2px}#fileind{margin-top:0}
 .sat{color:var(--mu);font-size:.8rem;margin-right:2px}
 .chip i{font-style:normal;font-size:.7rem;opacity:.75;margin-right:6px}
 .chip.empty.nx{border-color:var(--ac);color:var(--ac)}
@@ -68,15 +80,22 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
   <button class="sec" id="exClose">Schließen</button>
   <div id="exm"></div>
 </div></div>
+<div id="pw" hidden><div class="card">
+  <h1 style="margin-top:0">Trainingsplan</h1>
+  <div id="wzb"></div><div id="wzm"></div>
+  <button id="wzSave">Plan speichern</button>
+  <button class="sec" id="wzClose">Abbrechen</button>
+</div></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
 
 <h1>🏋️ Trainingsplan</h1>
+<div class="fi" id="planind"></div>
 <div class="fi" id="fileind"></div>
 <div class="card">
   <div id="editbar" hidden></div>
   <div class="row">
     <div><label style="margin-top:0">Datum</label><input type="date" id="date"></div>
-    <div><label style="margin-top:0">Einheit</label><select id="unit"><option value="1">Einheit 1</option><option value="2">Einheit 2</option></select></div>
+    <div><label style="margin-top:0">Einheit</label><select id="unit"></select></div>
   </div>
   <div id="fields"></div>
   <div id="msg"></div><div id="note"></div>
@@ -90,9 +109,14 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
   <summary>📊 Auswertungen</summary>
   <div class="sub">Kalenderübersicht</div>
   <div class="calh"><button id="cprev" aria-label="Voriger Monat">‹</button><span id="cmon"></span><button id="cnext" aria-label="Nächster Monat">›</button></div>
-  <div class="cal" id="cal"></div>
-  <div class="leg"><span><i style="background:var(--u1)"></i>Einheit 1</span><span><i style="background:var(--u2)"></i>Einheit 2</span><span id="ccount" style="margin-left:auto"></span></div>
+  <div class="calw" id="calw"><div class="cal" id="cal"></div><div class="pop" id="pop" hidden></div></div>
+  <div class="leg" id="cleg"></div></div>
 </details>
+
+<div class="card">
+  <button id="plNew" style="margin-top:0">📋 Neuen Trainingsplan anlegen</button>
+  <button class="sec" id="plEdit">✎ Aktuellen Plan bearbeiten</button>
+</div>
 
 <div class="card">
   <button id="tag" style="margin-top:0">📔 Trainingstagebuch exportieren</button>
@@ -104,14 +128,24 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 <div class="ver" id="ver"></div>
 
 <script>
-const VERSION="0.20";
-// s = Anzahl Sätze (0 = variabel), max = höchste Wiederholungszahl
-const PLAN={
-  1:[{n:"Kniebeugen",s:3},{n:"Bankdrücken",s:3},{n:"Vorgebeugtes Rudern",s:3}],
-  2:[{n:"Kreuzheben",s:3},{n:"Overhead-Press",s:3},{n:"Klimmzüge",s:0,max:12,w0:"0",goal:24}]
-};
+const VERSION="0.30";
+// Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.),
+// bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
+const DEFAULT_PLAN={name:"Standard",ts:0,units:[
+  {exs:[{n:"Kniebeugen",m:"wr",s:3},{n:"Bankdrücken",m:"wr",s:3},{n:"Vorgebeugtes Rudern",m:"wr",s:3}]},
+  {exs:[{n:"Kreuzheben",m:"wr",s:3},{n:"Overhead-Press",m:"wr",s:3},{n:"Klimmzüge",m:"wr",bw:true,s:0,max:12,goal:24}]}]};
+const PKEY="trainingsplan_plan_v1";
+function okPlan(p){return!!p&&typeof p.name==="string"&&Array.isArray(p.units)&&p.units.length>=1&&p.units.length<=6&&p.units.every(u=>u&&Array.isArray(u.exs)&&u.exs.every(e=>e&&typeof e.n==="string"&&["wr","w","r"].includes(e.m)))}
+let plan=DEFAULT_PLAN;
+try{const p=JSON.parse(localStorage.getItem(PKEY)||"null");if(okPlan(p))plan=p}catch(e){}
+const savePlan=()=>{try{localStorage.setItem(PKEY,JSON.stringify(plan))}catch(e){}};
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const unitDefs=u=>(plan.units[u-1]||{exs:[]}).exs;
+const defOf=(name,u)=>unitDefs(u).find(e=>e.n===name)||plan.units.flatMap(x=>x.exs).find(e=>e.n===name)||null;
+// Werte: "85x8-9-10" (Gewicht+Wdh.), "85" (nur Gewicht), "x8-9-10" (nur Wdh.)
+function parseVal(v){const i=v.indexOf("x");if(i<0)return{w:v,reps:null};return{w:i?v.slice(0,i):null,reps:v.slice(i+1).split("-").map(Number)}}
 const $=id=>document.getElementById(id);
-let data=[],st=[];
+let data=[],st=[],cur=[],dirty=false;
 
 // ---------- Speicher im Browser ----------
 const KEY="trainingsplan_v1";
@@ -119,12 +153,18 @@ const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(data));return tru
 try{data=collapse(JSON.parse(localStorage.getItem(KEY)||"[]").map(norm));persist()}catch(e){}
 
 // ---------- Trainingstagebuch (Datei) ----------
-const pack=d=>JSON.stringify({version:2,sessions:d},null,1);
+const pack=d=>JSON.stringify({version:3,plan,sessions:d},null,1);
 function unpack(t){
   if(!t.trim())return [];
   const j=JSON.parse(t),a=Array.isArray(j)?j:j&&j.sessions;
   if(!Array.isArray(a))throw new Error("Das ist keine gültige Trainingsdatei.");
   return a.filter(x=>x&&x.date&&x.unit&&x.ex&&typeof x.ex==="object").map(norm);
+}
+function filePlan(t){try{const j=JSON.parse(t);return j&&okPlan(j.plan)?j.plan:null}catch(e){return null}}
+// neuerer Trainingsplan gewinnt (Datei -> Browser; Browser -> Datei geschieht über pack)
+function mergePlan(fp){
+  if(fp&&fp.ts>plan.ts){plan=fp;savePlan();return `Trainingsplan „${plan.name}“ aus der Datei übernommen. `}
+  return "";
 }
 function sig(x){return x.date+"|"+x.unit+"|"+JSON.stringify(Object.entries(x.ex).sort())}
 function hash(str){ // einfacher 53-Bit-Hash (cyrb53)
@@ -194,9 +234,9 @@ async function exportOld(){
   try{
     if(FSA){
       const[h]=await showOpenFilePicker(PICK);
-      const m=merge(unpack(await(await h.getFile()).text()));
+      const txt=await(await h.getFile()).text(),pm=mergePlan(filePlan(txt)),m=merge(unpack(txt));
       await write(h,pack(m.all));setFile(h.name,"abgeglichen");
-      exm(done(m,m.nf,m.nb)+` Datei „${h.name}“ aktualisiert.`);
+      exm(pm+done(m,m.nf,m.nb)+` Datei „${h.name}“ aktualisiert.`);
     }else{mode="export";$("file").click()}
   }catch(e){if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)}
 }
@@ -205,14 +245,14 @@ $("file").onchange=e=>{
   const r=new FileReader();
   r.onload=()=>{try{
     if(mode==="import"){
-      const fa=unpack(r.result),m=merge(fa);
+      const pm=mergePlan(filePlan(r.result)),fa=unpack(r.result),m=merge(fa);
       data=m.all;persist();refresh();setFile(f.name,"importiert");
       const imp=$("imp");imp.style.color="var(--tx)";
-      imp.textContent=`Import: ${m.nb} neue oder geänderte Einträge übernommen. Insgesamt ${live().length} Einträge.`;
+      imp.textContent=pm+`Import: ${m.nb} neue oder geänderte Einträge übernommen. Insgesamt ${live().length} Einträge.`;
       return;
     }
-    const m=merge(unpack(r.result));
-    const msg=done(m,m.nf,m.nb);setFile(f.name,"abgeglichen");
+    const pm=mergePlan(filePlan(r.result)),m=merge(unpack(r.result));
+    const msg=pm+done(m,m.nf,m.nb);setFile(f.name,"abgeglichen");
     dl("Trainingstagebuch.json",pack(m.all),"application/json");
     exm(msg+" Dein Browser darf die Datei nicht überschreiben: die ergänzte Version wurde neu heruntergeladen – ersetze damit die alte Datei.");
   }catch(x){if(mode==="import"){const imp=$("imp");imp.style.color="#c33";imp.textContent="Fehler: "+(x.message||x)}else exm("Fehler: "+(x.message||x),1)}};
@@ -226,25 +266,22 @@ $("exNew").onclick=exportNew;
 $("exOld").onclick=exportOld;
 
 // ---------- Eingabe ----------
-const lastW=(u,name)=>{const L=live();for(let i=L.length-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[name])return L[i].ex[name].split("x")[0];return null};
+const lastW=(u,name)=>{const L=live();for(let i=L.length-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[name]){const w=parseVal(L[i].ex[name]).w;if(w!=null)return w}return null};
 const sum=a=>a.reduce((x,y)=>x+y,0);
 
-function build(){
-  const u=$("unit").value;
-  st=PLAN[u].map(e=>({w:lastW(u,e.n)??e.w0??"",reps:[]}));
-  $("fields").innerHTML=PLAN[u].map((e,i)=>`
-    <label class="fl"><span>${e.n}${e.s?"":" (beliebig viele Sätze, Enter ohne Zahl = fertig)"}</span><small class="dw" id="dw${i}"></small></label>
-    <div class="in">
-      <input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg"><span>kg ×</span>
-      <input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off">
-      <button class="add" data-i="${i}" type="button">＋</button>
-    </div>
-    <div class="chips" id="c${i}"></div>`).join("");
-  PLAN[u].forEach((_,i)=>{chips(i);updateDw(i)});
+function build(defs){
+  const u=+$("unit").value;dirty=false;
+  cur=defs||unitDefs(u);
+  st=cur.map(e=>({w:e.m==="r"?"":(lastW(u,e.n)??(e.bw?"0":"")),reps:[]}));
+  $("fields").innerHTML=cur.map((e,i)=>{
+    const hw=e.m!=="r",hr=e.m!=="w";
+    return `<label class="fl"><span>${esc(e.n)}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></label>
+    <div class="in">${hw?`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg"><span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>${hr?`<div class="chips" id="c${i}"></div>`:""}`}).join("");
+  cur.forEach((_,i)=>{chips(i);updateDw(i)});
   document.querySelectorAll(".w").forEach(el=>{
     el.onfocus=()=>el.select();
     el.oninput=()=>{st[el.dataset.i].w=el.value;updateDw(+el.dataset.i)};
-    el.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();rIn(el.dataset.i).focus()}};
+    el.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();const r=rIn(el.dataset.i);if(r)r.focus();else next(+el.dataset.i)}};
   });
   document.querySelectorAll(".r").forEach(el=>{
     el.onkeydown=e=>{
@@ -258,7 +295,7 @@ function build(){
 const rIn=i=>document.querySelector(`.r[data-i="${i}"]`);
 
 function chips(i){
-  const e=PLAN[$("unit").value][i],r=st[i].reps,n=r.length;
+  const e=cur[i];if(e.m==="w")return;const r=st[i].reps,n=r.length;
   let h=`<span class="sat">Satz</span>`+r.map((v,k)=>`<span class="chip" data-k="${k}" title="Antippen zum Entfernen"><i>${k+1}</i>${v}</span>`).join("");
   const slots=e.s?e.s:n+1;
   for(let k=n;k<slots;k++)h+=`<span class="chip empty${k===n?" nx":""}"><i>${k+1}</i>–</span>`;
@@ -268,7 +305,7 @@ function chips(i){
   const el=rIn(i);if(el)el.placeholder=(e.s&&n>=e.s)?"fertig":`Satz ${n+1}: Wdh.`;
 }
 function commit(i){
-  const e=PLAN[$("unit").value][i],el=rIn(i),v=el.value.trim(),r=st[i].reps;
+  const e=cur[i],el=rIn(i),v=el.value.trim(),r=st[i].reps;
   $("msg").textContent="";
   if(v===""){if(!e.s&&r.length)next(i);return}
   const n=+v,max=e.max||99;
@@ -278,23 +315,31 @@ function commit(i){
   if(e.s&&r.length===e.s)next(i);else el.focus();
 }
 function next(i){
-  const nx=document.querySelector(`.w[data-i="${i+1}"]`);
-  if(nx)nx.focus();else $("save").focus();
+  for(let j=i+1;j<cur.length;j++){const x=document.querySelector(`.w[data-i="${j}"],.r[data-i="${j}"]`);if(x){x.focus();return}}
+  $("save").focus();
 }
 $("unit").onchange=()=>{build();render()};
+$("date").onchange=()=>{
+  const c=live().find(x=>x.date===$("date").value&&x.id!==editId);
+  $("msg").textContent=c?`Am ${fmt($("date").value)} gibt es schon einen Eintrag (Einheit ${c.unit}).`:"";
+};
 
 $("save").onclick=()=>{
   const u=$("unit").value,ex={};let err="";
-  PLAN[u].forEach((e,i)=>{
-    const w=String(st[i].w).trim().replace(",","."),r=st[i].reps,ok=/^\d+(\.\d+)?$/.test(w);
-    document.querySelector(`.w[data-i="${i}"]`).classList.toggle("bad",!ok);
-    if(!ok)err=err||`${e.n}: Gewicht fehlt (bei Körpergewicht 0).`;
-    else if(e.s&&r.length!==e.s)err=err||`${e.n}: ${e.s} Sätze nötig (bisher ${r.length}).`;
-    else if(!e.s&&!r.length)err=err||`${e.n}: mindestens 1 Satz nötig.`;
-    else ex[e.n]=(+w)+"x"+r.join("-");
+  cur.forEach((e,i)=>{
+    const hw=e.m!=="r",hr=e.m!=="w",w=String(st[i].w).trim().replace(",","."),r=st[i].reps,ok=!hw||/^\d+(\.\d+)?$/.test(w);
+    const we=document.querySelector(`.w[data-i="${i}"]`);if(we)we.classList.toggle("bad",!ok);
+    if(!ok)err=err||`${e.n}: Gewicht fehlt${e.bw?" (bei Körpergewicht 0)":""}.`;
+    else if(hr&&e.s&&r.length!==e.s)err=err||`${e.n}: ${e.s} Sätze nötig (bisher ${r.length}).`;
+    else if(hr&&!e.s&&!r.length)err=err||`${e.n}: mindestens 1 Satz nötig.`;
+    else ex[e.n]=(hw?String(+w):"")+(hr?"x"+r.join("-"):"");
   });
   $("msg").textContent=err;
   if(err)return;
+  const dt=$("date").value;
+  if(!dt){$("msg").textContent="Bitte ein Datum wählen.";return}
+  const clash=live().find(x=>x.date===dt&&x.id!==editId);
+  if(clash){$("msg").textContent=`Am ${fmt(dt)} gibt es schon einen Eintrag (Einheit ${clash.unit}). Pro Tag ist nur ein Eintrag möglich – bitte ein anderes Datum wählen oder den vorhandenen Eintrag bearbeiten.`;return}
   if(editId!==null){
     data=data.map(x=>{
       if(x.id!==editId)return x;
@@ -316,12 +361,16 @@ $("save").onclick=()=>{
 let editId=null;
 function edit(id){
   const e=live().find(x=>x.id===id);if(!e)return;
-  editId=id;$("date").value=e.date;$("unit").value=e.unit;$("unit").disabled=true;build();
-  PLAN[e.unit].forEach((p,i)=>{
+  const base=unitDefs(e.unit).slice();
+  Object.keys(e.ex).forEach(k=>{if(!base.some(p=>p.n===k)){const pv=parseVal(e.ex[k]);base.push({n:k,m:pv.reps?(pv.w!=null?"wr":"r"):"w",s:0})}});
+  if(![...$("unit").options].some(o=>+o.value===e.unit))$("unit").add(new Option("Einheit "+e.unit,e.unit));
+  editId=id;$("date").value=e.date;$("unit").value=e.unit;$("unit").disabled=true;build(base);
+  base.forEach((p,i)=>{
     const v=e.ex[p.n];if(!v)return;
-    const[w,r]=v.split("x");
-    st[i].w=w;st[i].reps=r.split("-").map(Number);
-    document.querySelector(`.w[data-i="${i}"]`).value=w;chips(i);updateDw(i);
+    const pv=parseVal(v);
+    if(pv.w!=null){st[i].w=pv.w;const we=document.querySelector(`.w[data-i="${i}"]`);if(we)we.value=pv.w}
+    if(pv.reps)st[i].reps=pv.reps;
+    chips(i);updateDw(i);
   });
   $("editbar").textContent=`✎ Bearbeite Eintrag vom ${fmt(e.date)} (Einheit ${e.unit})`;
   $("editbar").hidden=false;$("cancel").hidden=false;$("editbar").parentElement.classList.add("editing");$("save").textContent="Änderung speichern";
@@ -335,6 +384,11 @@ function exitEdit(){
 $("cancel").onclick=exitEdit;
 const wd=d=>new Date(d+"T12:00").toLocaleDateString("de-DE",{weekday:"short"}).replace(".","");
 const fmt=d=>d.split("-").reverse().join(".");
+// Anzeige-Infos zu einem gespeicherten Wert
+function exInfo(k,v,u){
+  const p=parseVal(v),d=defOf(k,u),wg=p.w==null?null:p.w.replace(".",",");
+  return{p,z:!!(d&&d.bw&&p.w!=null&&!+p.w),kg:wg==null?null:(d&&d.bw?(+p.w?`+${wg} kg`:"Körpergewicht"):`${wg} kg`),sum:(p.reps&&d&&!d.s)?sum(p.reps):null};
+}
 // Gewichtsvergleich
 function dinfo(a,b){
   if(b==null||isNaN(a))return null;
@@ -344,18 +398,18 @@ function dinfo(a,b){
 // Gewicht dieser Übung in der vorangegangenen Einheit derselben Nummer
 function prevW(entry,name){
   const L=live(),i=L.findIndex(x=>x.id===entry.id);
-  for(let j=i-1;j>=0;j--)if(L[j].unit==entry.unit&&L[j].ex[name])return parseFloat(L[j].ex[name].split("x")[0]);
+  for(let j=i-1;j>=0;j--)if(L[j].unit==entry.unit&&L[j].ex[name]){const w=parseVal(L[j].ex[name]).w;if(w!=null)return parseFloat(w)}
   return null;
 }
 // Eingabe: Vergleichswert = letzte gleiche Einheit (beim Bearbeiten: die davor)
 function baseW(name){
   const u=$("unit").value,L=live();let end=L.length;
   if(editId!==null){const k=L.findIndex(x=>x.id===editId);if(k>=0)end=k}
-  for(let i=end-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[name])return parseFloat(L[i].ex[name].split("x")[0]);
+  for(let i=end-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[name]){const w=parseVal(L[i].ex[name]).w;if(w!=null)return parseFloat(w)}
   return null;
 }
 function updateDw(i){
-  const e=PLAN[$("unit").value][i],el=document.querySelector(`.w[data-i="${i}"]`),out=$("dw"+i);
+  const e=cur[i],el=document.querySelector(`.w[data-i="${i}"]`),out=$("dw"+i);
   if(!el||!out)return;
   const p=baseW(e.n);
   if(p==null){out.innerHTML="";return}
@@ -368,32 +422,59 @@ function renderCal(){
   const now=new Date();if(!cal)cal={y:now.getFullYear(),m:now.getMonth()};
   const{y,m}=cal,pre=y+"-"+String(m+1).padStart(2,"0"),days=new Date(y,m+1,0).getDate(),off=(new Date(y,m,1).getDay()+6)%7;
   const by={};let n=0;
-  live().forEach(x=>{if(x.date.slice(0,7)===pre){const d=+x.date.slice(8,10);(by[d]=by[d]||{})[x.unit]=1;n++}});
-  const today=(now.getFullYear()===y&&now.getMonth()===m)?now.getDate():0;
+  live().forEach(x=>{if(x.date.slice(0,7)===pre){const d=+x.date.slice(8,10);(by[d]=by[d]||[]).push(x.unit);n++}});
+  const today=(now.getFullYear()===y&&now.getMonth()===m)?now.getDate():0,uc=u=>Math.min(Math.max(u,1),6);
   let h=["Mo","Di","Mi","Do","Fr","Sa","So"].map(t=>`<div class="wd">${t}</div>`).join("")+"<div></div>".repeat(off);
   for(let d=1;d<=days;d++){
-    const u=by[d]||{},c=u[1]&&u[2]?"both":u[1]?"u1":u[2]?"u2":"";
-    const tt=c?` title="${u[1]?"Einheit 1":""}${u[1]&&u[2]?" + ":""}${u[2]?"Einheit 2":""}"`:"";
-    h+=`<div class="d ${c}${d===today?" today":""}"${tt}>${d}</div>`;
+    const us=[...new Set(by[d]||[])].sort((a,b)=>a-b),c=us.length>1?"both":us.length?"u"+uc(us[0]):"";
+    const st2=us.length>1?` style="background:linear-gradient(135deg,var(--u${uc(us[0])}) 50%,var(--u${uc(us[1])}) 50%)"`:"";
+    const tt=us.length?` title="${us.map(u=>"Einheit "+u).join(" + ")}"`:"";
+    h+=`<div class="d ${c}${d===today?" today":""}"${tt}${st2}${c?` data-d="${d}"`:""}>${d}</div>`;
   }
-  $("cal").innerHTML=h;
+  $("cal").innerHTML=h;hidePop();
   $("cmon").textContent=new Date(y,m,1).toLocaleDateString("de-DE",{month:"long",year:"numeric"});
-  $("ccount").textContent=n?`${n} Einheit${n>1?"en":""}`:"keine Einheit";
+  $("cleg").innerHTML=plan.units.map((_,k)=>`<span><i style="background:var(--u${k+1})"></i>Einheit ${k+1}</span>`).join("")+`<span style="margin-left:auto">${n?n+" Einheit"+(n>1?"en":""):"keine Einheit"}</span>`;
 }
+let popDay=null;
+function hidePop(){const p=$("pop");if(p){p.hidden=true}popDay=null}
+function popHtml(date){
+  return live().filter(x=>x.date===date).map(e=>
+    `<div class="ph">${wd(e.date)} ${fmt(e.date)} · Einheit ${e.unit}</div>`+
+    Object.entries(e.ex).map(([k,v])=>{
+      const i=exInfo(k,v,e.unit),t=[i.kg&&!i.z?i.kg:null,i.p.reps?i.p.reps.join(" · ")+(i.sum!=null?` (Σ ${i.sum})`:""):null].filter(Boolean).join(" · ");
+      return `<div class="pl"><span>${esc(k)}</span><span>${t||"Körpergewicht"}</span></div>`}).join("")).join("");
+}
+function showPop(cell){
+  const d=+cell.dataset.d,pop=$("pop");
+  if(!pop.hidden&&popDay===d){hidePop();return}
+  const html=popHtml(cal.y+"-"+String(cal.m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0"));
+  if(!html)return;
+  pop.innerHTML=html;pop.hidden=false;popDay=d;
+  const box=$("calw");
+  let left=cell.offsetLeft+cell.offsetWidth/2-pop.offsetWidth/2;
+  left=Math.max(0,Math.min(left,box.clientWidth-pop.offsetWidth));
+  let top=cell.offsetTop-pop.offsetHeight-6;
+  if(top<0)top=cell.offsetTop+cell.offsetHeight+6;
+  pop.style.left=left+"px";pop.style.top=top+"px";
+}
+$("cal").addEventListener("click",e=>{const c=e.target.closest(".d[data-d]");if(c)showPop(c)});
+document.addEventListener("click",e=>{if(!e.target.closest(".d[data-d]")&&!e.target.closest("#pop"))hidePop()});
 $("cprev").onclick=()=>calMove(-1);
 $("cnext").onclick=()=>calMove(1);
 function refId(){ // zuletzt eingetragene Einheit mit derselben Nummer (ohne den gerade bearbeiteten Eintrag)
   const u=+$("unit").value,L=live().filter(x=>x.unit===u&&x.id!==editId);
   return L.length?L[L.length-1].id:null;
 }
+let olderOpen=false;
 function render(){
   const ref=refId();renderCal();
-  $("hist").innerHTML=live().reverse().map(s=>
+  const cards=live().reverse().map(s=>
     `<div class="card${s.id===editId?" ed":""}${s.id===ref?" ref":""}"><div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>Einheit ${s.unit}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}</span><span><button class="x" onclick="edit('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="del('${s.id}')" title="Löschen">✕</button></span></div>`+
     Object.entries(s.ex).map(([k,v])=>{
-      const[w,rs]=v.split("x"),reps=rs.split("-").map(Number);
-      const pw=prevW(s,k),di=dinfo(+w,pw),df=di?`<small class="df ${di.c}">${di.t}</small>`:"",wg=w.replace(".",","),kg=k==="Klimmzüge"?(+w?`+${wg} kg`:"Körpergewicht"):`${wg} kg`;
-      return `<div class="ex"><div class="en">${k}</div><div class="ln"><b>${kg}${df}</b><div class="sets"><small>Wdh.</small>${reps.map(x=>`<span>${x}</span>`).join("")}${k==="Klimmzüge"?`<small>Σ ${sum(reps)}</small>`:""}</div></div></div>`}).join("")+`</div>`).join("");
+      const i=exInfo(k,v,s.unit),hw=i.p.w!=null,di=hw?dinfo(+i.p.w,prevW(s,k)):null,df=di?`<small class="df ${di.c}">${di.t}</small>`:"";
+      return `<div class="ex"><div class="en">${esc(k)}</div><div class="ln">${hw?`<b>${i.kg}${df}</b>`:""}${i.p.reps?`<div class="sets"><small>Wdh.</small>${i.p.reps.map(x=>`<span>${x}</span>`).join("")}${i.sum!=null?`<small>Σ ${i.sum}</small>`:""}</div>`:""}</div></div>`}).join("")+`</div>`);
+  const n=cards.length;
+  $("hist").innerHTML=cards.slice(0,2).join("")+(n>2?`<details class="old"${olderOpen?" open":""} ontoggle="olderOpen=this.open"><summary>Ältere Einträge (${n-2})</summary>${cards.slice(2).join("")}</details>`:"");
 }
 function del(id){
   if(!confirm("Eintrag löschen?"))return;
@@ -405,17 +486,77 @@ function dl(name,text,type){
   a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();
 }
 $("exp").onclick=()=>dl("trainingsplan.txt",
-  live().map(s=>fmt(s.date)+" (Einheit "+s.unit+")\n"+Object.entries(s.ex).map(([k,v])=>k+": "+v.split("x")[0]+" kg, Sätze: "+v.split("x")[1].replace(/-/g," · ")).join("\n")).join("\n\n"),"text/plain");
+  live().map(s=>fmt(s.date)+" (Einheit "+s.unit+")\n"+Object.entries(s.ex).map(([k,v])=>{const i=exInfo(k,v,s.unit);return k+": "+[i.kg,i.p.reps?"Wdh.: "+i.p.reps.join(" · "):null].filter(Boolean).join(", ")}).join("\n")).join("\n\n"),"text/plain");
 
 function init(){
   const t=new Date();$("date").value=new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
-  const L=live(),l=L[L.length-1];$("unit").value=l?(l.unit==1?2:1):1;
+  $("unit").innerHTML=plan.units.map((_,i)=>`<option value="${i+1}">Einheit ${i+1}</option>`).join("");
+  const L=live(),l=L[L.length-1];$("unit").value=l&&l.unit<plan.units.length?l.unit+1:1; // nächste Einheit im Wechsel
+  $("planind").textContent="📋 Trainingsplan: "+plan.name;
   $("msg").textContent="";$("note").textContent="";build();render();
 }
+// ---------- Trainingsplan anlegen / bearbeiten ----------
+let wz=null;
+const wzEx=()=>({n:"",m:"wr",s:3}),wzm=t=>{$("wzm").textContent=t},at=(a,b)=>`data-a="${a}" data-b="${b}"`;
+function wizOpen(fresh){
+  wz=fresh?{name:"Mein Trainingsplan",units:[{exs:[wzEx()]},{exs:[wzEx()]}]}:JSON.parse(JSON.stringify(plan));
+  wzm("");wizRender();$("pw").hidden=false;
+}
+function wizRender(){
+  const M={wr:"Gewicht + Wiederholungen",w:"Nur Gewicht",r:"Nur Wiederholungen"};
+  $("wzb").innerHTML=`<label style="margin-top:0">Name des Plans</label><input id="wzName" maxlength="40" value="${esc(wz.name)}">
+  <label>Anzahl Einheiten (1–6)</label><select id="wzN">${[1,2,3,4,5,6].map(n=>`<option${n===wz.units.length?" selected":""}>${n}</option>`).join("")}</select>`+
+  wz.units.map((u,a)=>`<div class="wu"><div class="wh">Einheit ${a+1}</div>`+u.exs.map((e,b)=>`<div class="we">
+    <div class="in"><input class="wn" ${at(a,b)} maxlength="40" placeholder="Übung" value="${esc(e.n)}"><button class="x" data-act="del" ${at(a,b)} title="Übung entfernen">✕</button></div>
+    <div class="wx"><select class="wm" ${at(a,b)}>${Object.entries(M).map(([k,t])=>`<option value="${k}"${e.m===k?" selected":""}>${t}</option>`).join("")}</select>
+    ${e.m==="wr"?`<label><input type="checkbox" class="wb" ${at(a,b)}${e.bw?" checked":""}>Körpergewichtsübung</label>`:""}
+    ${e.m==="wr"&&!e.bw?`<span>Sätze</span><select class="ws" ${at(a,b)}>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option${n===e.s?" selected":""}>${n}</option>`).join("")}</select>`:""}</div></div>`).join("")+
+    `<button class="sec" data-act="add" data-a="${a}">＋ Übung</button></div>`).join("");
+}
+$("wzb").addEventListener("input",e=>{const t=e.target;
+  if(t.id==="wzName")wz.name=t.value;else if(t.classList.contains("wn"))wz.units[+t.dataset.a].exs[+t.dataset.b].n=t.value});
+$("wzb").addEventListener("change",e=>{
+  const t=e.target,ex=t.dataset.a!=null?wz.units[+t.dataset.a].exs[+t.dataset.b]:null;
+  if(t.id==="wzN"){const n=+t.value;while(wz.units.length<n)wz.units.push({exs:[wzEx()]});wz.units.length=n;wizRender()}
+  else if(t.classList.contains("wm")){ex.m=t.value;if(ex.m!=="wr")ex.bw=false;if(ex.m==="wr"&&!ex.bw&&!ex.s)ex.s=3;wizRender()}
+  else if(t.classList.contains("wb")){ex.bw=t.checked;if(!ex.bw&&!ex.s)ex.s=3;wizRender()}
+  else if(t.classList.contains("ws"))ex.s=+t.value;
+});
+$("wzb").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-act]");if(!b)return;
+  const a=+b.dataset.a;
+  if(b.dataset.act==="add")wz.units[a].exs.push(wzEx());else wz.units[a].exs.splice(+b.dataset.b,1);
+  wizRender();
+});
+$("wzSave").onclick=()=>{
+  const name=wz.name.trim()||"Mein Trainingsplan",units=[];
+  for(let a=0;a<wz.units.length;a++){
+    const exs=[],seen=new Set();
+    for(const e of wz.units[a].exs){
+      const n=e.n.trim();if(!n)continue;
+      if(seen.has(n))return wzm(`Einheit ${a+1}: „${n}“ kommt doppelt vor.`);
+      seen.add(n);
+      const o={n,m:e.m};
+      if(e.m==="wr"&&!e.bw)o.s=e.s||3;else o.s=0;
+      if(e.m==="wr"&&e.bw)o.bw=true;
+      if(e.m!=="w"&&e.max)o.max=e.max;
+      if(e.m!=="w"&&e.goal)o.goal=e.goal;
+      exs.push(o);
+    }
+    if(!exs.length)return wzm(`Einheit ${a+1}: mindestens eine Übung eintragen.`);
+    units.push({exs});
+  }
+  if(!confirm(`Trainingsplan „${name}“ mit ${units.length} Einheit(en) speichern? Bestehende Einträge bleiben erhalten.`))return;
+  plan={name,ts:Date.now(),units};savePlan();$("pw").hidden=true;refresh();
+  $("note").textContent="✔ Trainingsplan gespeichert – er wird beim nächsten Export in die Datei geschrieben.";
+};
+$("wzClose").onclick=()=>{$("pw").hidden=true};
+$("plNew").onclick=()=>wizOpen(true);
+$("plEdit").onclick=()=>wizOpen(false);
 function refresh(){if(editId!==null)exitEdit();else init()}
 // Beim Zurückkehren zur Seite (z. B. am nächsten Tag): Datum/Einheit aktualisieren, sofern nichts eingegeben ist
 document.addEventListener("visibilitychange",()=>{
-  if(document.visibilityState==="visible"&&editId===null&&st.every(x=>!x.reps.length))init();
+  if(document.visibilityState==="visible"&&editId===null&&!dirty&&st.every(x=>!x.reps.length))init();
 });
 init();
 </script>

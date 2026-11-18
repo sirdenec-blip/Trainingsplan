@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.20** (steht auch unten auf der Seite)
+Aktuelle Version: **0.30** (steht auch unten auf der Seite)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -38,6 +38,24 @@ Eingabe: Jeder Satz hat eine Nummer (Satz 1, 2, 3 …), der nächste Satz ist fa
 
 Die Ansicht entspricht der Eingabe: links das Gewicht (kg), rechts die Wiederholungen je Satz (Beschriftung „Wdh.“). Beim Eintragen ist die zuletzt gespeicherte Einheit mit derselben Nummer grün gestrichelt umrandet (zum Vergleichen der Werte). Im Bearbeiten-Modus sind Formular und Eintrag gelb markiert.
 
+### Eigener Trainingsplan
+Button **📋 Neuen Trainingsplan anlegen** (oder **✎ Aktuellen Plan bearbeiten**) öffnet den Plan-Assistenten:
+- Name des Plans und Anzahl der Einheiten (1–6).
+- Pro Einheit beliebig viele Übungen. Pro Übung wird gewählt, wie dokumentiert wird:
+  - **Gewicht + Wiederholungen** (Standard: 3 Sätze, 1–10 wählbar). Mit Haken **Körpergewichtsübung** (wie Klimmzüge): Zusatzgewicht, beliebig viele Sätze.
+  - **Nur Gewicht** (ein Wert, z. B. `85`).
+  - **Nur Wiederholungen** (beliebig viele Sätze, z. B. `x60-45`).
+- Der Plan wird im Browser **und im Trainingstagebuch (Datei)** gespeichert (Dateiformat Version 3). Beim Abgleich/Import gewinnt der neuere Plan; die Meldung nennt es, wenn ein Plan aus der Datei übernommen wurde.
+- Oben steht klein der Name des aktiven Plans („📋 Trainingsplan: …“), darunter die zuletzt verwendete Datei.
+- Bestehende Einträge bleiben bei Planänderungen erhalten und werden weiter angezeigt.
+- Die Einheit wechselt der Reihe nach (1 → 2 → … → 1). Der Kalender nutzt bis zu sechs Grüntöne für die Einheiten.
+
+### Verlauf kompakt
+Angezeigt werden nur die beiden letzten Einträge. Alle weiteren stehen unter dem aufklappbaren Punkt „Ältere Einträge“.
+
+### Ein Eintrag pro Tag
+Pro Kalendertag ist nur ein Eintrag möglich. Beim Speichern (neu oder bearbeitet) erscheint sonst ein Hinweis, auch schon bei der Datumswahl. Bereits vorhandene Doppel (z. B. aus einem Abgleich) bleiben bestehen und lassen sich über Löschen/Bearbeiten bereinigen.
+
 ### Gewichtsvergleich
 - **Verlauf:** Hinter jedem Gewicht steht klein die Differenz zur vorangegangenen Einheit mit derselben Nummer (z. B. +0,5 grün oder −4 rot). Bei gleichem Gewicht oder ohne Vorgänger steht nichts.
 - **Eingabe:** Über jeder Übung steht rechts „zuletzt 85 kg“ (letzte gleiche Einheit) und, sobald du ein anderes Gewicht eingibst, die Differenz (z. B. +1). Beim Bearbeiten gilt die Einheit vor dem bearbeiteten Eintrag.
@@ -47,7 +65,7 @@ Beim Öffnen, nach dem Speichern, Löschen, Import/Abgleich und beim Zurückkehr
 
 ### Auswertungen
 Aufklappbarer Bereich „📊 Auswertungen“ unterhalb der Einträge.
-- **Kalenderübersicht:** Monatskalender (Mo–So) mit Blättern per ‹ ›. Tage mit Einheit sind grün markiert, Einheit 1 hellgrün, Einheit 2 dunkelgrün (beide am selben Tag: geteilt). Heute ist umrandet.
+- **Kalenderübersicht:** Tippen/Klicken auf einen markierten Tag öffnet ein kleines Fenster mit Einheit, Gewichten und Wiederholungen; erneutes Tippen oder Tippen daneben schließt es. Monatskalender (Mo–So) mit Blättern per ‹ ›. Tage mit Einheit sind grün markiert, Einheit 1 hellgrün, Einheit 2 dunkelgrün (beide am selben Tag: geteilt). Heute ist umrandet.
 
 ### Eindeutige IDs und Abgleich
 Jeder Eintrag hat eine eindeutige ID und einen Änderungszeitpunkt. Beim Abgleich gilt: gleiche ID = gleicher Eintrag, die **neuere Änderung gewinnt**. So bleibt nach dem Bearbeiten kein alter Eintrag stehen. Gelöschte Einträge bleiben als „gelöscht“ markiert in Browser und Datei (unsichtbar), damit eine Löschung beim Abgleich nicht rückgängig gemacht wird. Bearbeitete Einträge zeigen ein ⓘ (antippen = Zeitpunkt der letzten Änderung).
@@ -63,6 +81,8 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.30:** Eigene Trainingspläne (1–6 Einheiten, Dokumentationsarten pro Übung), Plan im Tagebuch gespeichert, Anzeige des aktiven Plans, Kalender mit bis zu 6 Grüntönen.
+- **0.21:** Nur letzte zwei Einträge sichtbar (Rest unter „Ältere Einträge“), Kurzübersicht beim Antippen eines Kalendertags, nur ein Eintrag pro Tag.
 - **0.20:** Gewichtsvergleich zur vorangegangenen gleichen Einheit (Verlauf und Eingabe).
 - **0.19:** Datum/Einheit werden bei jeder Aktualisierung neu gesetzt, Bereich „Auswertungen“ mit Kalenderübersicht.
 - **0.18:** Verlauf wie Eingabe angeordnet (kg links, Wiederholungen rechts), letzte gleiche Einheit grün gestrichelt, Bearbeiten-Modus gelb.
