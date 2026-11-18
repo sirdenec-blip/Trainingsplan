@@ -53,12 +53,15 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 .pop{position:absolute;z-index:5;width:max-content;max-width:100%;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.28);padding:8px 10px;font-size:.8rem;line-height:1.45}
 .pop .ph{font-weight:600;margin:0 0 3px}.pop .ph:not(:first-child){margin-top:8px}
 .pop .pl{display:flex;justify-content:space-between;gap:14px}.pop .pl span:first-child{color:var(--mu)}
-#pw{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;padding:16px;overflow:auto}#pw[hidden]{display:none}#pw>div{max-width:520px;margin:4vh auto}
+#pw{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:30;padding:16px;overflow:auto}#pw[hidden]{display:none}#pw>div{max-width:520px;margin:4vh auto}
 .wu{border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:12px}.wh{font-weight:600}
 .we{padding:8px 0;border-top:1px solid var(--bd)}.we .in input{flex:1}.we .x{font-size:1rem}
 .wx{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px;font-size:.9rem}.wx select{width:auto}
 .wx label{margin:0;display:flex;gap:6px;align-items:center;color:var(--tx)}.wx input[type=checkbox]{width:auto}
 #wzm{color:#c33;font-size:.85rem;min-height:1.2em;margin-top:8px}#planind{margin-bottom:2px}#fileind{margin-top:0}
+#start{position:fixed;inset:0;background:var(--bg);z-index:20;padding:16px;overflow:auto}#start[hidden]{display:none}#start>div{max-width:520px;margin:8vh auto 0}#start p{color:var(--mu);line-height:1.4}
+.sec.dng{color:#c33;border-color:#c33}.in .pr{flex:0 0 84px;text-align:center}
+.wsr{flex:0 0 100%;display:flex;gap:8px;align-items:center}
 .sat{color:var(--mu);font-size:.8rem;margin-right:2px}
 .chip i{font-style:normal;font-size:.7rem;opacity:.75;margin-right:6px}
 .chip.empty.nx{border-color:var(--ac);color:var(--ac)}
@@ -72,10 +75,22 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 </style>
 </head>
 <body>
+<div id="start" hidden><div class="card">
+  <h1 style="margin-top:0">🏋️ Trainingsplan</h1>
+  <div id="stMain"><p>Wie möchtest du starten?</p>
+    <button id="stNew">1 · Neuen Trainingsplan anlegen</button>
+    <button class="sec" id="stImp">2 · Trainingsplan importieren</button></div>
+  <div id="stOpts" hidden><p>Welchen Plan möchtest du anlegen?</p>
+    <button id="stWkm">WKM <small>(2 Einheiten mit je 3 Übungen)</small></button>
+    <button class="sec" id="stInd">Individuell</button>
+    <button class="sec" id="stBack">Zurück</button></div>
+  <p id="stMsg" style="color:#c33;font-size:.85rem"></p>
+</div></div>
 <div id="gate" hidden><div class="card">
-  <h1 style="margin-top:0">Trainingstagebuch</h1>
-  <p>Exportiert deine Einträge in eine Datei. Bei einer bestehenden Datei werden neue, geänderte und gelöschte Einträge in beide Richtungen abgeglichen (die neuere Änderung gewinnt).</p>
-  <button id="exNew" style="margin-top:6px">Neue Datei erstellen</button>
+  <h1 style="margin-top:0">Trainingsplan exportieren</h1>
+  <p>Plan und Einträge werden in eine Datei geschrieben. Bei einer bestehenden Datei werden neue, geänderte und gelöschte Einträge in beide Richtungen abgeglichen (die neuere Änderung gewinnt). Solange du hier nichts auswählst, wird keine Datei verändert.</p>
+  <button id="exOpen" hidden style="margin-top:6px"></button>
+  <button id="exNew" class="sec">Neue Datei erstellen</button>
   <button class="sec" id="exOld">Bestehende Datei auswählen</button>
   <button class="sec" id="exClose">Schließen</button>
   <div id="exm"></div>
@@ -114,36 +129,34 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 </details>
 
 <div class="card">
-  <button id="plNew" style="margin-top:0">📋 Neuen Trainingsplan anlegen</button>
-  <button class="sec" id="plEdit">✎ Aktuellen Plan bearbeiten</button>
+  <button id="plEdit" style="margin-top:0">✎ Trainingsplan bearbeiten</button>
+  <button class="sec dng" id="reset">🗑 Alle Daten zurücksetzen</button>
 </div>
 
 <div class="card">
-  <button id="tag" style="margin-top:0">📔 Trainingstagebuch exportieren</button>
-  <button class="sec" id="tagIn">📥 Trainingstagebuch importieren</button>
-  <div id="imp"></div>
+  <button id="tag" style="margin-top:0">📔 Trainingsplan exportieren</button>
   <button class="sec" id="exp">Als lesbaren Text herunterladen</button>
 </div>
 
 <div class="ver" id="ver"></div>
 
 <script>
-const VERSION="0.30";
-// Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.),
+const VERSION="0.31";
+// Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
-const DEFAULT_PLAN={name:"Standard",ts:0,units:[
+const WKM_PLAN={name:"WKM",ts:0,units:[
   {exs:[{n:"Kniebeugen",m:"wr",s:3},{n:"Bankdrücken",m:"wr",s:3},{n:"Vorgebeugtes Rudern",m:"wr",s:3}]},
   {exs:[{n:"Kreuzheben",m:"wr",s:3},{n:"Overhead-Press",m:"wr",s:3},{n:"Klimmzüge",m:"wr",bw:true,s:0,max:12,goal:24}]}]};
 const PKEY="trainingsplan_plan_v1";
-function okPlan(p){return!!p&&typeof p.name==="string"&&Array.isArray(p.units)&&p.units.length>=1&&p.units.length<=6&&p.units.every(u=>u&&Array.isArray(u.exs)&&u.exs.every(e=>e&&typeof e.n==="string"&&["wr","w","r"].includes(e.m)))}
-let plan=DEFAULT_PLAN;
+function okPlan(p){return!!p&&typeof p.name==="string"&&Array.isArray(p.units)&&p.units.length>=1&&p.units.length<=6&&p.units.every(u=>u&&Array.isArray(u.exs)&&u.exs.every(e=>e&&typeof e.n==="string"&&["wr","w","r","p"].includes(e.m)))}
+let plan=null;
 try{const p=JSON.parse(localStorage.getItem(PKEY)||"null");if(okPlan(p))plan=p}catch(e){}
 const savePlan=()=>{try{localStorage.setItem(PKEY,JSON.stringify(plan))}catch(e){}};
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const unitDefs=u=>(plan.units[u-1]||{exs:[]}).exs;
 const defOf=(name,u)=>unitDefs(u).find(e=>e.n===name)||plan.units.flatMap(x=>x.exs).find(e=>e.n===name)||null;
-// Werte: "85x8-9-10" (Gewicht+Wdh.), "85" (nur Gewicht), "x8-9-10" (nur Wdh.)
-function parseVal(v){const i=v.indexOf("x");if(i<0)return{w:v,reps:null};return{w:i?v.slice(0,i):null,reps:v.slice(i+1).split("-").map(Number)}}
+// Werte: "8@60-70-80" (Pyramide: 8 Wdh., Gewichte je Satz), "85x8-9-10" (Gewicht+Wdh.), "85" (nur Gewicht), "x8-9-10" (nur Wdh.)
+function parseVal(v){const a=v.indexOf("@");if(a>0)return{w:null,reps:null,pyr:{r:+v.slice(0,a),ws:v.slice(a+1).split("-").map(Number)}};const i=v.indexOf("x");if(i<0)return{w:v,reps:null};return{w:i?v.slice(0,i):null,reps:v.slice(i+1).split("-").map(Number)}}
 const $=id=>document.getElementById(id);
 let data=[],st=[],cur=[],dirty=false;
 
@@ -151,6 +164,7 @@ let data=[],st=[],cur=[],dirty=false;
 const KEY="trainingsplan_v1";
 const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){$("note").textContent="⚠ Browserspeicher nicht verfügbar – bitte regelmäßig exportieren.";return false}};
 try{data=collapse(JSON.parse(localStorage.getItem(KEY)||"[]").map(norm));persist()}catch(e){}
+if(!plan&&data.length){plan=JSON.parse(JSON.stringify(WKM_PLAN));savePlan()} // Daten aus älteren Versionen: Plan = WKM
 
 // ---------- Trainingstagebuch (Datei) ----------
 const pack=d=>JSON.stringify({version:3,plan,sessions:d},null,1);
@@ -214,53 +228,53 @@ function renderFile(){
   el.innerHTML="📄 Datei: <b></b> · "+f.action+" "+t;
   el.querySelector("b").textContent=f.name;
 }
-let mode="export";
+let mode="export",openHandle=null;
+const fileName=()=>((plan&&plan.name||"Trainingsplan").replace(/[\\/:*?"<>|]/g,"").trim()||"Trainingsplan")+".json";
 const exm=(t,bad)=>{$("exm").style.color=bad?"#c33":"var(--tx)";$("exm").textContent=t};
 async function write(h,text){const w=await h.createWritable();await w.write(text);await w.close()}
 const FSA="showSaveFilePicker" in window&&"showOpenFilePicker" in window;
-const PICK={types:[{description:"Trainingstagebuch (JSON)",accept:{"application/json":[".json"]}}]};
+const PICK={types:[{description:"Trainingsplan (JSON)",accept:{"application/json":[".json"]}}]};
 
 async function exportNew(){
   try{
-    if(FSA){const h=await showSaveFilePicker({suggestedName:"Trainingstagebuch.json",...PICK});await write(h,pack(data));setFile(h.name,"exportiert");exm(`Gespeichert: ${live().length} Einträge in „${h.name}“.`)}
-    else{dl("Trainingstagebuch.json",pack(data),"application/json");setFile("Trainingstagebuch.json","exportiert");exm(`Heruntergeladen: Trainingstagebuch.json mit ${live().length} Einträgen.`)}
+    if(FSA){const h=await showSaveFilePicker({suggestedName:fileName(),...PICK});await write(h,pack(data));openHandle=h;setFile(h.name,"exportiert");exm(`Gespeichert: „${plan.name}“ mit ${live().length} Einträgen in „${h.name}“.`)}
+    else{dl(fileName(),pack(data),"application/json");setFile(fileName(),"exportiert");exm(`Heruntergeladen: ${fileName()} mit ${live().length} Einträgen.`)}
   }catch(e){if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)}
 }
 function done(m,nf,nb){
   data=m.all;persist();refresh();
   return `${nb} neue oder geänderte Einträge in den Browser übernommen, ${nf} in die Datei. Insgesamt ${live().length} Einträge.`;
 }
+async function exportTo(h){ // gleicht mit der Datei ab und schreibt sie
+  if(await h.queryPermission({mode:"readwrite"})!=="granted")await h.requestPermission({mode:"readwrite"});
+  const txt=await(await h.getFile()).text(),pm=mergePlan(filePlan(txt)),m=merge(unpack(txt));
+  await write(h,pack(m.all));openHandle=h;setFile(h.name,"abgeglichen");
+  exm(pm+done(m,m.nf,m.nb)+` Datei „${h.name}“ aktualisiert.`);
+}
 async function exportOld(){
   try{
-    if(FSA){
-      const[h]=await showOpenFilePicker(PICK);
-      const txt=await(await h.getFile()).text(),pm=mergePlan(filePlan(txt)),m=merge(unpack(txt));
-      await write(h,pack(m.all));setFile(h.name,"abgeglichen");
-      exm(pm+done(m,m.nf,m.nb)+` Datei „${h.name}“ aktualisiert.`);
-    }else{mode="export";$("file").click()}
+    if(FSA){const[h]=await showOpenFilePicker(PICK);await exportTo(h)}
+    else{mode="export";$("file").click()}
   }catch(e){if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)}
 }
 $("file").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=()=>{try{
-    if(mode==="import"){
-      const pm=mergePlan(filePlan(r.result)),fa=unpack(r.result),m=merge(fa);
-      data=m.all;persist();refresh();setFile(f.name,"importiert");
-      const imp=$("imp");imp.style.color="var(--tx)";
-      imp.textContent=pm+`Import: ${m.nb} neue oder geänderte Einträge übernommen. Insgesamt ${live().length} Einträge.`;
-      return;
-    }
+    if(mode==="start"){startFrom(r.result,f.name,null);return}
     const pm=mergePlan(filePlan(r.result)),m=merge(unpack(r.result));
     const msg=pm+done(m,m.nf,m.nb);setFile(f.name,"abgeglichen");
-    dl("Trainingstagebuch.json",pack(m.all),"application/json");
+    dl(fileName(),pack(m.all),"application/json");
     exm(msg+" Dein Browser darf die Datei nicht überschreiben: die ergänzte Version wurde neu heruntergeladen – ersetze damit die alte Datei.");
-  }catch(x){if(mode==="import"){const imp=$("imp");imp.style.color="#c33";imp.textContent="Fehler: "+(x.message||x)}else exm("Fehler: "+(x.message||x),1)}};
+  }catch(x){if(mode==="start")stm("Fehler: "+(x.message||x));else exm("Fehler: "+(x.message||x),1)}};
   r.readAsText(f);e.target.value="";
 };
-$("tagIn").onclick=()=>{mode="import";$("imp").textContent="";$("file").click()};
 $("ver").textContent="Version "+VERSION;renderFile();
-$("tag").onclick=()=>{exm("");$("gate").hidden=false};
+$("tag").onclick=()=>{
+  exm("");const o=$("exOpen");o.hidden=!openHandle;if(openHandle)o.textContent=`In „${openHandle.name}“ speichern`;
+  $("gate").hidden=false;
+};
+$("exOpen").onclick=()=>exportTo(openHandle).catch(e=>{if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)});
 $("exClose").onclick=()=>{$("gate").hidden=true};
 $("exNew").onclick=exportNew;
 $("exOld").onclick=exportOld;
@@ -272,15 +286,17 @@ const sum=a=>a.reduce((x,y)=>x+y,0);
 function build(defs){
   const u=+$("unit").value;dirty=false;
   cur=defs||unitDefs(u);
-  st=cur.map(e=>({w:e.m==="r"?"":(lastW(u,e.n)??(e.bw?"0":"")),reps:[]}));
+  st=cur.map(e=>({w:(e.m==="r"||e.m==="p")?"":(lastW(u,e.n)??(e.bw?"0":"")),reps:[],pr:""}));
   $("fields").innerHTML=cur.map((e,i)=>{
-    const hw=e.m!=="r",hr=e.m!=="w";
-    return `<label class="fl"><span>${esc(e.n)}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></label>
-    <div class="in">${hw?`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg"><span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>${hr?`<div class="chips" id="c${i}"></div>`:""}`}).join("");
+    const hp=e.m==="p",hw=e.m==="wr"||e.m==="w",hr=e.m==="wr"||e.m==="r";
+    const row=hp?`<div class="in"><input class="pr" data-i="${i}" inputmode="numeric" placeholder="Wdh" aria-label="Wiederholungen je Satz"><span>Wdh. je Satz</span></div>
+      <div class="in" style="margin-top:8px"><input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="Satz 1: kg" autocomplete="off"><span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
+     :`<div class="in">${hw?`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg"><span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
+    return `<label class="fl"><span>${esc(e.n)}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></label>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}`}).join("");
   cur.forEach((_,i)=>{chips(i);updateDw(i)});
-  document.querySelectorAll(".w").forEach(el=>{
+  document.querySelectorAll(".w,.pr").forEach(el=>{
     el.onfocus=()=>el.select();
-    el.oninput=()=>{st[el.dataset.i].w=el.value;updateDw(+el.dataset.i)};
+    el.oninput=()=>{const k=el.dataset.i;if(el.classList.contains("pr"))st[k].pr=el.value;else{st[k].w=el.value;updateDw(+k)}};
     el.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();const r=rIn(el.dataset.i);if(r)r.focus();else next(+el.dataset.i)}};
   });
   document.querySelectorAll(".r").forEach(el=>{
@@ -296,18 +312,26 @@ const rIn=i=>document.querySelector(`.r[data-i="${i}"]`);
 
 function chips(i){
   const e=cur[i];if(e.m==="w")return;const r=st[i].reps,n=r.length;
-  let h=`<span class="sat">Satz</span>`+r.map((v,k)=>`<span class="chip" data-k="${k}" title="Antippen zum Entfernen"><i>${k+1}</i>${v}</span>`).join("");
+  let h=`<span class="sat">Satz</span>`+r.map((v,k)=>`<span class="chip" data-k="${k}" title="Antippen zum Entfernen"><i>${k+1}</i>${String(v).replace(".",",")}</span>`).join("");
   const slots=e.s?e.s:n+1;
   for(let k=n;k<slots;k++)h+=`<span class="chip empty${k===n?" nx":""}"><i>${k+1}</i>–</span>`;
   if(!e.s&&n)h+=`<span class="tot">Σ ${sum(r)}${e.goal?" / "+e.goal:""} Wdh.</span>`;
   const c=$("c"+i);c.innerHTML=h;
   c.querySelectorAll(".chip[data-k]").forEach(ch=>ch.onclick=()=>{st[i].reps.splice(+ch.dataset.k,1);chips(i)});
-  const el=rIn(i);if(el)el.placeholder=(e.s&&n>=e.s)?"fertig":`Satz ${n+1}: Wdh.`;
+  const el=rIn(i);if(el)el.placeholder=(e.s&&n>=e.s)?"fertig":`Satz ${n+1}: ${e.m==="p"?"kg":"Wdh."}`;
 }
 function commit(i){
   const e=cur[i],el=rIn(i),v=el.value.trim(),r=st[i].reps;
   $("msg").textContent="";
   if(v===""){if(!e.s&&r.length)next(i);return}
+  if(e.m==="p"){
+    const t=v.replace(",",".");
+    if(!/^\d+(\.\d+)?$/.test(t)||+t<=0){$("msg").textContent=`${e.n}: Gewicht je Satz in kg eingeben.`;el.select();return}
+    if(r.length>=e.s){next(i);return}
+    r.push(+t);el.value="";chips(i);
+    if(r.length===e.s)next(i);else el.focus();
+    return;
+  }
   const n=+v,max=e.max||99;
   if(!/^\d+$/.test(v)||n<1||n>max){$("msg").textContent=`${e.n}: Wiederholungen von 1 bis ${max} eingeben.`;el.select();return}
   if(e.s&&r.length>=e.s){next(i);return}
@@ -315,7 +339,7 @@ function commit(i){
   if(e.s&&r.length===e.s)next(i);else el.focus();
 }
 function next(i){
-  for(let j=i+1;j<cur.length;j++){const x=document.querySelector(`.w[data-i="${j}"],.r[data-i="${j}"]`);if(x){x.focus();return}}
+  for(let j=i+1;j<cur.length;j++){const x=document.querySelector(`.w[data-i="${j}"],.pr[data-i="${j}"],.r[data-i="${j}"]`);if(x){x.focus();return}}
   $("save").focus();
 }
 $("unit").onchange=()=>{build();render()};
@@ -327,8 +351,16 @@ $("date").onchange=()=>{
 $("save").onclick=()=>{
   const u=$("unit").value,ex={};let err="";
   cur.forEach((e,i)=>{
-    const hw=e.m!=="r",hr=e.m!=="w",w=String(st[i].w).trim().replace(",","."),r=st[i].reps,ok=!hw||/^\d+(\.\d+)?$/.test(w);
+    const hp=e.m==="p",hw=e.m==="wr"||e.m==="w",hr=e.m==="wr"||e.m==="r",w=String(st[i].w).trim().replace(",","."),r=st[i].reps,ok=!hw||/^\d+(\.\d+)?$/.test(w);
     const we=document.querySelector(`.w[data-i="${i}"]`);if(we)we.classList.toggle("bad",!ok);
+    if(hp){
+      const pr=String(st[i].pr).trim(),pok=/^\d+$/.test(pr)&&+pr>=1,pe=document.querySelector(`.pr[data-i="${i}"]`);
+      if(pe)pe.classList.toggle("bad",!pok);
+      if(!pok)err=err||`${e.n}: Wiederholungen je Satz fehlen.`;
+      else if(r.length!==e.s)err=err||`${e.n}: ${e.s} Sätze nötig (bisher ${r.length}).`;
+      else ex[e.n]=+pr+"@"+r.join("-");
+      return;
+    }
     if(!ok)err=err||`${e.n}: Gewicht fehlt${e.bw?" (bei Körpergewicht 0)":""}.`;
     else if(hr&&e.s&&r.length!==e.s)err=err||`${e.n}: ${e.s} Sätze nötig (bisher ${r.length}).`;
     else if(hr&&!e.s&&!r.length)err=err||`${e.n}: mindestens 1 Satz nötig.`;
@@ -362,7 +394,7 @@ let editId=null;
 function edit(id){
   const e=live().find(x=>x.id===id);if(!e)return;
   const base=unitDefs(e.unit).slice();
-  Object.keys(e.ex).forEach(k=>{if(!base.some(p=>p.n===k)){const pv=parseVal(e.ex[k]);base.push({n:k,m:pv.reps?(pv.w!=null?"wr":"r"):"w",s:0})}});
+  Object.keys(e.ex).forEach(k=>{if(!base.some(p=>p.n===k)){const pv=parseVal(e.ex[k]);base.push({n:k,m:pv.pyr?"p":pv.reps?(pv.w!=null?"wr":"r"):"w",s:pv.pyr?pv.pyr.ws.length:0})}});
   if(![...$("unit").options].some(o=>+o.value===e.unit))$("unit").add(new Option("Einheit "+e.unit,e.unit));
   editId=id;$("date").value=e.date;$("unit").value=e.unit;$("unit").disabled=true;build(base);
   base.forEach((p,i)=>{
@@ -370,6 +402,7 @@ function edit(id){
     const pv=parseVal(v);
     if(pv.w!=null){st[i].w=pv.w;const we=document.querySelector(`.w[data-i="${i}"]`);if(we)we.value=pv.w}
     if(pv.reps)st[i].reps=pv.reps;
+    if(pv.pyr){st[i].pr=String(pv.pyr.r);st[i].reps=pv.pyr.ws;const pe=document.querySelector(`.pr[data-i="${i}"]`);if(pe)pe.value=pv.pyr.r}
     chips(i);updateDw(i);
   });
   $("editbar").textContent=`✎ Bearbeite Eintrag vom ${fmt(e.date)} (Einheit ${e.unit})`;
@@ -387,7 +420,7 @@ const fmt=d=>d.split("-").reverse().join(".");
 // Anzeige-Infos zu einem gespeicherten Wert
 function exInfo(k,v,u){
   const p=parseVal(v),d=defOf(k,u),wg=p.w==null?null:p.w.replace(".",",");
-  return{p,z:!!(d&&d.bw&&p.w!=null&&!+p.w),kg:wg==null?null:(d&&d.bw?(+p.w?`+${wg} kg`:"Körpergewicht"):`${wg} kg`),sum:(p.reps&&d&&!d.s)?sum(p.reps):null};
+  return{p,pyr:p.pyr||null,z:!!(d&&d.bw&&p.w!=null&&!+p.w),kg:wg==null?null:(d&&d.bw?(+p.w?`+${wg} kg`:"Körpergewicht"):`${wg} kg`),sum:(p.reps&&d&&!d.s)?sum(p.reps):null};
 }
 // Gewichtsvergleich
 function dinfo(a,b){
@@ -441,7 +474,7 @@ function popHtml(date){
   return live().filter(x=>x.date===date).map(e=>
     `<div class="ph">${wd(e.date)} ${fmt(e.date)} · Einheit ${e.unit}</div>`+
     Object.entries(e.ex).map(([k,v])=>{
-      const i=exInfo(k,v,e.unit),t=[i.kg&&!i.z?i.kg:null,i.p.reps?i.p.reps.join(" · ")+(i.sum!=null?` (Σ ${i.sum})`:""):null].filter(Boolean).join(" · ");
+      const i=exInfo(k,v,e.unit),t=i.pyr?`${i.pyr.r} Wdh. · ${i.pyr.ws.map(x=>String(x).replace(".",",")).join(" · ")} kg`:[i.kg&&!i.z?i.kg:null,i.p.reps?i.p.reps.join(" · ")+(i.sum!=null?` (Σ ${i.sum})`:""):null].filter(Boolean).join(" · ");
       return `<div class="pl"><span>${esc(k)}</span><span>${t||"Körpergewicht"}</span></div>`}).join("")).join("");
 }
 function showPop(cell){
@@ -466,15 +499,24 @@ function refId(){ // zuletzt eingetragene Einheit mit derselben Nummer (ohne den
   return L.length?L[L.length-1].id:null;
 }
 let olderOpen=false;
+// sichtbar: je Einheit der neueste Eintrag (Referenz), aufgefüllt mit den neuesten übrigen – insgesamt so viele wie Einheiten im Plan
+function visIds(Lr){
+  const k=plan.units.length,v=new Set();
+  for(let u=1;u<=k;u++){const e=Lr.find(x=>x.unit===u);if(e)v.add(e.id)}
+  for(const e of Lr){if(v.size>=k)break;v.add(e.id)}
+  return v;
+}
 function render(){
   const ref=refId();renderCal();
-  const cards=live().reverse().map(s=>
+  const Lr=live().reverse(),vis=visIds(Lr);
+  const cards=Lr.map(s=>
     `<div class="card${s.id===editId?" ed":""}${s.id===ref?" ref":""}"><div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>Einheit ${s.unit}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}</span><span><button class="x" onclick="edit('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="del('${s.id}')" title="Löschen">✕</button></span></div>`+
     Object.entries(s.ex).map(([k,v])=>{
       const i=exInfo(k,v,s.unit),hw=i.p.w!=null,di=hw?dinfo(+i.p.w,prevW(s,k)):null,df=di?`<small class="df ${di.c}">${di.t}</small>`:"";
+      if(i.pyr)return `<div class="ex"><div class="en">${esc(k)}</div><div class="ln"><b>${i.pyr.r} Wdh.</b><div class="sets"><small>kg</small>${i.pyr.ws.map(x=>`<span>${String(x).replace(".",",")}</span>`).join("")}</div></div></div>`;
       return `<div class="ex"><div class="en">${esc(k)}</div><div class="ln">${hw?`<b>${i.kg}${df}</b>`:""}${i.p.reps?`<div class="sets"><small>Wdh.</small>${i.p.reps.map(x=>`<span>${x}</span>`).join("")}${i.sum!=null?`<small>Σ ${i.sum}</small>`:""}</div>`:""}</div></div>`}).join("")+`</div>`);
-  const n=cards.length;
-  $("hist").innerHTML=cards.slice(0,2).join("")+(n>2?`<details class="old"${olderOpen?" open":""} ontoggle="olderOpen=this.open"><summary>Ältere Einträge (${n-2})</summary>${cards.slice(2).join("")}</details>`:"");
+  const shown=cards.filter((_,i)=>vis.has(Lr[i].id)),older=cards.filter((_,i)=>!vis.has(Lr[i].id));
+  $("hist").innerHTML=shown.join("")+(older.length?`<details class="old"${olderOpen?" open":""} ontoggle="olderOpen=this.open"><summary>Ältere Einträge (${older.length})</summary>${older.join("")}</details>`:"");
 }
 function del(id){
   if(!confirm("Eintrag löschen?"))return;
@@ -486,15 +528,42 @@ function dl(name,text,type){
   a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();
 }
 $("exp").onclick=()=>dl("trainingsplan.txt",
-  live().map(s=>fmt(s.date)+" (Einheit "+s.unit+")\n"+Object.entries(s.ex).map(([k,v])=>{const i=exInfo(k,v,s.unit);return k+": "+[i.kg,i.p.reps?"Wdh.: "+i.p.reps.join(" · "):null].filter(Boolean).join(", ")}).join("\n")).join("\n\n"),"text/plain");
+  live().map(s=>fmt(s.date)+" (Einheit "+s.unit+")\n"+Object.entries(s.ex).map(([k,v])=>{const i=exInfo(k,v,s.unit);return k+": "+(i.pyr?`${i.pyr.r} Wdh., ${i.pyr.ws.join(" · ")} kg`:[i.kg,i.p.reps?"Wdh.: "+i.p.reps.join(" · "):null].filter(Boolean).join(", "))}).join("\n")).join("\n\n"),"text/plain");
 
 function init(){
+  if(!plan){showStart();return}
+  $("start").hidden=true;
   const t=new Date();$("date").value=new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
   $("unit").innerHTML=plan.units.map((_,i)=>`<option value="${i+1}">Einheit ${i+1}</option>`).join("");
   const L=live(),l=L[L.length-1];$("unit").value=l&&l.unit<plan.units.length?l.unit+1:1; // nächste Einheit im Wechsel
   $("planind").textContent="📋 Trainingsplan: "+plan.name;
   $("msg").textContent="";$("note").textContent="";build();render();
 }
+// ---------- Startmenü & Zurücksetzen ----------
+const stm=t=>{$("stMsg").textContent=t};
+function showStart(){$("start").hidden=false;$("stMain").hidden=false;$("stOpts").hidden=true;stm("")}
+$("stNew").onclick=()=>{$("stMain").hidden=true;$("stOpts").hidden=false};
+$("stBack").onclick=()=>{$("stMain").hidden=false;$("stOpts").hidden=true};
+$("stWkm").onclick=()=>{plan=JSON.parse(JSON.stringify(WKM_PLAN));plan.ts=Date.now();savePlan();init()};
+$("stInd").onclick=()=>wizOpen(true);
+function startFrom(text,name,h){ // Datei laden: Plan + Einträge ersetzen den Browserstand
+  const fp=filePlan(text),arr=unpack(text);
+  if(!fp&&!arr.length)throw new Error("Die Datei enthält weder einen Trainingsplan noch Einträge.");
+  plan=fp||JSON.parse(JSON.stringify(WKM_PLAN)); // ältere Dateien ohne Plan: WKM
+  data=collapse(arr).sort(cmp);savePlan();persist();openHandle=h||null;setFile(name,"geöffnet");init();
+}
+$("stImp").onclick=async()=>{
+  try{
+    if(FSA){const[h]=await showOpenFilePicker(PICK);startFrom(await(await h.getFile()).text(),h.name,h)}
+    else{mode="start";$("file").click()}
+  }catch(e){if(e.name!=="AbortError")stm("Fehler: "+(e.message||e))}
+};
+$("reset").onclick=()=>{
+  if(!confirm("⚠ Alle Daten zurücksetzen?\n\nTrainingsplan und alle Einträge im Browser werden entfernt – auch Änderungen, die noch nicht exportiert wurden.\nDie Datei auf deinem Gerät wird NICHT verändert.\n\nDanach startet das Programm wie beim ersten Öffnen."))return;
+  try{[KEY,PKEY,FKEY].forEach(k=>localStorage.removeItem(k))}catch(e){}
+  location.reload();
+};
+
 // ---------- Trainingsplan anlegen / bearbeiten ----------
 let wz=null;
 const wzEx=()=>({n:"",m:"wr",s:3}),wzm=t=>{$("wzm").textContent=t},at=(a,b)=>`data-a="${a}" data-b="${b}"`;
@@ -503,14 +572,14 @@ function wizOpen(fresh){
   wzm("");wizRender();$("pw").hidden=false;
 }
 function wizRender(){
-  const M={wr:"Gewicht + Wiederholungen",w:"Nur Gewicht",r:"Nur Wiederholungen"};
+  const M={wr:"Gewicht + Wiederholungen",w:"Nur Gewicht",r:"Nur Wiederholungen",p:"Pyramidensatz (Gewicht je Satz)"};
   $("wzb").innerHTML=`<label style="margin-top:0">Name des Plans</label><input id="wzName" maxlength="40" value="${esc(wz.name)}">
   <label>Anzahl Einheiten (1–6)</label><select id="wzN">${[1,2,3,4,5,6].map(n=>`<option${n===wz.units.length?" selected":""}>${n}</option>`).join("")}</select>`+
   wz.units.map((u,a)=>`<div class="wu"><div class="wh">Einheit ${a+1}</div>`+u.exs.map((e,b)=>`<div class="we">
     <div class="in"><input class="wn" ${at(a,b)} maxlength="40" placeholder="Übung" value="${esc(e.n)}"><button class="x" data-act="del" ${at(a,b)} title="Übung entfernen">✕</button></div>
     <div class="wx"><select class="wm" ${at(a,b)}>${Object.entries(M).map(([k,t])=>`<option value="${k}"${e.m===k?" selected":""}>${t}</option>`).join("")}</select>
     ${e.m==="wr"?`<label><input type="checkbox" class="wb" ${at(a,b)}${e.bw?" checked":""}>Körpergewichtsübung</label>`:""}
-    ${e.m==="wr"&&!e.bw?`<span>Sätze</span><select class="ws" ${at(a,b)}>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option${n===e.s?" selected":""}>${n}</option>`).join("")}</select>`:""}</div></div>`).join("")+
+    ${(e.m==="wr"&&!e.bw)||e.m==="p"?`<div class="wsr"><span>Sätze</span><select class="ws" ${at(a,b)}>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option${n===e.s?" selected":""}>${n}</option>`).join("")}</select></div>`:""}</div></div>`).join("")+
     `<button class="sec" data-act="add" data-a="${a}">＋ Übung</button></div>`).join("");
 }
 $("wzb").addEventListener("input",e=>{const t=e.target;
@@ -518,7 +587,7 @@ $("wzb").addEventListener("input",e=>{const t=e.target;
 $("wzb").addEventListener("change",e=>{
   const t=e.target,ex=t.dataset.a!=null?wz.units[+t.dataset.a].exs[+t.dataset.b]:null;
   if(t.id==="wzN"){const n=+t.value;while(wz.units.length<n)wz.units.push({exs:[wzEx()]});wz.units.length=n;wizRender()}
-  else if(t.classList.contains("wm")){ex.m=t.value;if(ex.m!=="wr")ex.bw=false;if(ex.m==="wr"&&!ex.bw&&!ex.s)ex.s=3;wizRender()}
+  else if(t.classList.contains("wm")){ex.m=t.value;if(ex.m!=="wr")ex.bw=false;if(((ex.m==="wr"&&!ex.bw)||ex.m==="p")&&!ex.s)ex.s=3;wizRender()}
   else if(t.classList.contains("wb")){ex.bw=t.checked;if(!ex.bw&&!ex.s)ex.s=3;wizRender()}
   else if(t.classList.contains("ws"))ex.s=+t.value;
 });
@@ -537,7 +606,7 @@ $("wzSave").onclick=()=>{
       if(seen.has(n))return wzm(`Einheit ${a+1}: „${n}“ kommt doppelt vor.`);
       seen.add(n);
       const o={n,m:e.m};
-      if(e.m==="wr"&&!e.bw)o.s=e.s||3;else o.s=0;
+      if((e.m==="wr"&&!e.bw)||e.m==="p")o.s=e.s||3;else o.s=0;
       if(e.m==="wr"&&e.bw)o.bw=true;
       if(e.m!=="w"&&e.max)o.max=e.max;
       if(e.m!=="w"&&e.goal)o.goal=e.goal;
@@ -551,7 +620,6 @@ $("wzSave").onclick=()=>{
   $("note").textContent="✔ Trainingsplan gespeichert – er wird beim nächsten Export in die Datei geschrieben.";
 };
 $("wzClose").onclick=()=>{$("pw").hidden=true};
-$("plNew").onclick=()=>wizOpen(true);
 $("plEdit").onclick=()=>wizOpen(false);
 function refresh(){if(editId!==null)exitEdit();else init()}
 // Beim Zurückkehren zur Seite (z. B. am nächsten Tag): Datum/Einheit aktualisieren, sofern nichts eingegeben ist

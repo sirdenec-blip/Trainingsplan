@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.30** (steht auch unten auf der Seite)
+Aktuelle Version: **0.31** (steht auch unten auf der Seite)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -23,35 +23,32 @@ Das Gewicht vom letzten Mal ist vorausgefüllt, Datum = heute, Einheit wechselt 
 ## Speicherung
 Alle Einträge werden automatisch im Browser des Geräts gespeichert (localStorage), du kannst also einfach am Handy trainieren.
 
-## Trainingstagebuch (Export in Datei)
-Button **Trainingstagebuch exportieren**:
-- **Neue Datei erstellen:** schreibt alle Einträge in eine neue Datei `Trainingstagebuch.json`.
-- **Bestehende Datei auswählen:** liest die Datei ein, ergänzt fehlende Einträge in beide Richtungen (Datei → Browser und Browser → Datei) und aktualisiert die Datei. Doppelte Einträge (gleiches Datum, gleiche Einheit, gleiche Werte) werden nicht doppelt angelegt.
+## Start, Speicherung und Dateien
+**Erster Start:** Menü mit zwei Optionen:
+1. **Neuen Trainingsplan anlegen:** *WKM* (2 Einheiten mit je 3 Übungen: Kniebeugen, Bankdrücken, Rudern / Kreuzheben, Overhead-Press, Klimmzüge) oder *Individuell* (Plan-Assistent, siehe unten).
+2. **Trainingsplan importieren:** Datei öffnen. Plan und Einträge der Datei werden in den Browser geladen. Dateien ohne Plan (ältere Versionen) bekommen den WKM-Plan.
 
-Chrome/Edge am Computer überschreiben die gewählte Datei direkt. Auf dem Handy (iPhone/Safari, Chrome Android) wird die ergänzte Datei neu heruntergeladen und ersetzt die alte.
+Danach läuft alles im Browser (localStorage). **An der geöffneten Datei wird nichts verändert, bis du „Trainingsplan exportieren“ drückst.**
 
-### Trainingstagebuch importieren
-Button **Trainingstagebuch importieren**: wählt eine Tagebuch-Datei aus und übernimmt alle Einträge, die im Browser noch fehlen. Die Datei wird dabei nicht verändert. Bereits vorhandene Einträge werden nicht doppelt angelegt.
+**📔 Trainingsplan exportieren:** schreibt Plan und Einträge in eine Datei. Optionen: in die geöffnete Datei speichern (wenn der Browser das erlaubt), neue Datei erstellen (Name = Planname) oder bestehende Datei auswählen. Bei bestehenden Dateien wird in beide Richtungen abgeglichen (neuere Änderung gewinnt, Löschungen werden mit abgeglichen). Auf dem Handy (iPhone/Safari, Chrome Android) kann der Browser Dateien nicht überschreiben: die Datei wird neu heruntergeladen und ersetzt die alte.
 
-### Anzeige
-Eingabe: Jeder Satz hat eine Nummer (Satz 1, 2, 3 …), der nächste Satz ist farbig markiert und das Eingabefeld nennt ihn („Satz 2: Wdh.“). Verlauf: pro Übung das Gewicht in kg und darunter die Wiederholungen je Satz als kleine Felder; bei Klimmzügen zusätzlich die Summe.
-
-Die Ansicht entspricht der Eingabe: links das Gewicht (kg), rechts die Wiederholungen je Satz (Beschriftung „Wdh.“). Beim Eintragen ist die zuletzt gespeicherte Einheit mit derselben Nummer grün gestrichelt umrandet (zum Vergleichen der Werte). Im Bearbeiten-Modus sind Formular und Eintrag gelb markiert.
+**🗑 Alle Daten zurücksetzen:** entfernt Plan und alle Einträge im Browser (auch nicht exportierte) nach Warnung; danach erscheint wieder das Startmenü. Die Datei auf dem Gerät bleibt unverändert.
 
 ### Eigener Trainingsplan
-Button **📋 Neuen Trainingsplan anlegen** (oder **✎ Aktuellen Plan bearbeiten**) öffnet den Plan-Assistenten:
+Der Plan-Assistent (Startmenü → *Individuell*, später **✎ Trainingsplan bearbeiten** – auch beim WKM-Plan):
 - Name des Plans und Anzahl der Einheiten (1–6).
 - Pro Einheit beliebig viele Übungen. Pro Übung wird gewählt, wie dokumentiert wird:
   - **Gewicht + Wiederholungen** (Standard: 3 Sätze, 1–10 wählbar). Mit Haken **Körpergewichtsübung** (wie Klimmzüge): Zusatzgewicht, beliebig viele Sätze.
   - **Nur Gewicht** (ein Wert, z. B. `85`).
   - **Nur Wiederholungen** (beliebig viele Sätze, z. B. `x60-45`).
+  - **Pyramidensatz:** einmal feste Wiederholungen, pro Satz das Gewicht (z. B. `8@60-70-80`), Sätze wählbar.
 - Der Plan wird im Browser **und im Trainingstagebuch (Datei)** gespeichert (Dateiformat Version 3). Beim Abgleich/Import gewinnt der neuere Plan; die Meldung nennt es, wenn ein Plan aus der Datei übernommen wurde.
 - Oben steht klein der Name des aktiven Plans („📋 Trainingsplan: …“), darunter die zuletzt verwendete Datei.
 - Bestehende Einträge bleiben bei Planänderungen erhalten und werden weiter angezeigt.
 - Die Einheit wechselt der Reihe nach (1 → 2 → … → 1). Der Kalender nutzt bis zu sechs Grüntöne für die Einheiten.
 
 ### Verlauf kompakt
-Angezeigt werden nur die beiden letzten Einträge. Alle weiteren stehen unter dem aufklappbaren Punkt „Ältere Einträge“.
+Angezeigt werden so viele Einträge, wie der Plan Einheiten hat – je Einheit der neueste (Referenz), mit den neuesten übrigen aufgefüllt. Alle weiteren stehen unter „Ältere Einträge“.
 
 ### Ein Eintrag pro Tag
 Pro Kalendertag ist nur ein Eintrag möglich. Beim Speichern (neu oder bearbeitet) erscheint sonst ein Hinweis, auch schon bei der Datumswahl. Bereits vorhandene Doppel (z. B. aus einem Abgleich) bleiben bestehen und lassen sich über Löschen/Bearbeiten bereinigen.
@@ -81,6 +78,7 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.31:** Pyramidensatz, neues Speichersystem (Startmenü, Import nur beim Start, Export schreibt als einziges in Dateien, „Alle Daten zurücksetzen“), Einträge je Einheit sichtbar, Layout-Fix „Sätze“ im Plan-Assistenten.
 - **0.30:** Eigene Trainingspläne (1–6 Einheiten, Dokumentationsarten pro Übung), Plan im Tagebuch gespeichert, Anzeige des aktiven Plans, Kalender mit bis zu 6 Grüntönen.
 - **0.21:** Nur letzte zwei Einträge sichtbar (Rest unter „Ältere Einträge“), Kurzübersicht beim Antippen eines Kalendertags, nur ein Eintrag pro Tag.
 - **0.20:** Gewichtsvergleich zur vorangegangenen gleichen Einheit (Verlauf und Eingabe).
