@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trainingsplan</title>
 <style>
-:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--bd:#ddd}
-@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--bd:#3a3a38}}
+:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--u1:#9ad9b6;--u1t:#0f2a1d;--u2:#1d6b4f;--u2t:#fff;--bd:#ddd}
+@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--u1:#2f7d5c;--u1t:#fff;--u2:#7ee2b8;--u2t:#0b2a1e;--bd:#3a3a38}}
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;max-width:520px;margin:auto}
 h1{font-size:1.3rem;margin:.2rem 0 1rem}
@@ -31,12 +31,24 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .l{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}
 .l span:first-child{color:var(--mu)}.l span:last-child{text-align:right}
 .x{width:auto;background:none;color:var(--mu);border:0;margin:0;padding:0 4px}
-#gate{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;padding:16px;overflow:auto}#gate[hidden]{display:none}#gate>div{max-width:520px;margin:8vh auto 0}#exm,#imp{margin-top:10px;font-size:.9rem;line-height:1.4}#editbar{color:var(--ac);font-weight:600;font-size:.9rem;margin-bottom:8px}.card.ed{border-color:var(--ac)}.sat{color:var(--mu);font-size:.8rem;margin-right:2px}
+#gate{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;padding:16px;overflow:auto}#gate[hidden]{display:none}#gate>div{max-width:520px;margin:8vh auto 0}#exm,#imp{margin-top:10px;font-size:.9rem;line-height:1.4}#editbar{color:var(--ye);font-weight:600;font-size:.9rem;margin-bottom:8px}.card.ed,.card.editing{border-color:var(--ye)}.card.editing #save{background:var(--ye);color:#1c1c1a}.card.ref{border:2px dashed var(--ac);padding:13px}details.card>summary{cursor:pointer;font-weight:600}
+.sub{color:var(--mu);font-size:.85rem;margin:12px 0 6px}
+.calh{display:flex;justify-content:space-between;align-items:center;font-weight:600;margin-bottom:8px}
+.calh button{width:auto;margin:0;background:none;border:0;color:var(--tx);font-size:1.4rem;padding:0 12px;line-height:1}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal .wd{color:var(--mu);font-size:.75rem}
+.cal .d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:.85rem;font-variant-numeric:tabular-nums}
+.d.u1{background:var(--u1);color:var(--u1t)}.d.u2{background:var(--u2);color:var(--u2t)}
+.d.both{background:linear-gradient(135deg,var(--u1) 50%,var(--u2) 50%);color:#fff;text-shadow:0 0 3px rgba(0,0,0,.7)}
+.d.today{outline:2px solid var(--tx);outline-offset:-2px}
+.leg{display:flex;gap:14px;font-size:.8rem;color:var(--mu);margin-top:10px;flex-wrap:wrap}
+.leg i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.sat{color:var(--mu);font-size:.8rem;margin-right:2px}
 .chip i{font-style:normal;font-size:.7rem;opacity:.75;margin-right:6px}
 .chip.empty.nx{border-color:var(--ac);color:var(--ac)}
 .ex{padding:7px 0;border-top:1px solid var(--bd)}.ex:first-of-type{border-top:0}
-.en{display:flex;justify-content:space-between;gap:10px}.en span{color:var(--mu)}.en b{font-variant-numeric:tabular-nums;white-space:nowrap}
-.sets{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.en{color:var(--mu);font-size:.85rem}.ln{display:flex;align-items:center;gap:10px;margin-top:3px}.ln b{flex:0 0 6.8rem;font-variant-numeric:tabular-nums}
+.sets{display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex:1}
 .sets small{color:var(--mu);font-size:.75rem}
 .sets span{background:var(--bg);border:1px solid var(--bd);border-radius:10px;min-width:28px;text-align:center;padding:1px 8px;font-size:.85rem;font-variant-numeric:tabular-nums}
 .inf{color:var(--mu);cursor:pointer;margin-left:6px;font-size:.95rem}.fi{color:var(--mu);font-size:.85rem;margin:-6px 0 12px}.fi b{color:var(--tx);font-weight:600}.ver{text-align:center;color:var(--mu);font-size:.8rem;margin:4px 0 20px}#gate p{color:var(--mu);line-height:1.4;font-size:.9rem}#note{color:var(--mu);font-size:.85rem;margin-top:6px}
@@ -68,6 +80,14 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
   <button class="sec" id="cancel" hidden>Bearbeiten abbrechen</button>
 </div>
 
+<details class="card" id="ausw">
+  <summary>📊 Auswertungen</summary>
+  <div class="sub">Kalenderübersicht</div>
+  <div class="calh"><button id="cprev" aria-label="Voriger Monat">‹</button><span id="cmon"></span><button id="cnext" aria-label="Nächster Monat">›</button></div>
+  <div class="cal" id="cal"></div>
+  <div class="leg"><span><i style="background:var(--u1)"></i>Einheit 1</span><span><i style="background:var(--u2)"></i>Einheit 2</span><span id="ccount" style="margin-left:auto"></span></div>
+</details>
+
 <div id="hist"></div>
 
 <div class="card">
@@ -80,7 +100,7 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 <div class="ver" id="ver"></div>
 
 <script>
-const VERSION="0.17";
+const VERSION="0.19";
 // s = Anzahl Sätze (0 = variabel), max = höchste Wiederholungszahl
 const PLAN={
   1:[{n:"Kniebeugen",s:3},{n:"Bankdrücken",s:3},{n:"Vorgebeugtes Rudern",s:3}],
@@ -163,7 +183,7 @@ async function exportNew(){
   }catch(e){if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)}
 }
 function done(m,nf,nb){
-  data=m.all;persist();build();render();
+  data=m.all;persist();refresh();
   return `${nb} neue oder geänderte Einträge in den Browser übernommen, ${nf} in die Datei. Insgesamt ${live().length} Einträge.`;
 }
 async function exportOld(){
@@ -182,7 +202,7 @@ $("file").onchange=e=>{
   r.onload=()=>{try{
     if(mode==="import"){
       const fa=unpack(r.result),m=merge(fa);
-      data=m.all;persist();build();render();setFile(f.name,"importiert");
+      data=m.all;persist();refresh();setFile(f.name,"importiert");
       const imp=$("imp");imp.style.color="var(--tx)";
       imp.textContent=`Import: ${m.nb} neue oder geänderte Einträge übernommen. Insgesamt ${live().length} Einträge.`;
       return;
@@ -257,7 +277,7 @@ function next(i){
   const nx=document.querySelector(`.w[data-i="${i+1}"]`);
   if(nx)nx.focus();else $("save").focus();
 }
-$("unit").onchange=build;
+$("unit").onchange=()=>{build();render()};
 
 $("save").onclick=()=>{
   const u=$("unit").value,ex={};let err="";
@@ -284,8 +304,8 @@ $("save").onclick=()=>{
     return;
   }
   data=[...data,{id:newId(),date:$("date").value,unit:+u,ex,ts:Date.now()}].sort(cmp);
-  if(persist())$("note").textContent="✔ Gespeichert.";
-  $("unit").value=u==1?2:1;build();render();
+  const ok=persist();init();
+  if(ok)$("note").textContent="✔ Gespeichert.";
   window.scrollTo({top:0,behavior:"smooth"});
 };
 
@@ -300,29 +320,54 @@ function edit(id){
     document.querySelector(`.w[data-i="${i}"]`).value=w;chips(i);
   });
   $("editbar").textContent=`✎ Bearbeite Eintrag vom ${fmt(e.date)} (Einheit ${e.unit})`;
-  $("editbar").hidden=false;$("cancel").hidden=false;$("save").textContent="Änderung speichern";
+  $("editbar").hidden=false;$("cancel").hidden=false;$("editbar").parentElement.classList.add("editing");$("save").textContent="Änderung speichern";
   $("msg").textContent="";$("note").textContent="";
   render();window.scrollTo({top:0,behavior:"smooth"});
 }
 function exitEdit(){
-  editId=null;$("unit").disabled=false;$("editbar").hidden=true;$("cancel").hidden=true;
+  editId=null;$("unit").disabled=false;$("editbar").hidden=true;$("cancel").hidden=true;$("editbar").parentElement.classList.remove("editing");
   $("save").textContent="Speichern";init();
 }
 $("cancel").onclick=exitEdit;
 const wd=d=>new Date(d+"T12:00").toLocaleDateString("de-DE",{weekday:"short"}).replace(".","");
 const fmt=d=>d.split("-").reverse().join(".");
+let cal=null;
+function calMove(n){const d=new Date(cal.y,cal.m+n,1);cal={y:d.getFullYear(),m:d.getMonth()};renderCal()}
+function renderCal(){
+  const now=new Date();if(!cal)cal={y:now.getFullYear(),m:now.getMonth()};
+  const{y,m}=cal,pre=y+"-"+String(m+1).padStart(2,"0"),days=new Date(y,m+1,0).getDate(),off=(new Date(y,m,1).getDay()+6)%7;
+  const by={};let n=0;
+  live().forEach(x=>{if(x.date.slice(0,7)===pre){const d=+x.date.slice(8,10);(by[d]=by[d]||{})[x.unit]=1;n++}});
+  const today=(now.getFullYear()===y&&now.getMonth()===m)?now.getDate():0;
+  let h=["Mo","Di","Mi","Do","Fr","Sa","So"].map(t=>`<div class="wd">${t}</div>`).join("")+"<div></div>".repeat(off);
+  for(let d=1;d<=days;d++){
+    const u=by[d]||{},c=u[1]&&u[2]?"both":u[1]?"u1":u[2]?"u2":"";
+    const tt=c?` title="${u[1]?"Einheit 1":""}${u[1]&&u[2]?" + ":""}${u[2]?"Einheit 2":""}"`:"";
+    h+=`<div class="d ${c}${d===today?" today":""}"${tt}>${d}</div>`;
+  }
+  $("cal").innerHTML=h;
+  $("cmon").textContent=new Date(y,m,1).toLocaleDateString("de-DE",{month:"long",year:"numeric"});
+  $("ccount").textContent=n?`${n} Einheit${n>1?"en":""}`:"keine Einheit";
+}
+$("cprev").onclick=()=>calMove(-1);
+$("cnext").onclick=()=>calMove(1);
+function refId(){ // zuletzt eingetragene Einheit mit derselben Nummer (ohne den gerade bearbeiteten Eintrag)
+  const u=+$("unit").value,L=live().filter(x=>x.unit===u&&x.id!==editId);
+  return L.length?L[L.length-1].id:null;
+}
 function render(){
+  const ref=refId();renderCal();
   $("hist").innerHTML=live().reverse().map(s=>
-    `<div class="card${s.id===editId?" ed":""}"><div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>Einheit ${s.unit}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}</span><span><button class="x" onclick="edit('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="del('${s.id}')" title="Löschen">✕</button></span></div>`+
+    `<div class="card${s.id===editId?" ed":""}${s.id===ref?" ref":""}"><div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>Einheit ${s.unit}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}</span><span><button class="x" onclick="edit('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="del('${s.id}')" title="Löschen">✕</button></span></div>`+
     Object.entries(s.ex).map(([k,v])=>{
       const[w,rs]=v.split("x"),reps=rs.split("-").map(Number);
       const wg=w.replace(".",","),kg=k==="Klimmzüge"?(+w?`+${wg} kg`:"Körpergewicht"):`${wg} kg`;
-      return `<div class="ex"><div class="en"><span>${k}</span><b>${kg}</b></div><div class="sets"><small>${reps.length>1?"Sätze":"Satz"}</small>${reps.map(x=>`<span>${x}</span>`).join("")}${k==="Klimmzüge"?`<small>Σ ${sum(reps)} Wdh.</small>`:""}</div></div>`}).join("")+`</div>`).join("");
+      return `<div class="ex"><div class="en">${k}</div><div class="ln"><b>${kg}</b><div class="sets"><small>Wiederholungen</small>${reps.map(x=>`<span>${x}</span>`).join("")}${k==="Klimmzüge"?`<small>Σ ${sum(reps)}</small>`:""}</div></div></div>`}).join("")+`</div>`).join("");
 }
 function del(id){
   if(!confirm("Eintrag löschen?"))return;
   data=data.map(x=>x.id===id?{...x,del:true,ts:Date.now()}:x);persist();
-  if(id===editId)exitEdit();else{if(editId===null)build();render()}
+  if(id===editId)exitEdit();else{if(editId===null)init();else render()}
 }
 function dl(name,text,type){
   const a=document.createElement("a");
@@ -336,6 +381,11 @@ function init(){
   const L=live(),l=L[L.length-1];$("unit").value=l?(l.unit==1?2:1):1;
   $("msg").textContent="";$("note").textContent="";build();render();
 }
+function refresh(){if(editId!==null)exitEdit();else init()}
+// Beim Zurückkehren zur Seite (z. B. am nächsten Tag): Datum/Einheit aktualisieren, sofern nichts eingegeben ist
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible"&&editId===null&&st.every(x=>!x.reps.length))init();
+});
 init();
 </script>
 </body>

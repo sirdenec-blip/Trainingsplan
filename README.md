@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.17** (steht auch unten auf der Seite)
+Aktuelle Version: **0.19** (steht auch unten auf der Seite)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -36,6 +36,15 @@ Button **Trainingstagebuch importieren**: wählt eine Tagebuch-Datei aus und üb
 ### Anzeige
 Eingabe: Jeder Satz hat eine Nummer (Satz 1, 2, 3 …), der nächste Satz ist farbig markiert und das Eingabefeld nennt ihn („Satz 2: Wdh.“). Verlauf: pro Übung das Gewicht in kg und darunter die Wiederholungen je Satz als kleine Felder; bei Klimmzügen zusätzlich die Summe.
 
+Die Ansicht entspricht der Eingabe: links das Gewicht (kg), rechts die Wiederholungen je Satz. Beim Eintragen ist die zuletzt gespeicherte Einheit mit derselben Nummer grün gestrichelt umrandet (zum Vergleichen der Werte). Im Bearbeiten-Modus sind Formular und Eintrag gelb markiert.
+
+### Datum und Einheit
+Beim Öffnen, nach dem Speichern, Löschen, Import/Abgleich und beim Zurückkehren zur Seite (sofern noch nichts eingegeben ist) wird das Datum auf heute gesetzt und die Einheit auf diejenige, die **nicht** im datumsmäßig letzten Eintrag vorkommt. Manuell kannst du jederzeit abweichen.
+
+### Auswertungen
+Aufklappbarer Bereich „📊 Auswertungen“.
+- **Kalenderübersicht:** Monatskalender (Mo–So) mit Blättern per ‹ ›. Tage mit Einheit sind grün markiert, Einheit 1 hellgrün, Einheit 2 dunkelgrün (beide am selben Tag: geteilt). Heute ist umrandet.
+
 ### Eindeutige IDs und Abgleich
 Jeder Eintrag hat eine eindeutige ID und einen Änderungszeitpunkt. Beim Abgleich gilt: gleiche ID = gleicher Eintrag, die **neuere Änderung gewinnt**. So bleibt nach dem Bearbeiten kein alter Eintrag stehen. Gelöschte Einträge bleiben als „gelöscht“ markiert in Browser und Datei (unsichtbar), damit eine Löschung beim Abgleich nicht rückgängig gemacht wird. Bearbeitete Einträge zeigen ein ⓘ (antippen = Zeitpunkt der letzten Änderung).
 Alt-Einträge (vor 0.16) bekommen beim ersten Start eine ID, die aus ihrem Inhalt berechnet wird. Duplikate aus früheren Versionen (alter und bearbeiteter Eintrag) müssen einmalig von Hand gelöscht werden.
@@ -50,6 +59,8 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.19:** Datum/Einheit werden bei jeder Aktualisierung neu gesetzt, Bereich „Auswertungen“ mit Kalenderübersicht.
+- **0.18:** Verlauf wie Eingabe angeordnet (kg links, Wiederholungen rechts), letzte gleiche Einheit grün gestrichelt, Bearbeiten-Modus gelb.
 - **0.17:** Satz-Nummern in der Eingabe, kompaktere Verlaufsansicht mit kg und Sätzen.
 - **0.16:** Eindeutige IDs, Abgleich von Änderungen und Löschungen, ⓘ bei bearbeiteten Einträgen. Dateiformat Version 2.
 - **0.15:** Einträge bearbeiten (Stift-Symbol im Verlauf).
