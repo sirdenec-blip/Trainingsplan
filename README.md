@@ -36,13 +36,13 @@ Button **Trainingstagebuch importieren**: wählt eine Tagebuch-Datei aus und üb
 ### Anzeige
 Eingabe: Jeder Satz hat eine Nummer (Satz 1, 2, 3 …), der nächste Satz ist farbig markiert und das Eingabefeld nennt ihn („Satz 2: Wdh.“). Verlauf: pro Übung das Gewicht in kg und darunter die Wiederholungen je Satz als kleine Felder; bei Klimmzügen zusätzlich die Summe.
 
-Die Ansicht entspricht der Eingabe: links das Gewicht (kg), rechts die Wiederholungen je Satz. Beim Eintragen ist die zuletzt gespeicherte Einheit mit derselben Nummer grün gestrichelt umrandet (zum Vergleichen der Werte). Im Bearbeiten-Modus sind Formular und Eintrag gelb markiert.
+Die Ansicht entspricht der Eingabe: links das Gewicht (kg), rechts die Wiederholungen je Satz (Beschriftung „Wdh.“). Beim Eintragen ist die zuletzt gespeicherte Einheit mit derselben Nummer grün gestrichelt umrandet (zum Vergleichen der Werte). Im Bearbeiten-Modus sind Formular und Eintrag gelb markiert.
 
 ### Datum und Einheit
 Beim Öffnen, nach dem Speichern, Löschen, Import/Abgleich und beim Zurückkehren zur Seite (sofern noch nichts eingegeben ist) wird das Datum auf heute gesetzt und die Einheit auf diejenige, die **nicht** im datumsmäßig letzten Eintrag vorkommt. Manuell kannst du jederzeit abweichen.
 
 ### Auswertungen
-Aufklappbarer Bereich „📊 Auswertungen“.
+Aufklappbarer Bereich „📊 Auswertungen“ unterhalb der Einträge.
 - **Kalenderübersicht:** Monatskalender (Mo–So) mit Blättern per ‹ ›. Tage mit Einheit sind grün markiert, Einheit 1 hellgrün, Einheit 2 dunkelgrün (beide am selben Tag: geteilt). Heute ist umrandet.
 
 ### Eindeutige IDs und Abgleich

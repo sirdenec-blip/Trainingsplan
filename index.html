@@ -80,6 +80,8 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
   <button class="sec" id="cancel" hidden>Bearbeiten abbrechen</button>
 </div>
 
+<div id="hist"></div>
+
 <details class="card" id="ausw">
   <summary>📊 Auswertungen</summary>
   <div class="sub">Kalenderübersicht</div>
@@ -87,8 +89,6 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
   <div class="cal" id="cal"></div>
   <div class="leg"><span><i style="background:var(--u1)"></i>Einheit 1</span><span><i style="background:var(--u2)"></i>Einheit 2</span><span id="ccount" style="margin-left:auto"></span></div>
 </details>
-
-<div id="hist"></div>
 
 <div class="card">
   <button id="tag" style="margin-top:0">📔 Trainingstagebuch exportieren</button>
@@ -362,7 +362,7 @@ function render(){
     Object.entries(s.ex).map(([k,v])=>{
       const[w,rs]=v.split("x"),reps=rs.split("-").map(Number);
       const wg=w.replace(".",","),kg=k==="Klimmzüge"?(+w?`+${wg} kg`:"Körpergewicht"):`${wg} kg`;
-      return `<div class="ex"><div class="en">${k}</div><div class="ln"><b>${kg}</b><div class="sets"><small>Wiederholungen</small>${reps.map(x=>`<span>${x}</span>`).join("")}${k==="Klimmzüge"?`<small>Σ ${sum(reps)}</small>`:""}</div></div></div>`}).join("")+`</div>`).join("");
+      return `<div class="ex"><div class="en">${k}</div><div class="ln"><b>${kg}</b><div class="sets"><small>Wdh.</small>${reps.map(x=>`<span>${x}</span>`).join("")}${k==="Klimmzüge"?`<small>Σ ${sum(reps)}</small>`:""}</div></div></div>`}).join("")+`</div>`).join("");
 }
 function del(id){
   if(!confirm("Eintrag löschen?"))return;
