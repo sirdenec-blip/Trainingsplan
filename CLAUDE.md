@@ -12,7 +12,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 
 ## Versionierung
 - Konstante `const VERSION="…"` in `index.html`, angezeigt im ⓘ-Menü.
-- Aktuell: **0.90** (Testversion PWA + Drive-Sync). **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
+- Aktuell: **0.91** (Testversion PWA + Drive-Sync, Client-ID eingetragen). **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
 - Wenn der Nutzer „gleiche Versionsnummer“ sagt, Version nicht erhöhen.
 - Bei jeder Version: `VERSION` und `CACHE` in `sw.js` anpassen, README aktualisieren (Versionszeile + „## Versionen“ + betroffene Abschnitte).
 - Vor größeren Umbauten: Konzept/Optionen knapp vorlegen und nachfragen.
@@ -22,7 +22,8 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 - **Gerät (localStorage):** `ttb_index` `{mode:"cloud"|"local"|null, active, email?, folder?, plans:{id:{id,name,n,last,fileId?,mod?,dirty?,rev?,debug?}}}`, `ttb_doc_<planId>` (Arbeitskopie), `ttb_tok` (Google-Zugang, ~1 h), `ttb_last` (letzter Abgleich). Oberfläche: `trainingsplan_ui` `{hf, hv, tmr}`.
 - **Ablauf:** `persist()` speichert sofort lokal, markiert `dirty`/`rev` und startet `syncSoon()` (1,5 s). `syncAll()`: Drive-Liste holen, neue Pläne anderer Geräte aufnehmen, je Plan `syncPlan()` = herunterladen → mit frischer lokaler Kopie zusammenführen (`mergeDocs`: gleiche ID, neuere `ts` gewinnt, Tombstones bleiben; neuerer Plan gewinnt) → lokal schreiben → nur bei Unterschied hochladen. `dirty` wird nur gelöscht, wenn `rev` während des Abgleichs unverändert blieb. Abgleich auch beim Öffnen, Zurückkehren (visibilitychange) und `online`; beim Verlassen wird Ausstehendes sofort übertragen.
 - **Google-Zugang:** GIS-Token-Client (Popup) bzw. auf dem iPhone in der installierten App (`navigator.standalone`) Weiterleitung mit `#access_token` (Rücksprung-Aktion in `sessionStorage.ttb_after`). Zugang ~1 h; Erneuern nur aus einem Klick (`kick()` nach Speichern/Löschen, Tipp auf die Statuszeile). Ohne Zugang arbeitet alles lokal weiter. Ein eigener Server (z. B. Cloudflare Worker für Dauerzugang) ist als **spätere Ausbaustufe** vorgesehen.
-- `CLIENT_ID` oben im Speicher-Abschnitt von `index.html`; leer = nur „Ohne Cloud“ möglich.
+- `CLIENT_ID` oben im Speicher-Abschnitt von `index.html` (Google-Cloud-Projekt „TTB Trainingstagebuch“ des Nutzers, Client „TTB Web“; erlaubte Quellen `https://sirdenec-blip.github.io` und `http://localhost:8765`). Status bei Google: „Testen“ – nur eingetragene Testnutzer können sich anmelden. Leer = nur „Ohne Cloud“ möglich.
+- Im Browser-Pane von Claude öffnet sich das Google-Anmeldefenster nicht (Popups nur nach echtem Nutzerklick) – echte Anmeldung testet der Nutzer.
 - **Datenschutz-Regeln:** Löschen eines Plans = Drive-Papierkorb (30 Tage). In Drive gelöschte Pläne werden lokal entfernt (vorher Rückfrage, falls offline geändert). „Von diesem Gerät entfernen“ synchronisiert vorher (offline verweigert) und löscht nur `ttb_*`. Debug-Plan (`id:"debug"`) wird **nie** hochgeladen. In Drive wird nie automatisch etwas gelöscht.
 - Keine Rückwärtskompatibilität zu Ständen vor 0.90 nötig (laut Nutzer keine echte Nutzung davor); alte Schlüssel `trainingsplan_v1/_plan_v1/_file` werden beim Start entfernt.
 

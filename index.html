@@ -238,7 +238,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.90";
+const VERSION="0.91";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -266,7 +266,7 @@ const live=()=>data.filter(x=>!x.del);
 // der Hauptspeicher (Ordner „Trainingstagebuch“, eine Datei pro Plan), abgeglichen im Hintergrund.
 // =====================================================================================
 // Google-OAuth-Client-ID (Typ „Webanwendung“). Leer = Drive-Anbindung ausgeblendet, nur „Ohne Cloud“ möglich.
-const CLIENT_ID="";
+const CLIENT_ID="134165771161-fu2co3cm28fdn1ag6eqfsdq9emqlpjoq.apps.googleusercontent.com";
 const SCOPE="https://www.googleapis.com/auth/drive.file",FOLDER="Trainingstagebuch",DOCV=4;
 const IKEY="ttb_index",TKEY="ttb_tok",DKEY=id=>"ttb_doc_"+id;
 // idx.mode: "cloud" | "local" | null (noch nicht eingerichtet); idx.plans[id] = {id,name,n,last,fileId?,mod?,dirty?,rev?,debug?}

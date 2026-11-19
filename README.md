@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.90** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.91** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -97,6 +97,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.91:** Google-Anbindung aktiviert (OAuth-Client-ID eingetragen). Anmeldung zunächst nur für eingetragene Testnutzer.
 - **0.90:** Testversion mit neuer Speicherung: Google Drive als Hauptspeicher (Ordner „Trainingstagebuch“, eine Datei pro Plan, automatischer Abgleich, offline nutzbar), mehrere Trainingspläne (laden, neu erstellen, aus bestehendem Plan übernehmen, löschen), Modus „Ohne Cloud“ als Nebenweg, installierbar als App „TTB“ (Android und iPhone), Debug-Plan nur auf dem Gerät. Datei-Export/-Import und Export-Erinnerung entfallen.
 - **0.52:** Pause-Standard 2:00 für alle Übungen, Timerleiste oben, freier Timer mit Pause/Weiter, Kompaktansicht mit Bubbles, Debug-Modus.
 - **0.51:** Einfarbige Symbole, Uhr-Knopf (Pausentimer an/aus, freier Timer), Filter nach Einheit zeigt nur den neuesten Eintrag, Export-Erinnerung ab 3 Änderungen oder nach einer Woche.
