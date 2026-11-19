@@ -73,8 +73,11 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 .tb th,.tb td{padding:5px 4px;text-align:right;border-top:1px solid var(--bd);white-space:nowrap}.tb th{color:var(--mu);font-weight:400;border-top:0}
 .tb td:first-child,.tb th:first-child{text-align:left;white-space:normal}
 .rc{padding:6px 0;border-top:1px solid var(--bd);font-size:.85rem}.rc b{display:block;margin-bottom:2px}.rc span{display:block;color:var(--mu)}
-.stp{display:flex;flex-direction:column;gap:2px;flex:0 0 auto}
-.stp button{width:26px;height:17px;padding:0;margin:0;font-size:.55rem;line-height:1;background:transparent;color:var(--tx);border:1px solid var(--bd);border-radius:5px;font-weight:400}
+.stw{display:flex;align-items:stretch;flex:0 0 auto}.stw.fl1{flex:1;min-width:0}
+.stw input{border-radius:0;min-width:0;flex:1}.stw.fl1 .r{flex:1}
+.sb{flex:0 0 46px;width:46px;min-height:46px;margin:0;padding:0;font-size:1rem;line-height:1;background:transparent;color:var(--tx);border:1px solid var(--bd);font-weight:400;touch-action:manipulation}
+.sb[data-st="1"]{border-radius:8px 0 0 8px;border-right:0}.sb[data-st="-1"]{border-radius:0 8px 8px 0;border-left:0}
+.in .stw .w{flex:0 0 84px}
 .top{display:flex;justify-content:space-between;align-items:center;margin:.2rem 0 1rem}.top h1{margin:0}
 .ib{width:34px;height:34px;padding:0;margin:0;border-radius:50%;background:transparent;color:var(--mu);border:1px solid var(--bd);font-size:1rem;font-weight:400}
 .infp{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:-4px 0 14px;font-size:.85rem;color:var(--mu);line-height:1.5}
@@ -169,7 +172,7 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 </div>
 
 <script>
-const VERSION="0.41";
+const VERSION="0.42";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -313,7 +316,8 @@ $("exOld").onclick=exportOld;
 const lastW=(u,name)=>{const L=live();for(let i=L.length-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[name]){const w=parseVal(L[i].ex[name]).w;if(w!=null)return w}return null};
 const sum=a=>a.reduce((x,y)=>x+y,0);
 
-const stp=(i,k)=>`<span class="stp"><button type="button" data-st="1" data-k="${k}" data-i="${i}" aria-label="Erhöhen">▲</button><button type="button" data-st="-1" data-k="${k}" data-i="${i}" aria-label="Verringern">▼</button></span>`;
+// Eingabefeld mit großem ▲ links und ▼ rechts über die volle Feldhöhe
+const stw=(i,k,inp)=>`<span class="stw${k==="r"?" fl1":""}"><button type="button" class="sb" data-st="1" data-k="${k}" data-i="${i}" aria-label="Erhöhen">▲</button>${inp}<button type="button" class="sb" data-st="-1" data-k="${k}" data-i="${i}" aria-label="Verringern">▼</button></span>`;
 const lastPyr=(u,n)=>{const L=live();for(let i=L.length-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[n]){const p=parseVal(L[i].ex[n]).pyr;if(p)return p.ws[0]}return null};
 $("fields").addEventListener("click",e=>{ // ▲▼: Gewicht in 0,25-Schritten
   const b=e.target.closest("button[data-st]");if(!b)return;
@@ -331,8 +335,8 @@ function build(defs){
   $("fields").innerHTML=cur.map((e,i)=>{
     const hp=e.m==="p",hw=e.m==="wr"||e.m==="w",hr=e.m==="wr"||e.m==="r";
     const row=hp?`<div class="in"><input class="pr" data-i="${i}" inputmode="numeric" placeholder="Wdh" aria-label="Wiederholungen je Satz"><span>Wdh. je Satz</span></div>
-      <div class="in" style="margin-top:8px"><input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="Satz 1: kg" autocomplete="off">${stp(i,"r")}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
-     :`<div class="in">${hw?`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg">${stp(i,"w")}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
+      <div class="in" style="margin-top:8px">${stw(i,"r",`<input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="Satz 1: kg" autocomplete="off">`)}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
+     :`<div class="in">${hw?`${stw(i,"w",`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg">`)}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
     return `<label class="fl"><span>${esc(e.n)}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></label>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}`}).join("");
   cur.forEach((_,i)=>{chips(i);updateDw(i)});
   document.querySelectorAll(".w,.pr").forEach(el=>{

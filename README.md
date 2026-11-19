@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.41** (steht auch unten auf der Seite)
+Aktuelle Version: **0.42** (steht auch unten auf der Seite)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -83,6 +83,7 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.42:** Gewichtspfeile größer: ▲ links und ▼ rechts neben dem Feld, über die volle Feldhöhe.
 - **0.41:** ▲▼ für Gewichte (0,25 kg), angeheftete Leiste „Ältere Einträge“ zum Einklappen, „1RM geschätzt“, Titel „Trainingstagebuch“, Info-Menü ⓘ (Plan, Datei, Version, „created by Claude and JD“).
 - **0.40:** Auswertungen: Fortschrittsübersicht, Bestleistungen, Regelmäßigkeit, Verläufe für Gewicht, geschätztes Max, Volumen und Wiederholungen; 🏆 im Verlauf.
 - **0.31:** Pyramidensatz, neues Speichersystem (Startmenü, Import nur beim Start, Export schreibt als einziges in Dateien, „Alle Daten zurücksetzen“), Einträge je Einheit sichtbar, Layout-Fix „Sätze“ im Plan-Assistenten.
