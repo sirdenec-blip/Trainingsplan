@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.50** (steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.51** (steht auch im ⓘ-Menü oben rechts)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -21,10 +21,11 @@ Die Striche werden automatisch gesetzt, gespeichert wird z. B. `85x8-9-10`.
 Das Gewicht vom letzten Mal ist vorausgefüllt, Datum = heute, Einheit wechselt automatisch.
 
 ### Helfer beim Training
-- **⏱ Pausentimer:** startet nach jedem eingetragenen Satz automatisch (Standard 2:00, pro Übung im Plan-Assistenten einstellbar oder „aus“). Die Leiste unten zeigt die Restzeit, „+30 s“ verlängert, ✕ beendet. Am Ende vibriert das Handy und die Leiste wird grün („Pause vorbei“). Nach dem letzten Satz der Einheit und beim Speichern stoppt der Timer.
-- **🔥 Aufwärmsätze:** Flammensymbol neben der Übung antippen: 40 %, 60 % und 80 % des eingetragenen Gewichts (auf 2,5 kg gerundet, mindestens 20 kg). Nur Anzeige.
+- **⏱ Pausentimer:** startet nach jedem eingetragenen Satz automatisch (Standard 2:00, bei Körpergewichtsübungen aus; pro Übung im Plan-Assistenten einstellbar, nicht bei „Nur Gewicht“). Die Leiste unten zeigt die Restzeit, „+30 s“ verlängert, ✕ beendet. Am Ende vibriert das Handy und die Leiste wird grün („Pause vorbei“). Nach dem letzten Satz der Einheit und beim Speichern stoppt der Timer.
+- **Uhr-Knopf** (neben der Notiz-Sprechblase): kurz antippen schaltet den Pausentimer aus bzw. wieder an (an = Symbol hervorgehoben, Standard; wird gemerkt). **Lange drücken** öffnet einen freien Timer unten: 2:00, mit −0:30 / −0:15 / +0:15 / +0:30 einstellbar (auch während er läuft), „Start“ startet. Am Ende steht „Zeit abgelaufen“ (bleibt stehen, bis ✕), „Neu“ startet ihn erneut. Solange der freie Timer läuft, startet kein Satztimer.
+- **Aufwärmsätze:** Flammensymbol neben der Übung antippen: 40 %, 60 % und 80 % des eingetragenen Gewichts (auf 2,5 kg gerundet, mindestens 20 kg). Nur Anzeige.
 - **Scheibenrechner:** Hantelsymbol neben der Übung antippen: welche Scheiben pro Seite bei einer 20-kg-Stange (Scheiben 25 / 20 / 15 / 10 / 5 / 2,5 / 1,25). Passt sich beim Ändern des Gewichts sofort an.
-- **💬 Notiz:** Sprechblase unter den Übungen antippen klappt ein Textfeld aus (z. B. „Schulter zwickt“). Die Notiz wird mit dem Eintrag gespeichert und abgeglichen.
+- **Notiz:** Sprechblase unter den Übungen antippen klappt ein Textfeld aus (z. B. „Schulter zwickt“). Die Notiz wird mit dem Eintrag gespeichert und abgeglichen.
 - **Bildschirm bleibt an:** Während der Eingabe hält die App den Bildschirm wach (bis zum Speichern bzw. 15 Minuten ohne Eingabe), sofern der Browser das unterstützt.
 
 ## Speicherung
@@ -39,7 +40,7 @@ Danach läuft alles im Browser (localStorage). **An der geöffneten Datei wird n
 
 **📔 Trainingsplan exportieren:** schreibt Plan und Einträge in eine Datei. Optionen: in die geöffnete Datei speichern (wenn der Browser das erlaubt), neue Datei erstellen (Name = Planname) oder bestehende Datei auswählen. Bei bestehenden Dateien wird in beide Richtungen abgeglichen (neuere Änderung gewinnt, Löschungen werden mit abgeglichen). Auf dem Handy (iPhone/Safari, Chrome Android) kann der Browser Dateien nicht überschreiben: die Datei wird neu heruntergeladen und ersetzt die alte.
 
-**Export-Erinnerung:** Gibt es Änderungen, die noch nicht in einer Datei gesichert sind, und liegt der letzte Export mindestens 7 Tage zurück (oder gab es noch keinen), steht unter dem Titel dezent „💾 Letzter Export vor N Tagen · jetzt exportieren“ (antippen öffnet den Export).
+**Export-Erinnerung:** Unter dem Titel steht dezent z. B. „💾 3 Änderungen nicht exportiert · Export vor 9 Tagen · jetzt exportieren“ (antippen öffnet den Export), sobald **3 oder mehr** Änderungen (neu, bearbeitet, gelöscht) noch nicht in einer Datei gesichert sind **oder** mindestens eine Änderung offen ist und der letzte Export **eine Woche** zurückliegt (ohne bisherigen Export: seit der ältesten offenen Änderung).
 
 **🗑 Alle Daten zurücksetzen:** entfernt Plan und alle Einträge im Browser (auch nicht exportierte) nach Warnung; danach erscheint wieder das Startmenü. Die Datei auf dem Gerät bleibt unverändert.
 
@@ -51,7 +52,7 @@ Der Plan-Assistent (Startmenü → *Individuell*, später **✎ Trainingsplan be
   - **Nur Gewicht** (ein Wert, z. B. `85`).
   - **Nur Wiederholungen** (beliebig viele Sätze, z. B. `x60-45`).
   - **Pyramidensatz:** einmal feste Wiederholungen, pro Satz das Gewicht (z. B. `8@60-70-80`), Sätze wählbar.
-  - **Pause** für den Pausentimer (0:30 bis 5:00 oder aus, Standard 2:00), außer bei „Nur Gewicht“.
+  - **Pause** für den Pausentimer (0:30 bis 5:00 oder aus; Standard 2:00, bei Körpergewichtsübungen aus), außer bei „Nur Gewicht“.
 - Der Plan wird im Browser **und im Trainingstagebuch (Datei)** gespeichert (Dateiformat Version 3). Beim Abgleich/Import gewinnt der neuere Plan; die Meldung nennt es, wenn ein Plan aus der Datei übernommen wurde.
 - Der aktive Plan und die zuletzt verwendete Datei stehen im ⓘ-Menü oben rechts.
 - Bestehende Einträge bleiben bei Planänderungen erhalten und werden weiter angezeigt.
@@ -61,7 +62,7 @@ Der Plan-Assistent (Startmenü → *Individuell*, später **✎ Trainingsplan be
 Angezeigt werden so viele Einträge, wie der Plan Einheiten hat – je Einheit der neueste (Referenz), mit den neuesten übrigen aufgefüllt. Alle weiteren stehen unter „Ältere Einträge“.
 
 Über dem Verlauf (Auswahl wird gemerkt):
-- **Alle · E1 · E2 …** filtert nach Einheit (dann die neuesten Einträge dieser Einheit sichtbar, Rest unter „Ältere Einträge“).
+- **Alle · E1 · E2 …** filtert nach Einheit (dann nur der neueste Eintrag dieser Einheit sichtbar, alle anderen unter „Ältere Einträge“).
 - **Kompakt** (Standard): eine Zeile pro Übung, z. B. „Kniebeugen 90 kg +2,5 · 8 8 7“. Notizen als 💬 im Kopf, antippen zeigt sie.
 - **Ausführlich:** die bisherige Darstellung mit Satz-Kästchen, Notiz sichtbar darunter.
 
@@ -99,6 +100,7 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.51:** Einfarbige Symbole (Flamme, Notiz, Uhr), Uhr-Knopf: Pausentimer an/aus und freier Timer (lange drücken, ±0:15/±0:30, „Zeit abgelaufen“), Pause bei Körpergewichtsübungen standardmäßig aus, Filter nach Einheit zeigt nur den neuesten Eintrag, Export-Erinnerung ab 3 Änderungen oder nach einer Woche.
 - **0.50:** Logo „Feuerfuchs“ (auch als Browser-Symbol), Verlauf filterbar nach Einheit mit Kompakt-/Ausführlich-Ansicht (kompakt als Standard), Notiz pro Eintrag (💬), Pausentimer (pro Übung einstellbar), Aufwärmsätze (🔥) und Scheibenrechner, antippbare Diagramme, Export-Erinnerung, Bildschirm bleibt während der Eingabe an.
 - **0.45:** Kürzerer Platzhalter „Wdh.“ im Wiederholungsfeld, Gewichte in der Eingabe mit Komma (z. B. 110,5), bei Körpergewichtsübungen „zuletzt Körpergewicht“ bzw. „zuletzt +2,5 kg“.
 - **0.44:** Eingabezeile auch auf schmalen Handys (360 px) mit ausreichend breitem Wiederholungsfeld; README: Version steht im ⓘ-Menü.

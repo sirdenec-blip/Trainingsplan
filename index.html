@@ -110,7 +110,8 @@ h1.lg{display:flex;align-items:center;gap:8px}.logo{width:34px;height:34px;flex:
 .cn{color:var(--mu);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cv{white-space:nowrap;text-align:right}.cv b{font-weight:600}.cv small{color:var(--mu);font-size:.75rem}
 .card.cmp{padding:10px 14px}.card.cmp.ref{padding:9px 13px}.card.cmp .h{margin-bottom:2px}
 .nt{color:var(--mu);font-size:.85rem;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}
-#tbar{position:fixed;left:0;right:0;bottom:0;z-index:8;display:flex;align-items:center;gap:10px;max-width:520px;margin:0 auto;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--ac);box-shadow:0 -4px 14px rgba(0,0,0,.18)}#tbar[hidden]{display:none}
+#tbar .tr1{display:flex;align-items:center;gap:10px}#tbar .tr2{display:flex;gap:6px}#tbar .tr2[hidden]{display:none}#tbar .tr2 button{flex:1;padding:6px 0}body.tmf{padding-bottom:132px}
+#tbar{position:fixed;left:0;right:0;bottom:0;z-index:8;display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--ac);box-shadow:0 -4px 14px rgba(0,0,0,.18)}#tbar[hidden]{display:none}
 #tbar b{font-size:1.4rem;font-variant-numeric:tabular-nums}#tbar small{flex:1;min-width:0;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #tbar button{width:auto;margin:0;padding:6px 12px}#tbar.fin{background:var(--ac);color:#fff}#tbar.fin small{color:#fff}body.tmo{padding-bottom:84px}
 #v-oth{position:relative}.ch .hit{fill:transparent;cursor:pointer}.ch circle.on{r:5px;stroke:var(--tx);stroke-width:1.5}.ch rect.on{fill:var(--ye)}
@@ -190,7 +191,7 @@ h1.lg{display:flex;align-items:center;gap:8px}.logo{width:34px;height:34px;flex:
     <div><label style="margin-top:0">Einheit</label><select id="unit"></select></div>
   </div>
   <div id="fields"></div>
-  <div class="nrow"><button type="button" class="ico" id="nbtn" title="Notiz" aria-label="Notiz">💬</button><textarea id="noteIn" rows="2" maxlength="300" placeholder="Notiz, z. B. Schulter zwickt" hidden></textarea></div>
+  <div class="nrow"><button type="button" class="ico" id="nbtn" title="Notiz" aria-label="Notiz"></button><button type="button" class="ico" id="tbtn" title="Pausentimer an/aus – lange drücken: freier Timer" aria-label="Pausentimer"></button><textarea id="noteIn" rows="2" maxlength="300" placeholder="Notiz, z. B. Schulter zwickt" hidden></textarea></div>
   <div id="msg"></div><div id="note"></div>
   <button id="save">Speichern</button>
   <button class="sec" id="cancel" hidden>Bearbeiten abbrechen</button>
@@ -225,10 +226,13 @@ h1.lg{display:flex;align-items:center;gap:8px}.logo{width:34px;height:34px;flex:
   <button id="tag" style="margin-top:0">📔 Trainingsplan exportieren</button>
   <button class="sec" id="exp">Als lesbaren Text herunterladen</button>
 </div>
-<div id="tbar" hidden><span>⏱</span><b id="tval">2:00</b><small id="tnm"></small><button class="sec" id="t30" type="button">+30 s</button><button class="sec" id="tx" type="button" aria-label="Timer beenden">✕</button></div>
+<div id="tbar" hidden>
+  <div class="tr1"><span>⏱</span><b id="tval">2:00</b><small id="tnm"></small><button class="sec" id="tgo" type="button" hidden>Start</button><button class="sec" id="t30" type="button">+30 s</button><button class="sec" id="tx" type="button" aria-label="Timer beenden">✕</button></div>
+  <div class="tr2" id="tadj" hidden><button class="sec" type="button" data-ad="-30">−0:30</button><button class="sec" type="button" data-ad="-15">−0:15</button><button class="sec" type="button" data-ad="15">+0:15</button><button class="sec" type="button" data-ad="30">+0:30</button></div>
+</div>
 
 <script>
-const VERSION="0.50";
+const VERSION="0.51";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -308,13 +312,15 @@ function setFile(name,action){
   try{localStorage.setItem(FKEY,JSON.stringify({name,action,ts:Date.now()}))}catch(e){}
   renderFile();renderExr();
 }
-// Dezenter Hinweis unter der Titelleiste: nicht exportierte Änderungen und letzter Export ≥ 7 Tage (oder noch nie)
+// Dezenter Hinweis unter der Titelleiste: ab 3 nicht exportierten Änderungen (neu, bearbeitet, gelöscht)
+// ODER mindestens 1 Änderung und 1 Woche seit dem letzten Export (ohne Export: seit der ältesten offenen Änderung)
 function renderExr(){
   const el=$("exr");let f=null;try{f=JSON.parse(localStorage.getItem(FKEY)||"null")}catch(e){}
-  if(!plan||!data.length){el.hidden=true;return}
-  const last=f?f.ts:0,mx=Math.max(plan.ts||0,...data.map(x=>x.ts||0)),d=last?Math.floor((Date.now()-last)/864e5):0;
-  if(last&&(mx<=last||d<7)){el.hidden=true;return}
-  el.innerHTML=(last?`💾 Letzter Export vor ${d} Tagen`:"💾 Noch nicht exportiert")+" · <u>jetzt exportieren</u>";
+  const last=f?f.ts:0,open=plan?data.filter(x=>(x.ts||0)>last):[],n=open.length;
+  const ref=last||Math.min(...open.map(x=>x.ts||0)),old=n&&Date.now()-ref>=7*864e5;
+  if(!(n>=3||old)){el.hidden=true;return}
+  const d=last?Math.floor((Date.now()-last)/864e5):0,ago=d===0?"heute":d===1?"gestern":`vor ${d} Tagen`;
+  el.innerHTML=`💾 ${n} ${n===1?"Änderung":"Änderungen"} nicht exportiert${last?` · Export ${ago}`:""} · <u>jetzt exportieren</u>`;
   el.hidden=false;
 }
 function renderFile(){
@@ -393,11 +399,17 @@ const stw=(i,k,inp)=>`<span class="stw${k==="r"?" fl1":""}"><button type="button
 const lastPyr=(u,n)=>{const L=live();for(let i=L.length-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[n]){const p=parseVal(L[i].ex[n]).pyr;if(p)return p.ws[0]}return null};
 // Aufwärmsätze (🔥) und Scheibenrechner (Hantel): aufklappbar je Übung, offen bleibt offen (Schlüssel "w|Name" / "p|Name")
 const AX=new Set(),PLATES=[25,20,15,10,5,2.5,1.25],BAR=20;
-const BB='<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" style="vertical-align:-3px"><path fill="currentColor" d="M1.5 10h2V8H6v8H3.5v-2h-2zM7 5.5h3v13H7zM10 11h4v2h-4zM14 5.5h3v13h-3zM18 8h2.5v2h2v4h-2v2H18z"/></svg>';
+// Einfarbige Symbole (currentColor): Hantel, Flamme, Notiz, Uhr
+const svgI=(d,s=17)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" aria-hidden="true" style="vertical-align:-3px">${d}</svg>`;
+const BB=svgI('<path fill="currentColor" d="M1.5 10h2V8H6v8H3.5v-2h-2zM7 5.5h3v13H7zM10 11h4v2h-4zM14 5.5h3v13h-3zM18 8h2.5v2h2v4h-2v2H18z"/>');
+const FL=svgI('<path fill="currentColor" fill-rule="evenodd" d="M12 1c.9 3.4 4.4 5.4 5.6 8.8.7-.9 1-2 .9-3.3 2.3 2.1 3.5 5 3.5 7.7A10 10 0 0 1 2 14.2c0-3.3 1.8-6 3.8-7.8-.1 1.8.4 3.1 1.4 4.1.4-4.4 2.6-6.9 4.8-9.5zM12 21a3.7 3.7 0 0 0 3.7-3.7c0-2.3-1.9-3.6-2.8-5.8-1.5 1.7-4.6 3.5-4.6 5.8A3.7 3.7 0 0 0 12 21z"/>');
+const NB=s=>svgI('<path d="M4.5 4h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4h-1A1.5 1.5 0 0 1 3 14.5v-9A1.5 1.5 0 0 1 4.5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7.5 8.5h9M7.5 12h5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',s);
+const CK=s=>svgI('<circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9.5v4.5l3 2M9.5 2.5h5M12 2.5v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',s);
+$("nbtn").innerHTML=NB(22);$("tbtn").innerHTML=CK(22);
 const kgf=x=>String(Math.round(x*100)/100).replace(".",",");
 function warmHtml(w){
-  if(!(w>BAR))return "🔥 Aufwärmen: erst ab einem Arbeitsgewicht über 20 kg.";
-  return "🔥"+[40,60,80].map(p=>`<span class="ax">${kgf(Math.max(BAR,Math.round(w*p/100/2.5)*2.5))} kg <small>${p} %</small></span>`).join("");
+  if(!(w>BAR))return FL+" Aufwärmen: erst ab einem Arbeitsgewicht über 20 kg.";
+  return FL+[40,60,80].map(p=>`<span class="ax">${kgf(Math.max(BAR,Math.round(w*p/100/2.5)*2.5))} kg <small>${p} %</small></span>`).join("");
 }
 function plateHtml(w){
   if(isNaN(w))return "";
@@ -433,7 +445,7 @@ function build(defs){
       <div class="in g g2" style="margin-top:8px">${stw(i,"r",`<input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="kg" autocomplete="off">`)}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
      :`<div class="in g ${hw&&hr?"g1":hw?"g3":"g4"}">${hw?`${stw(i,"w",`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg">`)}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
     const ax=hw&&!e.bw,ib=(k,t,s)=>`<button type="button" class="ico${AX.has(k+"|"+e.n)?" on":""}" data-ax="${k}" data-i="${i}" title="${t}" aria-label="${t}">${s}</button>`;
-    return `<div class="fl lb"><span>${esc(e.n)}${ax?ib("w","Aufwärmsätze","🔥")+ib("p","Scheibenrechner",BB):""}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></div>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}${ax?`<div class="aux" id="aw${i}" hidden></div><div class="aux" id="ap${i}" hidden></div>`:""}`}).join("");
+    return `<div class="fl lb"><span>${esc(e.n)}${ax?ib("w","Aufwärmsätze",FL)+ib("p","Scheibenrechner",BB):""}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></div>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}${ax?`<div class="aux" id="aw${i}" hidden></div><div class="aux" id="ap${i}" hidden></div>`:""}`}).join("");
   cur.forEach((_,i)=>{chips(i);updateDw(i)});
   document.querySelectorAll(".w,.pr").forEach(el=>{
     el.onfocus=()=>el.select();
@@ -480,28 +492,53 @@ function commit(i){
   if(e.s&&r.length===e.s)next(i);else el.focus();
 }
 // ---------- Pausentimer (startet nach jedem Satz; nach dem letzten Satz der letzten Übung nicht) ----------
+// tm.mode: "set" = Satzpause (automatisch), "free" = freier Timer (langer Druck auf die Uhr)
 let tm=null;
-function restAfter(i){const e=cur[i];if(i===cur.length-1&&e.s&&st[i].reps.length>=e.s)tStop();else tStart(e)}
+const restOf=e=>e.rest??(e.bw?0:120); // Standard: 2:00, Körpergewichtsübungen 0 (aus)
+const fmtS=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+function restAfter(i){const e=cur[i];if(i===cur.length-1&&e.s&&st[i].reps.length>=e.s){if(tm&&tm.mode==="set")tStop()}else tStart(e)}
 function tStart(e){
-  const sec=e.rest??120;if(!sec)return;
-  tStop();tm={end:Date.now()+sec*1e3,iv:setInterval(tTick,250)};
-  $("tnm").textContent=e.n;$("tbar").classList.remove("fin");$("tbar").hidden=false;document.body.classList.add("tmo");tTick();wlOn();
+  const sec=restOf(e);
+  if(ui.tmr===false||!sec||(tm&&tm.mode==="free"&&!tm.fin))return; // ausgeschaltet, Pause 0 oder freier Timer aktiv
+  tStop();tm={mode:"set",name:e.n,sec,run:true,end:Date.now()+sec*1e3,iv:setInterval(tTick,250)};
+  tShow();tTick();wlOn();
+}
+function tFree(){tStop();tm={mode:"free",sec:120,run:false};tShow();$("tval").textContent=fmtS(tm.sec);wlOn()}
+function tShow(){
+  const f=tm.mode==="free";
+  $("tnm").textContent=tm.fin?"":f?"Timer":tm.name;
+  $("tgo").hidden=!f||(tm.run&&!tm.fin);$("tgo").textContent=tm.fin?"Neu":"Start";
+  $("t30").hidden=f;$("tadj").hidden=!f;
+  $("tbar").classList.toggle("fin",!!tm.fin);$("tbar").hidden=false;
+  document.body.classList.add("tmo");document.body.classList.toggle("tmf",f);
 }
 function tTick(){
-  if(!tm||tm.fin)return;
+  if(!tm||!tm.run||tm.fin)return;
   const s=Math.ceil((tm.end-Date.now())/1e3);
-  if(s>0){$("tval").textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");return}
-  clearInterval(tm.iv);tm.fin=true;$("tval").textContent="Pause vorbei";$("tbar").classList.add("fin");
+  if(s>0){$("tval").textContent=fmtS(s);return}
+  clearInterval(tm.iv);tm.fin=true;$("tval").textContent=tm.mode==="free"?"Zeit abgelaufen":"Pause vorbei";tShow();
   try{if(navigator.vibrate)navigator.vibrate([400,200,400,200,400])}catch(x){}
-  tm.done=setTimeout(tStop,8000);
+  if(tm.mode==="set")tm.done=setTimeout(tStop,8000); // freier Timer bleibt stehen, bis ✕
 }
-function tStop(){if(tm){clearInterval(tm.iv);clearTimeout(tm.done)}tm=null;$("tbar").hidden=true;document.body.classList.remove("tmo")}
-$("t30").onclick=()=>{
-  if(!tm)return;
-  if(tm.fin){clearTimeout(tm.done);tm.fin=false;tm.end=Date.now()+30e3;tm.iv=setInterval(tTick,250);$("tbar").classList.remove("fin")}else tm.end+=30e3;
-  tTick();
-};
+function tStop(){if(tm){clearInterval(tm.iv);clearTimeout(tm.done)}tm=null;$("tbar").hidden=true;document.body.classList.remove("tmo","tmf")}
+function tRun(sec){clearInterval(tm.iv);clearTimeout(tm.done);tm.fin=false;tm.run=true;tm.end=Date.now()+sec*1e3;tm.iv=setInterval(tTick,250);tShow();tTick()}
+$("t30").onclick=()=>{if(!tm)return;if(tm.fin)tRun(30);else{tm.end+=30e3;tTick()}};
+$("tgo").onclick=()=>{if(tm)tRun(tm.sec)};
+$("tadj").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-ad]");if(!b||!tm)return;const d=+b.dataset.ad;
+  if(tm.run&&!tm.fin){tm.end=Math.max(Date.now()+1e3,tm.end+d*1e3);tTick()}
+  else{tm.sec=Math.max(15,tm.sec+d);tm.run=false;tm.fin=false;$("tval").textContent=fmtS(tm.sec);tShow()}
+});
 $("tx").onclick=tStop;
+// Uhr-Knopf: kurz = Satzpausen an/aus (Standard an), lang (0,5 s) = freier Timer
+{
+  const tb=$("tbtn");let lpT=null,lp=false;
+  const upd=()=>tb.classList.toggle("on",ui.tmr!==false);upd();
+  tb.addEventListener("pointerdown",()=>{lp=false;clearTimeout(lpT);lpT=setTimeout(()=>{lp=true;tFree()},500)});
+  ["pointerup","pointerleave","pointercancel"].forEach(t=>tb.addEventListener(t,()=>clearTimeout(lpT)));
+  tb.addEventListener("contextmenu",e=>e.preventDefault());
+  tb.onclick=()=>{if(lp){lp=false;return}ui.tmr=ui.tmr===false;saveUi();upd();if(ui.tmr===false&&tm&&tm.mode==="set")tStop()};
+}
 // ---------- Bildschirm wach halten (Wake Lock) während der Eingabe; aus nach Speichern oder 15 min ohne Eingabe ----------
 let wl=null,wlP=false,wlWant=false,wlT=null;
 async function wlOn(){
@@ -871,8 +908,8 @@ function render(){
   const bt=(a,v,t)=>`<button type="button" data-${a}="${v}"${ui[a]===v?' class="on"':""}>${t}</button>`;
   $("hbar").hidden=!live().length;
   $("hbar").innerHTML=`<div class="vbs">${k>1?[0,...plan.units.map((_,j)=>j+1)].map(u=>bt("hf",u,u?"E"+u:"Alle")).join(""):""}</div><div class="vbs">${bt("hv","k","Kompakt")}${bt("hv","d","Ausführlich")}</div>`;
-  // Filter: nur Einträge der gewählten Einheit; sichtbar bleiben so viele wie Einheiten im Plan
-  const Lr=live().reverse().filter(x=>!ui.hf||x.unit===ui.hf),vis=ui.hf?new Set(Lr.slice(0,k).map(x=>x.id)):visIds(Lr);
+  // Filter: nur Einträge der gewählten Einheit; davon nur der neueste sichtbar, Rest unter „Ältere Einträge“
+  const Lr=live().reverse().filter(x=>!ui.hf||x.unit===ui.hf),vis=ui.hf?new Set(Lr.slice(0,1).map(x=>x.id)):visIds(Lr);
   const cards=Lr.map(s=>card(s,ref,rec));
   const shown=cards.filter((_,i)=>vis.has(Lr[i].id)),older=cards.filter((_,i)=>!vis.has(Lr[i].id));
   $("hist").innerHTML=shown.join("")+(older.length?`<details class="old"${olderOpen?" open":""} ontoggle="olderOpen=this.open;if(!olderOpen)this.scrollIntoView({block:'nearest'})"><summary>Ältere Einträge (${older.length})</summary>${older.join("")}</details>`:"");
@@ -939,7 +976,7 @@ function wizRender(){
     <div class="in"><input class="wn" ${at(a,b)} maxlength="40" placeholder="Übung" value="${esc(e.n)}"><button class="x" data-act="del" ${at(a,b)} title="Übung entfernen">✕</button></div>
     <div class="wx"><select class="wm" ${at(a,b)}>${Object.entries(M).map(([k,t])=>`<option value="${k}"${e.m===k?" selected":""}>${t}</option>`).join("")}</select>
     ${e.m==="wr"?`<label><input type="checkbox" class="wb" ${at(a,b)}${e.bw?" checked":""}>Körpergewichtsübung</label>`:""}
-    ${e.m!=="w"?`<div class="wsr">${(e.m==="wr"&&!e.bw)||e.m==="p"?`<span>Sätze</span><select class="ws" ${at(a,b)}>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option${n===e.s?" selected":""}>${n}</option>`).join("")}</select>`:""}<span>Pause</span><select class="wp" ${at(a,b)}>${RESTS.map(s=>`<option value="${s}"${s===(e.rest??120)?" selected":""}>${restL(s)}</option>`).join("")}</select></div>`:""}</div></div>`).join("")+
+    ${e.m!=="w"?`<div class="wsr">${(e.m==="wr"&&!e.bw)||e.m==="p"?`<span>Sätze</span><select class="ws" ${at(a,b)}>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option${n===e.s?" selected":""}>${n}</option>`).join("")}</select>`:""}<span>Pause</span><select class="wp" ${at(a,b)}>${RESTS.map(s=>`<option value="${s}"${s===restOf(e)?" selected":""}>${restL(s)}</option>`).join("")}</select></div>`:""}</div></div>`).join("")+
     `<button class="sec" data-act="add" data-a="${a}">＋ Übung</button></div>`).join("");
 }
 $("wzb").addEventListener("input",e=>{const t=e.target;
@@ -971,7 +1008,7 @@ $("wzSave").onclick=()=>{
       if(e.m==="wr"&&e.bw)o.bw=true;
       if(e.m!=="w"&&e.max)o.max=e.max;
       if(e.m!=="w"&&e.goal)o.goal=e.goal;
-      if(e.m!=="w"&&e.rest!=null&&e.rest!==120)o.rest=e.rest; // Pause in Sekunden (Standard 120, 0 = aus)
+      if(e.m!=="w"&&e.rest!=null&&e.rest!==restOf(o))o.rest=e.rest; // Pause in Sekunden (Standard 120, Körpergewicht 0 = aus)
       exs.push(o);
     }
     if(!exs.length)return wzm(`Einheit ${a+1}: mindestens eine Übung eintragen.`);
