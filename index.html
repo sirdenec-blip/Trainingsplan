@@ -238,7 +238,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.91";
+const VERSION="0.92";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -319,12 +319,16 @@ let tok=null;try{tok=JSON.parse(localStorage.getItem(TKEY)||"null")}catch(e){}
 const tokValid=()=>!!tok&&tok.exp>Date.now()+60e3;
 function setTok(t,sec){tok={t,exp:Date.now()+(+sec||3600)*1e3};try{localStorage.setItem(TKEY,JSON.stringify(tok))}catch(e){}}
 function dropTok(){tok=null;try{localStorage.removeItem(TKEY)}catch(e){}}
-const iosApp=()=>navigator.standalone===true; // installierte Web-App auf dem iPhone: Anmeldung per Weiterleitung statt Fenster
-const RURI=location.origin+location.pathname;
-if(location.hash.includes("access_token=")){ // Rückkehr von der Google-Anmeldeseite (Weiterleitung)
-  const h=new URLSearchParams(location.hash.slice(1));
-  if(h.get("state")&&h.get("state")===sessionStorage.getItem("ttb_st"))setTok(h.get("access_token"),h.get("expires_in"));
-  history.replaceState(null,"",RURI);
+// Installierte App (Android und iPhone): Das Google-Anmeldefenster öffnet dort in einem eigenen Overlay ohne Verbindung
+// zur App und bleibt am Ende weiß hängen. Deshalb dort Anmeldung per Weiterleitung im selben Fenster.
+const appMode=()=>navigator.standalone===true||matchMedia("(display-mode: standalone)").matches;
+const RURI=location.origin+location.pathname.replace(/index\.html$/,"");
+const SKEY="ttb_st";
+if(/[#&](access_token|error)=/.test(location.hash)){ // Rückkehr von der Google-Anmeldeseite (Weiterleitung)
+  const h=new URLSearchParams(location.hash.slice(1)),ok=!!h.get("state")&&h.get("state")===localStorage.getItem(SKEY);
+  if(ok&&h.get("access_token"))setTok(h.get("access_token"),h.get("expires_in"));
+  else if(ok&&h.get("error")&&h.get("error")!=="interaction_required"&&h.get("error")!=="login_required"&&h.get("error")!=="consent_required")sessionStorage.setItem("ttb_autherr",h.get("error"));
+  localStorage.removeItem(SKEY);history.replaceState(null,"",RURI);
 }
 let tc=null,tcWait=null;
 function gisLoad(){
@@ -337,13 +341,15 @@ function tokenClient(){
     error_callback:e=>{const w=tcWait;tcWait=null;if(w)w.rej(Object.assign(new Error(e&&e.type==="popup_closed"?"Anmeldung abgebrochen":"Anmeldefenster blockiert"),{auth:true}))}});
   return tc;
 }
-// Google-Zugang holen – nur aus einem Klick heraus aufrufen (Browser erlauben das Anmeldefenster nur nach einem Fingertipp)
-function auth(after){
+// Google-Zugang holen – nur aus einem Klick heraus aufrufen (Browser erlauben das Anmeldefenster nur nach einem Fingertipp).
+// In der installierten App: Weiterleitung (Seite lädt kurz neu, Daten sind vorher lokal gesichert); silent = ohne Rückfrage (prompt=none)
+function auth(after,silent){
   if(tokValid())return Promise.resolve();
   if(MOCK)return MOCK.auth().then(t=>setTok(t,3600));
-  if(iosApp()){
-    const s=uid();sessionStorage.setItem("ttb_st",s);if(after)sessionStorage.setItem("ttb_after",after);
-    location.href="https://accounts.google.com/o/oauth2/v2/auth?"+new URLSearchParams({client_id:CLIENT_ID,redirect_uri:RURI,response_type:"token",scope:SCOPE,include_granted_scopes:"true",state:s,...(idx.email?{login_hint:idx.email}:{})});
+  if(appMode()){
+    const s=uid();localStorage.setItem(SKEY,s);if(after)sessionStorage.setItem("ttb_after",after);
+    location.href="https://accounts.google.com/o/oauth2/v2/auth?"+new URLSearchParams({client_id:CLIENT_ID,redirect_uri:RURI,response_type:"token",scope:SCOPE,include_granted_scopes:"true",state:s,
+      ...(silent?{prompt:"none"}:idx.email?{}:{prompt:"select_account"}),...(idx.email?{login_hint:idx.email}:{})});
     return new Promise(()=>{});
   }
   const c=tokenClient();if(!c)return Promise.reject(new Error("Google ist gerade nicht erreichbar"));
@@ -435,7 +441,15 @@ function adopt(m){
   if(editId===null&&!dirty&&st.every(x=>!x.reps.length))init();else render();
 }
 // nach einer Änderung per Klick: abgelaufenen Google-Zugang gleich mit erneuern (Fenster blitzt kurz auf)
-function kick(){if(idx.mode==="cloud"&&!tokValid()&&navigator.onLine&&cloudOk()&&!iosApp())auth().then(()=>syncSoon(200)).catch(()=>renderSync())}
+function kick(){if(idx.mode==="cloud"&&!tokValid()&&navigator.onLine&&cloudOk()&&!appMode())auth().then(()=>syncSoon(200)).catch(()=>renderSync())}
+// Installierte App: abgelaufenen Zugang still erneuern (Weiterleitung mit prompt=none), aber nur wenn gerade nichts eingegeben wird.
+// Höchstens alle 30 Minuten versuchen, damit bei abgemeldetem Google-Konto keine Schleife entsteht.
+function silentRenew(){
+  if(idx.mode!=="cloud"||tokValid()||!appMode()||!navigator.onLine||!CLIENT_ID||MOCK)return false;
+  if(plan&&(editId!==null||dirty||st.some(x=>x.reps.length)||$("noteIn").value.trim()))return false;
+  const last=+(localStorage.getItem("ttb_silent")||0);if(Date.now()-last<30*60e3)return false;
+  localStorage.setItem("ttb_silent",Date.now());auth(null,true);return true;
+}
 // Erstmals oder erneut mit Google Drive verbinden (vom Startbildschirm oder aus dem Modus „Ohne Cloud“)
 async function connect(){
   try{
@@ -1285,6 +1299,7 @@ function refresh(){if(editId!==null)exitEdit();else init()}
 // Beim Zurückkehren zur Seite (z. B. am nächsten Tag): Datum/Einheit aktualisieren, sofern nichts eingegeben ist
 document.addEventListener("visibilitychange",()=>{
   if(document.visibilityState!=="visible"){if(syncT)syncAll();return} // beim Verlassen: Ausstehendes sofort übertragen
+  if(silentRenew())return; // installierte App: Zugang still erneuern (lädt neu)
   if(idx.mode==="cloud")syncAll(); // beim Zurückkehren: Änderungen anderer Geräte holen
 
   if(wlWant)wlOn(); // Wake Lock wird beim Verlassen der Seite automatisch freigegeben
@@ -1296,8 +1311,11 @@ try{["trainingsplan_v1","trainingsplan_plan_v1","trainingsplan_file"].forEach(k=
 gisLoad();
 if(idx.active&&!openPlan(idx.active))idx.active=null;
 init();
-if(idx.mode==="cloud")syncAll();
-if(sessionStorage.getItem("ttb_after")==="connect"){sessionStorage.removeItem("ttb_after");if(tokValid())connect()} // nach Google-Weiterleitung (iPhone-App)
+const after=sessionStorage.getItem("ttb_after");sessionStorage.removeItem("ttb_after");
+const autherr=sessionStorage.getItem("ttb_autherr");sessionStorage.removeItem("ttb_autherr");
+if(autherr)toast(autherr==="access_denied"?"Google-Anmeldung abgebrochen.":"Google-Anmeldung fehlgeschlagen ("+autherr+").");
+if(after==="connect"&&tokValid())connect(); // nach Google-Weiterleitung (installierte App)
+else if(!silentRenew()&&idx.mode==="cloud")syncAll();
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register("sw.js").catch(()=>{});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{}); // Gerätespeicher möglichst nicht automatisch räumen
 </script>

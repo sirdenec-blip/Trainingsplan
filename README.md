@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.91** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.92** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -24,7 +24,9 @@ Danach erscheint „TTB“ mit dem Feuerfuchs-Symbol auf dem Startbildschirm, oh
 - **Kein Empfang im Studio:** Änderungen werden auf dem Gerät vorgemerkt und übertragen, sobald wieder Verbindung besteht.
 - Beim Öffnen und beim Zurückkehren in die App holt sie Änderungen von anderen Geräten.
 - Zwei Geräte gleichzeitig: Es wird pro Eintrag zusammengeführt (gleiche ID = gleicher Eintrag, neuere Änderung gewinnt, Löschungen werden mitgenommen). Vor jedem Hochladen liest die App den aktuellen Stand aus Drive – es wird nie blind überschrieben.
-- **Google-Zugang:** Google erlaubt Web-Apps ohne eigenen Server nur einen Zugang für ca. eine Stunde. Ist er abgelaufen, blitzt beim nächsten „Speichern“ kurz ein Google-Fenster auf (bei mehreren Google-Konten: einmal antippen). Bis dahin ist alles auf dem Gerät gesichert.
+- **Google-Zugang:** Google erlaubt Web-Apps ohne eigenen Server nur einen Zugang für ca. eine Stunde. Bis zur Erneuerung ist alles auf dem Gerät gesichert.
+  - **Installierte App (Android/iPhone):** Anmeldung per Weiterleitung im selben Fenster (die App wechselt kurz zur Google-Seite und kommt zurück). Ein abgelaufener Zugang wird beim Öffnen oder Zurückkehren zur App still erneuert, solange gerade nichts eingegeben wird (kurzes Neuladen). Klappt das nicht, zeigt die Statuszeile „Google-Verbindung erneuern“.
+  - **Im Browser-Tab:** Beim nächsten „Speichern“ blitzt kurz ein Google-Fenster auf (bei mehreren Google-Konten: einmal antippen).
 
 **Statuszeile** unter dem Titel (neben dem Plannamen), z. B.:
 - „☁ In Google Drive gespeichert · vor 2 Min.“
@@ -97,6 +99,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.92:** Bugfix: In der installierten App blieb die Google-Anmeldung auf einer weißen Seite hängen. Jetzt Anmeldung per Weiterleitung, abgelaufener Zugang wird beim Öffnen/Zurückkehren still erneuert.
 - **0.91:** Google-Anbindung aktiviert (OAuth-Client-ID eingetragen). Anmeldung zunächst nur für eingetragene Testnutzer.
 - **0.90:** Testversion mit neuer Speicherung: Google Drive als Hauptspeicher (Ordner „Trainingstagebuch“, eine Datei pro Plan, automatischer Abgleich, offline nutzbar), mehrere Trainingspläne (laden, neu erstellen, aus bestehendem Plan übernehmen, löschen), Modus „Ohne Cloud“ als Nebenweg, installierbar als App „TTB“ (Android und iPhone), Debug-Plan nur auf dem Gerät. Datei-Export/-Import und Export-Erinnerung entfallen.
 - **0.52:** Pause-Standard 2:00 für alle Übungen, Timerleiste oben, freier Timer mit Pause/Weiter, Kompaktansicht mit Bubbles, Debug-Modus.
