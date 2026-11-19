@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trainingstagebuch</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1d6b4f">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TTB">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--dn:#b4533a;--u1:#c7ecd3;--u1t:#0f2a1d;--u2:#9bdcb2;--u2t:#0f2a1d;--u3:#6cc790;--u3t:#0f2a1d;--u4:#3fa86c;--u4t:#fff;--u5:#2a7f50;--u5t:#fff;--u6:#17573a;--u6t:#fff;--bd:#ddd}
 @media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--dn:#e8866d;--u1:#1f5a40;--u1t:#fff;--u2:#2c7a57;--u2t:#fff;--u3:#3b9c70;--u3t:#fff;--u4:#5cbf91;--u4t:#0b2a1e;--u5:#8adbb2;--u5t:#0b2a1e;--u6:#bdf0d6;--u6t:#0b2a1e;--bd:#3a3a38}}
@@ -121,7 +128,15 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 #v-oth{position:relative}.ch .hit{fill:transparent;cursor:pointer}.ch circle.on{r:5px;stroke:var(--tx);stroke-width:1.5}.ch rect.on{fill:var(--ye)}
 .ctip{position:absolute;z-index:5;pointer-events:none;background:var(--card);border:1px solid var(--bd);border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.25);padding:4px 8px;font-size:.8rem;white-space:nowrap}
 .hbar[hidden],.aux[hidden]{display:none}
-.exr{color:var(--mu);font-size:.8rem;margin:-8px 0 12px;cursor:pointer}.exr u{color:var(--ac);text-decoration:none;font-weight:600}
+/* 0.90: Planleiste + Speicherstatus, Planverwaltung, Hinweise */
+.pbar{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;margin:-8px 0 12px;font-size:.8rem}
+.pn{width:auto;margin:0;padding:0;background:none;border:0;color:var(--tx);font-weight:600;font-size:.85rem}
+.sst{color:var(--mu);cursor:pointer}.sst u{color:var(--ac);text-decoration:none;font-weight:600}.sst.warn{color:var(--ye)}
+.lnk{width:auto;display:block;margin:16px auto 0;background:none;border:0;color:var(--mu);font-weight:400;font-size:.85rem;text-decoration:underline}
+.pl{display:block;text-align:left;background:transparent;color:var(--tx);border:1px solid var(--bd);margin-top:8px;font-weight:400}.pl b{display:block}.pl small{color:var(--mu);font-size:.8rem}.pl.on{border:2px solid var(--ac);padding:9px}.pl.dl b{color:#c33}
+#pm{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:25;padding:16px;overflow:auto}#pm[hidden]{display:none}#pm>div{max-width:520px;margin:4vh auto}
+#start .mu,#pm .mu{line-height:1.4}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;width:max-content;max-width:calc(100% - 32px);background:var(--tx);color:var(--bg);padding:10px 14px;border-radius:10px;font-size:.85rem;line-height:1.4;box-shadow:0 4px 14px rgba(0,0,0,.25)}.toast[hidden]{display:none}
 </style>
 <link rel="icon" id="fav">
 </head>
@@ -154,23 +169,13 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </symbol></svg>
 <div id="start" hidden><div class="card">
   <h1 class="lg" style="margin-top:0"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#lg"/></svg>Trainingstagebuch</h1>
-  <div id="stMain"><p>Wie möchtest du starten?</p>
-    <button id="stNew">1 · Neuen Trainingsplan anlegen</button>
-    <button class="sec" id="stImp">2 · Trainingsplan importieren</button></div>
-  <div id="stOpts" hidden><p>Welchen Plan möchtest du anlegen?</p>
-    <button id="stWkm">WKM <small>(2 Einheiten mit je 3 Übungen)</small></button>
-    <button class="sec" id="stInd">Individuell</button>
-    <button class="sec" id="stBack">Zurück</button></div>
-  <p id="stMsg" style="color:#c33;font-size:.85rem"></p>
+  <div id="stb"></div>
+  <p id="stMsg" class="mu"></p>
 </div></div>
-<div id="gate" hidden><div class="card">
-  <h1 style="margin-top:0">Trainingsplan exportieren</h1>
-  <p>Plan und Einträge werden in eine Datei geschrieben. Bei einer bestehenden Datei werden neue, geänderte und gelöschte Einträge in beide Richtungen abgeglichen (die neuere Änderung gewinnt). Solange du hier nichts auswählst, wird keine Datei verändert.</p>
-  <button id="exOpen" hidden style="margin-top:6px"></button>
-  <button id="exNew" class="sec">Neue Datei erstellen</button>
-  <button class="sec" id="exOld">Bestehende Datei auswählen</button>
-  <button class="sec" id="exClose">Schließen</button>
-  <div id="exm"></div>
+<div id="pm" hidden><div class="card">
+  <h1 style="margin-top:0">Trainingspläne</h1>
+  <div id="pmb"></div>
+  <button class="sec" id="pmClose">Schließen</button>
 </div></div>
 <div id="pw" hidden><div class="card">
   <h1 style="margin-top:0">Trainingsplan</h1>
@@ -187,7 +192,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
   <div>created by Claude and JD</div>
   <div class="ver" id="ver"></div>
 </div>
-<div class="exr" id="exr" hidden></div>
+<div class="pbar"><button type="button" class="pn" id="pname" title="Plan wechseln"></button><span class="sst" id="sst"></span></div>
 <div class="card">
   <div id="editbar" hidden></div>
   <div class="row">
@@ -222,177 +227,275 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </details>
 
 <div class="card">
-  <button id="plEdit" style="margin-top:0">✎ Trainingsplan bearbeiten</button>
-  <button class="sec dng" id="reset">🗑 Alle Daten zurücksetzen</button>
-</div>
-
-<div class="card">
-  <button id="tag" style="margin-top:0">📔 Trainingsplan exportieren</button>
+  <button id="plSw" style="margin-top:0">⇄ Plan wechseln</button>
+  <button class="sec" id="plEdit">✎ Plan bearbeiten</button>
   <button class="sec" id="exp">Als lesbaren Text herunterladen</button>
 </div>
+<div class="toast" id="toast" hidden></div>
 <div id="tbar" hidden>
   <div class="tr1"><span>⏱</span><b id="tval">2:00</b><small id="tnm"></small><button class="sec" id="tgo" type="button" hidden>Start</button><button class="sec" id="t30" type="button">+30 s</button><button class="sec" id="tx" type="button" aria-label="Timer beenden">✕</button></div>
   <div class="tr2" id="tadj" hidden><button class="sec" type="button" data-ad="-30">−0:30</button><button class="sec" type="button" data-ad="-15">−0:15</button><button class="sec" type="button" data-ad="15">+0:15</button><button class="sec" type="button" data-ad="30">+0:30</button></div>
 </div>
 
 <script>
-const VERSION="0.52";
+const VERSION="0.90";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
   {exs:[{n:"Kniebeugen",m:"wr",s:3},{n:"Bankdrücken",m:"wr",s:3},{n:"Vorgebeugtes Rudern",m:"wr",s:3}]},
   {exs:[{n:"Kreuzheben",m:"wr",s:3},{n:"Overhead-Press",m:"wr",s:3},{n:"Klimmzüge",m:"wr",bw:true,s:0,max:12,goal:24}]}]};
-const PKEY="trainingsplan_plan_v1";
 function okPlan(p){return!!p&&typeof p.name==="string"&&Array.isArray(p.units)&&p.units.length>=1&&p.units.length<=6&&p.units.every(u=>u&&Array.isArray(u.exs)&&u.exs.every(e=>e&&typeof e.n==="string"&&["wr","w","r","p"].includes(e.m)))}
 let plan=null;
-try{const p=JSON.parse(localStorage.getItem(PKEY)||"null");if(okPlan(p))plan=p}catch(e){}
-const savePlan=()=>{try{localStorage.setItem(PKEY,JSON.stringify(plan))}catch(e){}};
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
 const unitDefs=u=>(plan.units[u-1]||{exs:[]}).exs;
 const defOf=(name,u)=>unitDefs(u).find(e=>e.n===name)||plan.units.flatMap(x=>x.exs).find(e=>e.n===name)||null;
 // Werte: "8@60-70-80" (Pyramide: 8 Wdh., Gewichte je Satz), "85x8-9-10" (Gewicht+Wdh.), "85" (nur Gewicht), "x8-9-10" (nur Wdh.)
 function parseVal(v){const a=v.indexOf("@");if(a>0)return{w:null,reps:null,pyr:{r:+v.slice(0,a),ws:v.slice(a+1).split("-").map(Number)}};const i=v.indexOf("x");if(i<0)return{w:v,reps:null};return{w:i?v.slice(0,i):null,reps:v.slice(i+1).split("-").map(Number)}}
 const $=id=>document.getElementById(id);
 let data=[],st=[],cur=[],dirty=false;
-
-// ---------- Speicher im Browser ----------
-const KEY="trainingsplan_v1";
-const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){$("note").textContent="⚠ Browserspeicher nicht verfügbar – bitte regelmäßig exportieren.";return false}};
-try{data=collapse(JSON.parse(localStorage.getItem(KEY)||"[]").map(norm));persist()}catch(e){}
-if(!plan&&data.length){plan=JSON.parse(JSON.stringify(WKM_PLAN));savePlan()} // Daten aus älteren Versionen: Plan = WKM
-
-// ---------- Trainingstagebuch (Datei) ----------
-const pack=d=>JSON.stringify({version:3,plan,sessions:d},null,1);
-function unpack(t){
-  if(!t.trim())return [];
-  const j=JSON.parse(t),a=Array.isArray(j)?j:j&&j.sessions;
-  if(!Array.isArray(a))throw new Error("Das ist keine gültige Trainingsdatei.");
-  return a.filter(x=>x&&x.date&&x.unit&&x.ex&&typeof x.ex==="object").map(norm);
-}
-function filePlan(t){try{const j=JSON.parse(t);return j&&okPlan(j.plan)?j.plan:null}catch(e){return null}}
-// neuerer Trainingsplan gewinnt (Datei -> Browser; Browser -> Datei geschieht über pack)
-function mergePlan(fp){
-  if(fp&&fp.ts>plan.ts){plan=fp;savePlan();return `Trainingsplan „${plan.name}“ aus der Datei übernommen. `}
-  return "";
-}
-// Notiz nur anhängen, wenn vorhanden: Signatur (und damit Alt-IDs) bleibt für Einträge ohne Notiz unverändert
 function sig(x){return x.date+"|"+x.unit+"|"+JSON.stringify(Object.entries(x.ex).sort())+(x.note?"|"+x.note:"")}
-function hash(str){ // einfacher 53-Bit-Hash (cyrb53)
-  let h1=0xdeadbeef,h2=0x41c6ce57;
-  for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}
-  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);
-  h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
-  return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);
-}
-const newId=()=>"n"+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-// Alt-Einträge (Zahlen-ID) bekommen eine ID, die aus dem Inhalt abgeleitet wird:
-// derselbe Eintrag in Browser und Datei erhält so dieselbe ID.
-function norm(x){
-  if(typeof x.id==="string"&&x.ts)return x;
-  const o={id:"l"+hash(sig(x)),date:x.date,unit:+x.unit,ex:x.ex,ts:(typeof x.id==="number"&&x.id>1e12)?x.id:0};
-  if(x.del)o.del=true;
-  return o;
-}
-function collapse(arr){const m=new Map();arr.forEach(x=>{const o=m.get(x.id);if(!o||x.ts>o.ts)m.set(x.id,x)});return[...m.values()]}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+const newId=()=>"n"+uid();
 const cmp=(a,b)=>a.date.localeCompare(b.date)||(a.ts-b.ts);
 const live=()=>data.filter(x=>!x.del);
-// führt Browser-Daten und Datei-Daten zusammen: gleiche ID = gleicher Eintrag, neuere Änderung gewinnt
-function merge(fileArr){
-  const M=new Map(data.map(x=>[x.id,x])),F=new Map(fileArr.map(x=>[x.id,x])),out=new Map();
-  let nf=0,nb=0;
-  new Set([...M.keys(),...F.keys()]).forEach(id=>{
-    const a=M.get(id),b=F.get(id);
-    if(!b){out.set(id,a);if(!a.del)nf++;return}
-    if(!a){out.set(id,b);if(!b.del)nb++;return}
-    const same=sig(a)===sig(b)&&!!a.del===!!b.del;
-    if(same){out.set(id,b.ts>a.ts?b:a);return}
-    if(b.ts>a.ts){out.set(id,b);nb++}else if(a.ts>b.ts){out.set(id,a);nf++}else out.set(id,a);
-  });
-  return{all:[...out.values()].sort(cmp),nf,nb};
-}
-// Zuletzt verwendete Tagebuch-Datei merken und anzeigen
-const FKEY="trainingsplan_file";
-function setFile(name,action){
-  try{localStorage.setItem(FKEY,JSON.stringify({name,action,ts:Date.now()}))}catch(e){}
-  renderFile();renderExr();
-}
-// Dezenter Hinweis unter der Titelleiste: ab 3 nicht exportierten Änderungen (neu, bearbeitet, gelöscht)
-// ODER mindestens 1 Änderung und 1 Woche seit dem letzten Export (ohne Export: seit der ältesten offenen Änderung)
-function renderExr(){
-  const el=$("exr");let f=null;try{f=JSON.parse(localStorage.getItem(FKEY)||"null")}catch(e){}
-  const last=f?f.ts:0,open=plan?data.filter(x=>(x.ts||0)>last):[],n=open.length;
-  const ref=last||Math.min(...open.map(x=>x.ts||0)),old=n&&Date.now()-ref>=7*864e5;
-  if(!(n>=3||old)){el.hidden=true;return}
-  const d=last?Math.floor((Date.now()-last)/864e5):0,ago=d===0?"heute":d===1?"gestern":`vor ${d} Tagen`;
-  el.innerHTML=`💾 ${n} ${n===1?"Änderung":"Änderungen"} nicht exportiert${last?` · Export ${ago}`:""} · <u>jetzt exportieren</u>`;
-  el.hidden=false;
-}
-function renderFile(){
-  let f=null;try{f=JSON.parse(localStorage.getItem(FKEY)||"null")}catch(e){}
-  const el=$("fileind");
-  if(!f){el.textContent="📄 Keine Datei verknüpft – Daten nur im Browser";return}
-  const t=new Date(f.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
-  el.innerHTML="📄 Datei: <b></b> · "+f.action+" "+t;
-  el.querySelector("b").textContent=f.name;
-}
-let mode="export",openHandle=null;
-const fileName=()=>((plan&&plan.name||"Trainingsplan").replace(/[\\/:*?"<>|]/g,"").trim()||"Trainingsplan")+".json";
-const exm=(t,bad)=>{$("exm").style.color=bad?"#c33":"var(--tx)";$("exm").textContent=t};
-async function write(h,text){const w=await h.createWritable();await w.write(text);await w.close()}
-const FSA="showSaveFilePicker" in window&&"showOpenFilePicker" in window;
-const PICK={types:[{description:"Trainingsplan (JSON)",accept:{"application/json":[".json"]}}]};
 
-async function exportNew(){
-  try{
-    if(FSA){const h=await showSaveFilePicker({suggestedName:fileName(),...PICK});await write(h,pack(data));openHandle=h;setFile(h.name,"exportiert");exm(`Gespeichert: „${plan.name}“ mit ${live().length} Einträgen in „${h.name}“.`)}
-    else{dl(fileName(),pack(data),"application/json");setFile(fileName(),"exportiert");exm(`Heruntergeladen: ${fileName()} mit ${live().length} Einträgen.`)}
-  }catch(e){if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)}
+// =====================================================================================
+// Speicher: mehrere Trainingspläne. Jeder Plan ist ein Dokument {app,version,plan,sessions}.
+// Auf dem Gerät (localStorage) liegt immer eine Arbeitskopie; im Cloud-Modus ist Google Drive
+// der Hauptspeicher (Ordner „Trainingstagebuch“, eine Datei pro Plan), abgeglichen im Hintergrund.
+// =====================================================================================
+// Google-OAuth-Client-ID (Typ „Webanwendung“). Leer = Drive-Anbindung ausgeblendet, nur „Ohne Cloud“ möglich.
+const CLIENT_ID="";
+const SCOPE="https://www.googleapis.com/auth/drive.file",FOLDER="Trainingstagebuch",DOCV=4;
+const IKEY="ttb_index",TKEY="ttb_tok",DKEY=id=>"ttb_doc_"+id;
+// idx.mode: "cloud" | "local" | null (noch nicht eingerichtet); idx.plans[id] = {id,name,n,last,fileId?,mod?,dirty?,rev?,debug?}
+let idx={mode:null,active:null,plans:{}};
+try{Object.assign(idx,JSON.parse(localStorage.getItem(IKEY)||"{}"))}catch(e){}
+const saveIdx=()=>{try{localStorage.setItem(IKEY,JSON.stringify(idx))}catch(e){}};
+const readDoc=id=>{try{const d=JSON.parse(localStorage.getItem(DKEY(id))||"null");return d&&okPlan(d.plan)&&Array.isArray(d.sessions)?d:null}catch(e){return null}};
+const writeDoc=d=>{try{localStorage.setItem(DKEY(d.plan.id),JSON.stringify(d));return true}catch(e){return false}};
+const docOf=()=>({app:"TTB",version:DOCV,plan,sessions:data});
+function docMeta(d){const L=d.sessions.filter(x=>!x.del);return{name:d.plan.name,n:L.length,last:L.reduce((a,x)=>x.date>a?x.date:a,"")||null}}
+const plans=()=>Object.values(idx.plans).sort((a,b)=>(b.last||"").localeCompare(a.last||"")||a.name.localeCompare(b.name));
+const anyDirty=()=>Object.values(idx.plans).some(e=>e.dirty&&!e.debug);
+const nameTaken=(n,except)=>Object.values(idx.plans).some(e=>e.id!==except&&e.name.trim().toLowerCase()===n.trim().toLowerCase());
+function uniqueName(n,except){let x=n,k=2;while(nameTaken(x,except))x=n+" "+k++;return x}
+function openPlan(id){const d=readDoc(id);if(!d)return false;plan=d.plan;data=d.sessions.slice().sort(cmp);idx.active=id;saveIdx();return true}
+// Jede Änderung am aktiven Plan: sofort auf dem Gerät speichern, kurz danach (Cloud-Modus) nach Google Drive
+function persist(){
+  const e=idx.plans[plan.id]||(idx.plans[plan.id]={id:plan.id});
+  Object.assign(e,docMeta(docOf()));
+  if(!e.debug&&idx.mode==="cloud"){e.dirty=true;e.rev=(e.rev||0)+1}
+  const ok=writeDoc(docOf());saveIdx();
+  if(!ok)toast("⚠ Gerätespeicher voll oder gesperrt – Änderung nicht gespeichert.");
+  syncSoon();renderSync();return ok;
 }
-function done(m,nf,nb){
-  data=m.all;persist();refresh();
-  return `${nb} neue oder geänderte Einträge in den Browser übernommen, ${nf} in die Datei. Insgesamt ${live().length} Einträge.`;
+const savePlan=persist;
+// neuen Plan anlegen und aktivieren (extra: {id, debug} für den Debug-Plan)
+function newPlan(p,sessions=[],extra={}){
+  plan={...clone(p),id:extra.id||uid(),name:uniqueName(p.name),ts:Date.now()};data=sessions;
+  idx.plans[plan.id]={...extra,id:plan.id};idx.active=plan.id;persist();
 }
-async function exportTo(h){ // gleicht mit der Datei ab und schreibt sie
-  if(await h.queryPermission({mode:"readwrite"})!=="granted")await h.requestPermission({mode:"readwrite"});
-  const txt=await(await h.getFile()).text(),pm=mergePlan(filePlan(txt)),m=merge(unpack(txt));
-  await write(h,pack(m.all));openHandle=h;setFile(h.name,"abgeglichen");
-  exm(pm+done(m,m.nf,m.nb)+` Datei „${h.name}“ aktualisiert.`);
+function removeLocal(id){
+  try{localStorage.removeItem(DKEY(id))}catch(e){}
+  delete idx.plans[id];
+  if(idx.active===id){idx.active=null;plan=null;data=[];const o=plans().find(p=>readDoc(p.id));if(o)openPlan(o.id)}
+  saveIdx();
 }
-async function exportOld(){
-  try{
-    if(FSA){const[h]=await showOpenFilePicker(PICK);await exportTo(h)}
-    else{mode="export";$("file").click()}
-  }catch(e){if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)}
+// Zusammenführen: gleiche ID = gleicher Eintrag, neuere Änderung (ts) gewinnt, Löschmarkierungen bleiben erhalten; neuerer Plan gewinnt
+function mergeDocs(a,b){
+  const M=new Map();[...a.sessions,...(b.sessions||[])].forEach(x=>{const o=M.get(x.id);if(!o||x.ts>o.ts)M.set(x.id,x)});
+  const p=(b.plan.ts||0)>(a.plan.ts||0)?b.plan:a.plan;
+  return{app:"TTB",version:DOCV,plan:{...p,id:a.plan.id},sessions:[...M.values()].sort(cmp)};
 }
-$("file").onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=()=>{try{
-    if(mode==="start"){startFrom(r.result,f.name,null);return}
-    const pm=mergePlan(filePlan(r.result)),m=merge(unpack(r.result));
-    const msg=pm+done(m,m.nf,m.nb);setFile(f.name,"abgeglichen");
-    dl(fileName(),pack(m.all),"application/json");
-    exm(msg+" Dein Browser darf die Datei nicht überschreiben: die ergänzte Version wurde neu heruntergeladen – ersetze damit die alte Datei.");
-  }catch(x){if(mode==="start")stm("Fehler: "+(x.message||x));else exm("Fehler: "+(x.message||x),1)}};
-  r.readAsText(f);e.target.value="";
+
+// ---------- Google-Anmeldung ----------
+// Ohne eigenen Server gibt Google nur einen Zugang für ca. 1 Stunde. Erneuern geht nur nach einem Fingertipp
+// (Anmeldefenster blitzt kurz auf); bis dahin arbeitet die App mit der Kopie auf dem Gerät weiter.
+const MOCK=window.TTB_DRIVE_MOCK||null; // nur für Tests: Ersatz für Google Drive
+const cloudOk=()=>!!(CLIENT_ID||MOCK);
+let tok=null;try{tok=JSON.parse(localStorage.getItem(TKEY)||"null")}catch(e){}
+const tokValid=()=>!!tok&&tok.exp>Date.now()+60e3;
+function setTok(t,sec){tok={t,exp:Date.now()+(+sec||3600)*1e3};try{localStorage.setItem(TKEY,JSON.stringify(tok))}catch(e){}}
+function dropTok(){tok=null;try{localStorage.removeItem(TKEY)}catch(e){}}
+const iosApp=()=>navigator.standalone===true; // installierte Web-App auf dem iPhone: Anmeldung per Weiterleitung statt Fenster
+const RURI=location.origin+location.pathname;
+if(location.hash.includes("access_token=")){ // Rückkehr von der Google-Anmeldeseite (Weiterleitung)
+  const h=new URLSearchParams(location.hash.slice(1));
+  if(h.get("state")&&h.get("state")===sessionStorage.getItem("ttb_st"))setTok(h.get("access_token"),h.get("expires_in"));
+  history.replaceState(null,"",RURI);
+}
+let tc=null,tcWait=null;
+function gisLoad(){
+  if(!CLIENT_ID||MOCK||window.google&&google.accounts&&google.accounts.oauth2)return;
+  const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;document.head.appendChild(s);
+}
+function tokenClient(){
+  if(!tc&&window.google&&google.accounts&&google.accounts.oauth2)tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,
+    callback:r=>{const w=tcWait;tcWait=null;if(!w)return;if(r.error)w.rej(new Error(r.error));else{setTok(r.access_token,r.expires_in);w.res()}},
+    error_callback:e=>{const w=tcWait;tcWait=null;if(w)w.rej(Object.assign(new Error(e&&e.type==="popup_closed"?"Anmeldung abgebrochen":"Anmeldefenster blockiert"),{auth:true}))}});
+  return tc;
+}
+// Google-Zugang holen – nur aus einem Klick heraus aufrufen (Browser erlauben das Anmeldefenster nur nach einem Fingertipp)
+function auth(after){
+  if(tokValid())return Promise.resolve();
+  if(MOCK)return MOCK.auth().then(t=>setTok(t,3600));
+  if(iosApp()){
+    const s=uid();sessionStorage.setItem("ttb_st",s);if(after)sessionStorage.setItem("ttb_after",after);
+    location.href="https://accounts.google.com/o/oauth2/v2/auth?"+new URLSearchParams({client_id:CLIENT_ID,redirect_uri:RURI,response_type:"token",scope:SCOPE,include_granted_scopes:"true",state:s,...(idx.email?{login_hint:idx.email}:{})});
+    return new Promise(()=>{});
+  }
+  const c=tokenClient();if(!c)return Promise.reject(new Error("Google ist gerade nicht erreichbar"));
+  return new Promise((res,rej)=>{tcWait={res,rej};c.requestAccessToken({prompt:idx.email?"":"select_account",...(idx.email?{login_hint:idx.email}:{})})});
+}
+
+// ---------- Google Drive (REST) ----------
+async function api(path,o={}){
+  if(!tokValid())throw Object.assign(new Error("Anmeldung nötig"),{auth:true});
+  const r=await fetch("https://www.googleapis.com/"+path,{...o,headers:{...(o.headers||{}),Authorization:"Bearer "+tok.t}});
+  if(r.status===401){dropTok();throw Object.assign(new Error("Anmeldung abgelaufen"),{auth:true})}
+  if(!r.ok)throw Object.assign(new Error("Google Drive meldet Fehler "+r.status),{status:r.status});
+  return r.status===204?null:r.json();
+}
+const Qs=s=>encodeURIComponent(s),JH={"Content-Type":"application/json"};
+const fileName=d=>(d.plan.name.replace(/[\\/:*?"<>|]/g,"").trim()||"Trainingsplan")+".json";
+function drvUp(method,path,m,d){
+  const b="ttb"+uid();
+  return api(`upload/drive/v3/files${path}?uploadType=multipart&fields=id,modifiedTime`,{method,headers:{"Content-Type":"multipart/related; boundary="+b},
+    body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(m)}\r\n--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(d)}\r\n--${b}--`});
+}
+// Jede Plan-Datei trägt die Plan-ID als appProperty „ttbPlan“ – so bleibt sie auch nach Umbenennen dieselbe Datei.
+const DRV=MOCK||{
+  async email(){return(await api("drive/v3/about?fields=user(emailAddress)")).user.emailAddress},
+  async folder(){
+    if(idx.folder)return idx.folder;
+    const r=await api(`drive/v3/files?q=${Qs(`name='${FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`)}&fields=files(id)`);
+    idx.folder=r.files.length?r.files[0].id:(await api("drive/v3/files?fields=id",{method:"POST",headers:JH,body:JSON.stringify({name:FOLDER,mimeType:"application/vnd.google-apps.folder"})})).id;
+    saveIdx();return idx.folder;
+  },
+  async list(){
+    const f=await this.folder(),r=await api(`drive/v3/files?q=${Qs(`'${f}' in parents and trashed=false`)}&fields=files(id,name,modifiedTime,appProperties)&pageSize=500`);
+    return r.files.filter(x=>x.appProperties&&x.appProperties.ttbPlan).map(x=>({fileId:x.id,planId:x.appProperties.ttbPlan,name:x.name.replace(/\.json$/i,""),mod:x.modifiedTime}));
+  },
+  get:id=>api(`drive/v3/files/${id}?alt=media`),
+  meta:id=>api(`drive/v3/files/${id}?fields=id,trashed`),
+  async create(d){return drvUp("POST","",{name:fileName(d),parents:[await this.folder()],mimeType:"application/json",appProperties:{ttbPlan:d.plan.id}},d)},
+  update:(id,d)=>drvUp("PATCH","/"+id,{name:fileName(d)},d),
+  trash:id=>api(`drive/v3/files/${id}?fields=id`,{method:"PATCH",headers:JH,body:JSON.stringify({trashed:true})})
 };
-renderFile();
-$("exr").onclick=()=>$("tag").click();
+
+// ---------- Synchronisierung ----------
+let syncT=null,syncing=false,again=false,netDown=false,syncErr="",lastSync=+(localStorage.getItem("ttb_last")||0);
+function syncSoon(ms=1500){if(idx.mode!=="cloud")return;clearTimeout(syncT);syncT=setTimeout(syncAll,ms)}
+async function syncAll(){
+  clearTimeout(syncT);syncT=null;
+  if(idx.mode!=="cloud"||!tokValid())return renderSync();
+  if(syncing){again=true;return}
+  syncing=true;renderSync();
+  try{
+    const rem=new Map((await DRV.list()).map(r=>[r.planId,r]));
+    rem.forEach(r=>{if(!idx.plans[r.planId])idx.plans[r.planId]={id:r.planId,name:r.name,fileId:r.fileId}}); // Pläne von anderen Geräten
+    for(const e of Object.values(idx.plans))if(!e.debug&&idx.plans[e.id])await syncPlan(e,rem.get(e.id));
+    lastSync=Date.now();try{localStorage.setItem("ttb_last",lastSync)}catch(x){}netDown=false;syncErr="";
+  }catch(x){if(x.auth)dropTok();else if(x instanceof TypeError)netDown=true;else syncErr=x.message;console.warn("Sync:",x)}
+  syncing=false;saveIdx();renderSync();
+  if(again){again=false;syncSoon(300)}
+}
+async function syncPlan(e,r){
+  const rev=e.rev||0,done=()=>{if((e.rev||0)===rev)e.dirty=false};
+  if(e.fileId&&!r){ // nicht (mehr) im Ordner: im Papierkorb/gelöscht – oder nur verschoben?
+    let gone=false;try{gone=!!(await DRV.meta(e.fileId)).trashed}catch(x){if(x.status===404)gone=true;else throw x}
+    if(gone&&!remoteGone(e))return;
+  }
+  if(!e.fileId){const loc=readDoc(e.id);if(!loc)return;const c=await DRV.create(loc);e.fileId=c.id;e.mod=c.modifiedTime;return done()}
+  if(!e.dirty&&r&&r.mod&&e.mod===r.mod&&readDoc(e.id))return; // nichts Neues
+  const remote=await DRV.get(e.fileId);
+  if(!remote||!okPlan(remote.plan))throw new Error(`Datei „${e.name}“ in Google Drive ist nicht lesbar`);
+  const rd={...remote,plan:{...remote.plan,id:e.id},sessions:(remote.sessions||[]).slice().sort(cmp)};
+  const loc=readDoc(e.id),m=loc?mergeDocs(loc,rd):rd; // lesen + zusammenführen + schreiben ohne Unterbrechung
+  writeDoc(m);Object.assign(e,docMeta(m));
+  if(idx.active===e.id)adopt(m);
+  if(JSON.stringify(m.plan)!==JSON.stringify(rd.plan)||JSON.stringify(m.sessions)!==JSON.stringify(rd.sessions)){const u=await DRV.update(e.fileId,m);e.mod=u.modifiedTime}
+  else if(r&&r.mod)e.mod=r.mod;
+  done();
+}
+// Plan wurde in Drive gelöscht. Rückgabe true = Plan behalten (wird neu angelegt)
+function remoteGone(e){
+  if(e.dirty&&readDoc(e.id)&&confirm(`Der Plan „${e.name}“ wurde in Google Drive gelöscht. Auf diesem Gerät gibt es dazu noch nicht gespeicherte Änderungen.\n\nOK = Plan behalten (wird neu in Google Drive angelegt)\nAbbrechen = Plan auch hier entfernen`)){e.fileId=null;e.mod=null;return true}
+  const act=idx.active===e.id;removeLocal(e.id);
+  if(e.n!=null)toast(`Plan „${e.name}“ wurde in Google Drive gelöscht und von diesem Gerät entfernt.`);
+  if(act)init();
+  return false;
+}
+// neuer Stand aus Drive für den gerade offenen Plan
+function adopt(m){
+  const before=JSON.stringify(docOf());plan=m.plan;data=m.sessions.slice();
+  if(JSON.stringify(docOf())===before)return;
+  if(editId===null&&!dirty&&st.every(x=>!x.reps.length))init();else render();
+}
+// nach einer Änderung per Klick: abgelaufenen Google-Zugang gleich mit erneuern (Fenster blitzt kurz auf)
+function kick(){if(idx.mode==="cloud"&&!tokValid()&&navigator.onLine&&cloudOk()&&!iosApp())auth().then(()=>syncSoon(200)).catch(()=>renderSync())}
+// Erstmals oder erneut mit Google Drive verbinden (vom Startbildschirm oder aus dem Modus „Ohne Cloud“)
+async function connect(){
+  try{
+    stm("Verbinde mit Google …");await auth("connect");
+    idx.email=await DRV.email();
+    const rem=await DRV.list();
+    for(const e of Object.values(idx.plans)){ // vorhandene Pläne dieses Geräts mitnehmen; gleichnamige zusammenführen
+      if(e.debug)continue;
+      const r=rem.find(x=>x.planId!==e.id&&x.name.toLowerCase()===e.name.toLowerCase()),loc=readDoc(e.id);
+      if(r&&loc){
+        const m=mergeDocs({...loc,plan:{...loc.plan,id:r.planId}},await DRV.get(r.fileId));
+        try{localStorage.removeItem(DKEY(e.id))}catch(x){}delete idx.plans[e.id];writeDoc(m);
+        idx.plans[r.planId]={id:r.planId,fileId:r.fileId,dirty:true,rev:1,...docMeta(m)};if(idx.active===e.id)idx.active=r.planId;
+      }else{e.dirty=true;e.rev=(e.rev||0)+1}
+    }
+    idx.mode="cloud";saveIdx();stm("Lade Pläne aus Google Drive …");
+    await syncAll();
+    if(netDown||syncErr)throw new Error(syncErr||"keine Verbindung");
+    stm("");
+    if(!(idx.active&&openPlan(idx.active))){plan=null;const ps=plans().filter(p=>!p.debug&&readDoc(p.id));if(ps.length===1)openPlan(ps[0].id)}
+    init();toast("Mit Google Drive verbunden"+(idx.email?" ("+idx.email+")":"")+".");
+  }catch(x){stm(x.auth?"Anmeldung abgebrochen.":"Verbindung fehlgeschlagen: "+x.message)}
+}
+
+// ---------- Statuszeile unter dem Titel, Hinweise ----------
+const ago=t=>{const m=Math.round((Date.now()-t)/6e4);return m<1?"gerade eben":m<60?`vor ${m} Min.`:m<1440?`vor ${Math.round(m/60)} Std.`:`vor ${Math.round(m/1440)} Tagen`};
+function renderSync(){
+  const el=$("sst");if(!el)return;
+  const e=plan&&idx.plans[plan.id],cl=idx.mode==="cloud",dt=anyDirty();let t="",w=false;
+  if(!plan)t="";
+  else if(e&&e.debug)t="🐞 Debug-Plan · nur auf diesem Gerät";
+  else if(!cl){t=cloudOk()?"⚠ Nur auf diesem Gerät · <u>mit Google Drive verbinden</u>":"⚠ Nur auf diesem Gerät gespeichert";w=true}
+  else if(syncing)t="☁ Synchronisiere …";
+  else if(netDown||!navigator.onLine)t=dt?"☁ Offline · Änderungen auf dem Gerät gesichert, werden später übertragen":"☁ Offline";
+  else if(!tokValid()){if(dt){t="⚠ Auf dem Gerät gesichert · <u>Google-Verbindung erneuern</u>";w=true}else t=`☁ Google Drive${lastSync?" · abgeglichen "+ago(lastSync):""} · <u>aktualisieren</u>`}
+  else if(syncErr){t="⚠ Synchronisierung fehlgeschlagen · <u>erneut versuchen</u>";w=true}
+  else if(dt)t="☁ Wird gespeichert …";
+  else t=`☁ In Google Drive gespeichert${lastSync?" · "+ago(lastSync):""}`;
+  el.innerHTML=t;el.classList.toggle("warn",w);
+  $("pname").textContent=plan?"📋 "+plan.name+" ▾":"";
+  $("planind").textContent=plan?"📋 Trainingsplan: "+plan.name:"";
+  $("fileind").textContent=cl?"☁ Google Drive"+(idx.email?": "+idx.email:"")+" · Ordner „"+FOLDER+"“":"📱 Nur auf diesem Gerät gespeichert";
+}
+setInterval(renderSync,30e3);
+$("sst").onclick=()=>{
+  if(!plan||(idx.plans[plan.id]||{}).debug)return;
+  if(idx.mode!=="cloud"){if(cloudOk())connect();return}
+  syncErr="";auth().then(syncAll).catch(x=>toast("Google-Anmeldung nicht möglich: "+x.message));
+};
+function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{el.hidden=true},5000)}
+const stm=t=>{if(!$("start").hidden)$("stMsg").textContent=t;else if(t)toast(t)};
+window.addEventListener("online",()=>{netDown=false;syncSoon(300)});
+window.addEventListener("offline",renderSync);
 $("fav").href="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'+$("lg").innerHTML+"</svg>");
-// Ansicht des Verlaufs (Filter nach Einheit, Kompakt/Ausführlich) merken
+// Ansicht des Verlaufs (Filter nach Einheit, Kompakt/Ausführlich) und Pausentimer an/aus merken
 const UKEY="trainingsplan_ui";let ui={hf:0,hv:"k"};
 try{Object.assign(ui,JSON.parse(localStorage.getItem(UKEY)||"{}"))}catch(e){}
 const saveUi=()=>{try{localStorage.setItem(UKEY,JSON.stringify(ui))}catch(e){}};
 $("inf").onclick=()=>{$("infp").hidden=!$("infp").hidden};
 document.addEventListener("click",e=>{if(!e.target.closest("#infp,#inf"))$("infp").hidden=true});
-$("tag").onclick=()=>{
-  exm("");const o=$("exOpen");o.hidden=!openHandle;if(openHandle)o.textContent=`In „${openHandle.name}“ speichern`;
-  $("gate").hidden=false;
-};
-$("exOpen").onclick=()=>exportTo(openHandle).catch(e=>{if(e.name!=="AbortError")exm("Fehler: "+(e.message||e),1)});
-$("exClose").onclick=()=>{$("gate").hidden=true};
-$("exNew").onclick=exportNew;
-$("exOld").onclick=exportOld;
 
 // ---------- Eingabe ----------
 const lastW=(u,name)=>{const L=live();for(let i=L.length-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[name]){const w=parseVal(L[i].ex[name]).w;if(w!=null)return w}return null};
@@ -410,9 +513,9 @@ const FL=svgI('<path fill="currentColor" fill-rule="evenodd" d="M12 1c.9 3.4 4.4
 const NB=s=>svgI('<path d="M4.5 4h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4h-1A1.5 1.5 0 0 1 3 14.5v-9A1.5 1.5 0 0 1 4.5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7.5 8.5h9M7.5 12h5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',s);
 const CK=s=>svgI('<circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9.5v4.5l3 2M9.5 2.5h5M12 2.5v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',s);
 $("nbtn").innerHTML=NB(22);$("tbtn").innerHTML=CK(22);
-// ---------- Debug-Modus: Käfer hinter der Versionsnummer (ⓘ-Menü); lange drücken = Beispieldaten laden ----------
+// ---------- Debug-Modus: Käfer hinter der Versionsnummer (ⓘ-Menü); lange drücken = Debug-Plan mit Beispieldaten ----------
 const BUG=svgI('<ellipse cx="12" cy="14.5" rx="5.5" ry="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v13M9 7.5a3 3 0 0 1 6 0M9.6 5 8 3M14.4 5 16 3M6.5 12H3M6.5 16H3.2M7.3 19.3 5 21M17.5 12H21M17.5 16h3.3M16.7 19.3 19 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',15);
-$("ver").innerHTML=`Version ${VERSION} <button type="button" class="ico" id="dbg" title="Debug: lange drücken lädt Beispieldaten" aria-label="Debug-Modus">${BUG}</button><span id="dbgh" hidden> Debug: lange drücken lädt Beispieldaten</span>`;
+$("ver").innerHTML=`Version ${VERSION} <button type="button" class="ico" id="dbg" title="Debug: lange drücken legt einen Test-Plan an" aria-label="Debug-Modus">${BUG}</button><span id="dbgh" hidden> Debug: lange drücken legt den Plan „🐞 Debug-WKM“ mit Beispieldaten an – nur auf diesem Gerät, deine Pläne bleiben unberührt.</span>`;
 const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 // ca. 46 Beispiel-Einträge (WKM) über gut ein halbes Jahr bis vorgestern: Steigerung, Deload, Plateau, Lücke,
 // Klimmzüge von Körpergewicht bis +2,5 kg, Notizen, bearbeitete Einträge, ein gelöschter Eintrag, krumme Gewichte (Scheibenrechner)
@@ -439,11 +542,13 @@ function demoData(){
   out.push({id:"demoDel",date:out[20].date.slice(0,8)+"28",unit:1,ex:{"Kniebeugen":"20x5-5-5"},ts:Date.now()-864e5,del:true}); // Löschmarkierung
   return out;
 }
+// Debug-Plan: eigener Plan „🐞 Debug-WKM“, nur auf diesem Gerät, wird nie nach Google Drive übertragen.
+// Erneuter langer Druck setzt ihn auf die Beispieldaten zurück.
 function demoLoad(){
-  if(!confirm("⚠ Debug: Beispieldaten laden?\n\nTrainingsplan und ALLE Einträge im Browser werden gelöscht – auch Änderungen, die noch nicht exportiert wurden – und durch einen WKM-Plan mit ca. 46 Beispiel-Einträgen ersetzt.\nDie Datei auf deinem Gerät wird NICHT verändert.\n\nFortfahren?"))return;
-  try{[KEY,PKEY,FKEY].forEach(k=>localStorage.removeItem(k))}catch(e){}
-  plan=JSON.parse(JSON.stringify(WKM_PLAN));plan.ts=Date.now()-1e3;data=demoData().sort(cmp);
-  savePlan();persist();setFile("Beispieldaten (Debug)","geladen");location.reload();
+  if(editId!==null){editId=null;$("unit").disabled=false;$("editbar").hidden=true;$("cancel").hidden=true;$("editbar").parentElement.classList.remove("editing");$("save").textContent="Speichern"}
+  removeLocal("debug");
+  newPlan({...WKM_PLAN,name:"🐞 Debug-WKM"},demoData().sort(cmp),{id:"debug",debug:true});
+  $("infp").hidden=true;init();toast("Debug-Plan mit Beispieldaten angelegt – nur auf diesem Gerät.");
 }
 {
   const b=$("dbg");let t=null,lp=false;
@@ -654,13 +759,13 @@ $("save").onclick=()=>{
       if(sig(n)===sig(x))return x; // nichts geändert
       return{...n,ts:Date.now(),ed:true};
     }).sort(cmp);
-    const ok=persist();exitEdit();
+    const ok=persist();exitEdit();kick();
     if(ok)$("note").textContent="✔ Änderung gespeichert.";
     window.scrollTo({top:0,behavior:"smooth"});
     return;
   }
   data=[...data,{id:newId(),date:$("date").value,unit:+u,ex,ts:Date.now(),...(note?{note}:{})}].sort(cmp);
-  const ok=persist();init();
+  const ok=persist();init();kick();
   if(ok)$("note").textContent="✔ Gespeichert.";
   window.scrollTo({top:0,behavior:"smooth"});
 };
@@ -962,7 +1067,7 @@ $("hbar").addEventListener("click",e=>{
   saveUi();render();
 });
 function render(){
-  const ref=refId();renderCal();const rec=recSet();renderAus();renderExr();
+  const ref=refId();renderCal();const rec=recSet();renderAus();renderSync();
   const k=plan.units.length;if(ui.hf>k)ui.hf=0;
   const bt=(a,v,t)=>`<button type="button" data-${a}="${v}"${ui[a]===v?' class="on"':""}>${t}</button>`;
   $("hbar").hidden=!live().length;
@@ -975,7 +1080,7 @@ function render(){
 }
 function del(id){
   if(!confirm("Eintrag löschen?"))return;
-  data=data.map(x=>x.id===id?{...x,del:true,ts:Date.now()}:x);persist();
+  data=data.map(x=>x.id===id?{...x,del:true,ts:Date.now()}:x);persist();kick();
   if(id===editId)exitEdit();else{if(editId===null)init();else render()}
 }
 function dl(name,text,type){
@@ -991,41 +1096,133 @@ function init(){
   const t=new Date();$("date").value=new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
   $("unit").innerHTML=plan.units.map((_,i)=>`<option value="${i+1}">Einheit ${i+1}</option>`).join("");
   const L=live(),l=L[L.length-1];$("unit").value=l&&l.unit<plan.units.length?l.unit+1:1; // nächste Einheit im Wechsel
-  $("planind").textContent="📋 Trainingsplan: "+plan.name;
   $("msg").textContent="";$("note").textContent="";setNote("");build();render();
 }
-// ---------- Startmenü & Zurücksetzen ----------
-const stm=t=>{$("stMsg").textContent=t};
-function showStart(){$("start").hidden=false;$("stMain").hidden=false;$("stOpts").hidden=true;stm("")}
-$("stNew").onclick=()=>{$("stMain").hidden=true;$("stOpts").hidden=false};
-$("stBack").onclick=()=>{$("stMain").hidden=false;$("stOpts").hidden=true};
-$("stWkm").onclick=()=>{plan=JSON.parse(JSON.stringify(WKM_PLAN));plan.ts=Date.now();savePlan();init()};
-$("stInd").onclick=()=>wizOpen(true);
-function startFrom(text,name,h){ // Datei laden: Plan + Einträge ersetzen den Browserstand
-  const fp=filePlan(text),arr=unpack(text);
-  if(!fp&&!arr.length)throw new Error("Die Datei enthält weder einen Trainingsplan noch Einträge.");
-  plan=fp||JSON.parse(JSON.stringify(WKM_PLAN)); // ältere Dateien ohne Plan: WKM
-  data=collapse(arr).sort(cmp);savePlan();persist();openHandle=h||null;setFile(name,"geöffnet");init();
+// ---------- Startbildschirm ----------
+// main = noch nicht eingerichtet (Google Drive / ohne Cloud), plan = Plan anlegen, pick = vorhandenen Plan wählen
+function showStart(v){
+  if(!v)v=!idx.mode?"main":plans().some(p=>readDoc(p.id))?"pick":"plan";
+  $("start").hidden=false;$("stMsg").textContent="";const b=$("stb");
+  if(v==="main")b.innerHTML=`<p>Dein Trainingstagebuch fürs Krafttraining. Pläne und Einträge werden automatisch in <b>deinem Google Drive</b> gesichert – auf all deinen Geräten aktuell und auch ohne Empfang im Studio nutzbar.</p>`
+    +(cloudOk()?`<button data-st="g">Mit Google Drive starten</button>`:`<button disabled style="opacity:.5">Mit Google Drive starten</button><p class="mu">Die Google-Anbindung ist noch nicht eingerichtet.</p>`)
+    +`<button class="lnk" data-st="local">Ohne Cloud nutzen</button>`;
+  else if(v==="plan")b.innerHTML=`<p>Welchen Trainingsplan möchtest du anlegen?</p><button data-st="wkm">WKM <small>(2 Einheiten mit je 3 Übungen)</small></button><button class="sec" data-st="ind">Individuell</button>`
+    +(plans().some(p=>readDoc(p.id))?`<button class="sec" data-st="pick">Bestehenden Plan öffnen</button>`:"");
+  else b.innerHTML=`<p>Welchen Trainingsplan möchtest du öffnen?</p>`+planRows("open")+`<button class="sec" data-st="plan">Neuen Plan erstellen</button>`;
 }
-$("stImp").onclick=async()=>{
-  try{
-    if(FSA){const[h]=await showOpenFilePicker(PICK);startFrom(await(await h.getFile()).text(),h.name,h)}
-    else{mode="start";$("file").click()}
-  }catch(e){if(e.name!=="AbortError")stm("Fehler: "+(e.message||e))}
-};
-$("reset").onclick=()=>{
-  if(!confirm("⚠ Alle Daten zurücksetzen?\n\nTrainingsplan und alle Einträge im Browser werden entfernt – auch Änderungen, die noch nicht exportiert wurden.\nDie Datei auf deinem Gerät wird NICHT verändert.\n\nDanach startet das Programm wie beim ersten Öffnen."))return;
-  try{[KEY,PKEY,FKEY].forEach(k=>localStorage.removeItem(k))}catch(e){}
+const LOCAL_INFO="Ohne Cloud nutzen?\n\n• Pläne und Einträge liegen nur in diesem Browser auf diesem Gerät.\n• Keine automatische Sicherung und kein Abgleich mit anderen Geräten.\n• Der Browser kann die Daten löschen – z. B. beim Löschen der Browserdaten, auf dem iPhone schon nach 7 Tagen ohne Nutzung in Safari.\n• Sichern nur von Hand über „Sicherungskopie teilen“.\n\nDu kannst später jederzeit mit Google Drive verbinden.";
+$("stb").addEventListener("click",e=>{
+  const b=e.target.closest("[data-st],[data-pid]");if(!b)return;
+  if(b.dataset.pid)return planAct(b.dataset.pa,b.dataset.pid);
+  const a=b.dataset.st;
+  if(a==="g")connect();
+  else if(a==="local"){if(confirm(LOCAL_INFO)){idx.mode="local";saveIdx();showStart("plan")}}
+  else if(a==="wkm"){newPlan(WKM_PLAN);init();kick()}
+  else if(a==="ind")wizOpen("new");
+  else showStart(a);
+});
+// ---------- Pläne verwalten: laden, neu erstellen (WKM / Individuell / übernehmen), löschen ----------
+function planRows(act){
+  const ps=plans().filter(p=>act!=="copy"||readDoc(p.id));
+  if(!ps.length)return `<p class="mu">Keine Pläne vorhanden.</p>`;
+  return ps.map(p=>{
+    const on=plan&&p.id===plan.id,loc=!!readDoc(p.id);
+    const inf=[p.n!=null?`${p.n} ${p.n===1?"Eintrag":"Einträge"}`:"",p.last?"zuletzt "+fmt(p.last):"",
+      p.debug||idx.mode!=="cloud"?"nur auf diesem Gerät":!loc?"noch nicht auf diesem Gerät geladen":""].filter(Boolean).join(" · ");
+    return `<button type="button" class="pl${on?" on":""}${act==="del"?" dl":""}" data-pid="${p.id}" data-pa="${act}"><b>${esc(p.name)}${on?" ✓":""}</b><small>${inf||"noch keine Einträge"}</small></button>`}).join("");
+}
+function pmOpen(v){$("pm").hidden=false;pmView(v||"main")}
+function pmClose(){$("pm").hidden=true}
+function pmView(v){
+  const b=$("pmb"),cl=idx.mode==="cloud",back=`<button class="sec" data-pm="main">Zurück</button>`;
+  if(v==="main")b.innerHTML=`<button data-pm="load" style="margin-top:0">1 · Bestehenden Plan laden</button><button class="sec" data-pm="new">2 · Neuen Plan erstellen</button><button class="sec" data-pm="del">3 · Plan löschen</button>`
+    +`<div class="sub">Speicherung</div><p class="mu" style="margin:0">${cl?`☁ Google Drive${idx.email?" ("+esc(idx.email)+")":""}, Ordner „${FOLDER}“ – eine Datei pro Plan, automatisch abgeglichen.`:"📱 Nur auf diesem Gerät – keine automatische Sicherung."}</p>`
+    +(!cl&&cloudOk()?`<button data-pm="connect">Mit Google Drive verbinden</button>`:"")
+    +(!cl?`<button class="sec" data-pm="backup">Sicherungskopie teilen</button><button class="sec" data-pm="restore">Sicherung einspielen</button>`:"")
+    +`<button class="sec dng" data-pm="wipe">Von diesem Gerät entfernen</button>`;
+  else if(v==="load")b.innerHTML=`<div class="sub" style="margin-top:0">Bestehenden Plan laden</div>`+planRows("open")+back;
+  else if(v==="new")b.innerHTML=`<div class="sub" style="margin-top:0">Neuen Plan erstellen</div><button data-pm="nwkm" style="margin-top:0">WKM <small>(2 Einheiten mit je 3 Übungen)</small></button><button class="sec" data-pm="nind">Individuell</button><button class="sec" data-pm="copy">Aus bestehendem Plan übernehmen</button><p class="mu">„Übernehmen“ kopiert Übungen, Sätze und Pausen eines Plans – die Trainingseinträge nicht.</p>`+back;
+  else if(v==="copy")b.innerHTML=`<div class="sub" style="margin-top:0">Welchen Plan übernehmen?</div>`+planRows("copy")+`<button class="sec" data-pm="new">Zurück</button>`;
+  else if(v==="del")b.innerHTML=`<div class="sub" style="margin-top:0">Welchen Plan löschen?</div>`+planRows("del")+back;
+}
+$("pmb").addEventListener("click",e=>{
+  const b=e.target.closest("[data-pm],[data-pid]");if(!b)return;
+  if(b.dataset.pid)return planAct(b.dataset.pa,b.dataset.pid);
+  const a=b.dataset.pm;
+  if(a==="nwkm"){pmClose();if(editId!==null)exitEdit();newPlan(WKM_PLAN);init();kick();toast(`Plan „${plan.name}“ angelegt.`)}
+  else if(a==="nind"){pmClose();wizOpen("new")}
+  else if(a==="connect"){pmClose();connect()}
+  else if(a==="backup")backup();
+  else if(a==="restore")$("file").click();
+  else if(a==="wipe")wipe();
+  else pmView(a);
+});
+$("pmClose").onclick=pmClose;
+$("plSw").onclick=()=>pmOpen();
+$("pname").onclick=()=>pmOpen();
+function planAct(a,id){
+  const e=idx.plans[id];if(!e)return;
+  if(a==="open"){
+    if(!readDoc(id))return toast("Dieser Plan ist auf diesem Gerät noch nicht geladen – bitte mit Internetverbindung erneut versuchen.");
+    if(editId!==null)exitEdit();
+    openPlan(id);pmClose();init();toast(`Plan „${plan.name}“ geöffnet.`);
+  }else if(a==="copy"){pmClose();wizOpen("copy",readDoc(id).plan)}
+  else if(a==="del")delPlan(id);
+}
+function delPlan(id){
+  const e=idx.plans[id],cl=idx.mode==="cloud"&&!!e.fileId&&!e.debug;
+  if(!confirm(`Plan „${e.name}“${e.n!=null?` mit ${e.n} ${e.n===1?"Eintrag":"Einträgen"}`:""} löschen?\n\n`+(cl?"Die Datei wird in den Papierkorb von Google Drive verschoben und ist dort 30 Tage wiederherstellbar. Der Plan verschwindet auf allen Geräten.":"Der Plan wird von diesem Gerät gelöscht. Das lässt sich nicht rückgängig machen.")))return;
+  const fin=()=>{const act=!!plan&&plan.id===id;if(act&&editId!==null)exitEdit();removeLocal(id);if(act){pmClose();init()}else pmView("main");toast(`Plan „${e.name}“ gelöscht.`)};
+  if(!cl)return fin();
+  if(!navigator.onLine)return toast("Zum Löschen wird eine Internetverbindung benötigt.");
+  auth().then(()=>DRV.trash(e.fileId)).then(fin).catch(x=>toast("Löschen fehlgeschlagen: "+x.message));
+}
+// Von diesem Gerät entfernen: löscht nur die Kopien auf dem Gerät (vorher synchronisieren), Google Drive bleibt unverändert
+function wipe(){
+  if(idx.mode==="cloud"&&anyDirty()){
+    if(!navigator.onLine)return alert("Es gibt noch Änderungen, die nicht in Google Drive gespeichert sind, und keine Internetverbindung.\n\nBitte erst mit Verbindung synchronisieren – sonst gingen sie verloren.");
+    return auth().then(syncAll).then(()=>anyDirty()?alert("Synchronisieren hat nicht geklappt – Entfernen abgebrochen, damit nichts verloren geht."):wipe2()).catch(x=>toast("Google-Anmeldung nicht möglich: "+x.message));
+  }
+  wipe2();
+}
+function wipe2(){
+  const cl=idx.mode==="cloud";
+  if(!confirm(cl?"Alle Pläne von diesem Gerät entfernen und die Verbindung zu Google trennen?\n\nIn Google Drive bleibt alles erhalten – beim nächsten Verbinden ist alles wieder da.":"⚠ Alle Pläne und Einträge auf diesem Gerät löschen?\n\nOhne Cloud sind sie danach unwiderruflich weg (außer du hast eine Sicherungskopie)."))return;
+  try{if(tok&&window.google&&google.accounts&&google.accounts.oauth2)google.accounts.oauth2.revoke(tok.t,()=>{})}catch(x){}
+  try{Object.keys(localStorage).filter(k=>k.startsWith("ttb_")).forEach(k=>localStorage.removeItem(k))}catch(x){}
   location.reload();
+}
+// Sicherungskopie (nur Modus „Ohne Cloud“): teilen bzw. herunterladen, und wieder einspielen
+async function backup(){
+  const d=docOf(),txt=JSON.stringify(d,null,1),name=fileName(d);
+  try{const f=new File([txt],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return}}catch(x){if(x.name==="AbortError")return}
+  dl(name,txt,"application/json");
+}
+$("file").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{
+    const d=JSON.parse(r.result);if(!d||!okPlan(d.plan)||!Array.isArray(d.sessions))throw new Error("Das ist keine TTB-Sicherung.");
+    const id=d.plan.id||uid(),loc=readDoc(id),inp={app:"TTB",version:DOCV,plan:{...d.plan,id},sessions:d.sessions};
+    const m=loc?mergeDocs(loc,inp):{...inp,plan:{...inp.plan,name:uniqueName(d.plan.name)}};
+    writeDoc(m);idx.plans[id]={...(idx.plans[id]||{}),id,...docMeta(m)};
+    if(editId!==null)exitEdit();
+    openPlan(id);persist();pmClose();init();toast(`Sicherung „${m.plan.name}“ eingespielt (${docMeta(m).n} Einträge).`);
+  }catch(x){toast("Fehler: "+x.message)}};
+  r.readAsText(f);e.target.value="";
 };
 
 // ---------- Trainingsplan anlegen / bearbeiten ----------
 let wz=null;
 const RESTS=[0,30,45,60,90,120,150,180,240,300],restL=s=>s?Math.floor(s/60)+":"+String(s%60).padStart(2,"0")+" min":"aus";
 const wzEx=()=>({n:"",m:"wr",s:3}),wzm=t=>{$("wzm").textContent=t},at=(a,b)=>`data-a="${a}" data-b="${b}"`;
-function wizOpen(fresh){
-  wz=fresh?{name:"Mein Trainingsplan",units:[{exs:[wzEx()]},{exs:[wzEx()]}]}:JSON.parse(JSON.stringify(plan));
-  wzm("");wizRender();$("pw").hidden=false;
+// m: "edit" = aktiven Plan bearbeiten, "new" = neuer leerer Plan, "copy" = neuer Plan mit den Übungen von src
+let wzMode="edit";
+function wizOpen(m,src){
+  wzMode=m;
+  wz=m==="new"?{name:uniqueName("Mein Trainingsplan"),units:[{exs:[wzEx()]},{exs:[wzEx()]}]}
+    :m==="copy"?{name:uniqueName(src.name+" (Kopie)"),units:clone(src.units)}:clone(plan);
+  wzm("");wizRender();$("pw").hidden=false;$("pw").scrollTop=0;
 }
 function wizRender(){
   const M={wr:"Gewicht + Wiederholungen",w:"Nur Gewicht",r:"Nur Wiederholungen",p:"Pyramidensatz (Gewicht je Satz)"};
@@ -1073,21 +1270,36 @@ $("wzSave").onclick=()=>{
     if(!exs.length)return wzm(`Einheit ${a+1}: mindestens eine Übung eintragen.`);
     units.push({exs});
   }
-  if(!confirm(`Trainingsplan „${name}“ mit ${units.length} Einheit(en) speichern? Bestehende Einträge bleiben erhalten.`))return;
-  plan={name,ts:Date.now(),units};savePlan();$("pw").hidden=true;refresh();
-  $("note").textContent="✔ Trainingsplan gespeichert – er wird beim nächsten Export in die Datei geschrieben.";
+  if(nameTaken(name,wzMode==="edit"?plan.id:null))return wzm(`Es gibt schon einen Plan „${name}“ – bitte einen anderen Namen wählen.`);
+  if(wzMode==="edit"){
+    if(!confirm(`Trainingsplan „${name}“ mit ${units.length} Einheit(en) speichern? Bestehende Einträge bleiben erhalten.`))return;
+    plan={...plan,name,ts:Date.now(),units};savePlan();$("pw").hidden=true;refresh();kick();
+    $("note").textContent="✔ Trainingsplan gespeichert.";return;
+  }
+  if(editId!==null)exitEdit();
+  newPlan({name,units});$("pw").hidden=true;init();kick();toast(`Plan „${plan.name}“ angelegt.`);
 };
 $("wzClose").onclick=()=>{$("pw").hidden=true};
-$("plEdit").onclick=()=>wizOpen(false);
+$("plEdit").onclick=()=>wizOpen("edit");
 function refresh(){if(editId!==null)exitEdit();else init()}
 // Beim Zurückkehren zur Seite (z. B. am nächsten Tag): Datum/Einheit aktualisieren, sofern nichts eingegeben ist
 document.addEventListener("visibilitychange",()=>{
-  if(document.visibilityState!=="visible")return;
+  if(document.visibilityState!=="visible"){if(syncT)syncAll();return} // beim Verlassen: Ausstehendes sofort übertragen
+  if(idx.mode==="cloud")syncAll(); // beim Zurückkehren: Änderungen anderer Geräte holen
+
   if(wlWant)wlOn(); // Wake Lock wird beim Verlassen der Seite automatisch freigegeben
   tTick();
-  if(editId===null&&!dirty&&st.every(x=>!x.reps.length))init();
+  if(plan&&editId===null&&!dirty&&st.every(x=>!x.reps.length))init();
 });
+// ---------- Start ----------
+try{["trainingsplan_v1","trainingsplan_plan_v1","trainingsplan_file"].forEach(k=>localStorage.removeItem(k))}catch(e){} // Altbestände vor 0.90
+gisLoad();
+if(idx.active&&!openPlan(idx.active))idx.active=null;
 init();
+if(idx.mode==="cloud")syncAll();
+if(sessionStorage.getItem("ttb_after")==="connect"){sessionStorage.removeItem("ttb_after");if(tokValid())connect()} // nach Google-Weiterleitung (iPhone-App)
+if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register("sw.js").catch(()=>{});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{}); // Gerätespeicher möglichst nicht automatisch räumen
 </script>
 </body>
 </html>

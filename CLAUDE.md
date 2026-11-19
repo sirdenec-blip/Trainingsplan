@@ -1,63 +1,63 @@
-# Trainingstagebuch – Projektkontext für Claude
+# TTB – Trainingstagebuch – Projektkontext für Claude
 
-Persönliche Web-App zum Dokumentieren von Krafttraining (Gewicht, Sätze, Wiederholungen).
+Web-App (PWA „TTB“) zum Dokumentieren von Krafttraining (Gewicht, Sätze, Wiederholungen), mit Google-Drive-Speicherung.
 Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Oberfläche ebenfalls Deutsch.
 
 ## Aufbau
-- **Eine einzige Datei: `index.html`** (HTML + CSS + JavaScript inline, keine Bibliotheken, kein Build-Schritt).
+- **`index.html`**: die ganze App (HTML + CSS + JavaScript inline, kein Build-Schritt). Einzige externe Quelle: Googles Anmelde-Skript `accounts.google.com/gsi/client` (wird nur mit `CLIENT_ID` geladen).
+- **`manifest.webmanifest`** (Name „TTB – Trainingstagebuch“, Kurzname **„TTB“**), **`icons/`** (aus dem Logo erzeugte PNGs: 192, 512, maskable 512, apple-touch 180), **`sw.js`** (Service Worker: Netz zuerst, nach 3 s Cache; Google-Anfragen unberührt). Bei neuer Version `CACHE`-Name in `sw.js` mitziehen (`ttb-<Version>`).
 - `README.md`: Nutzerdoku inkl. Versionsliste.
 - Gehostet über **GitHub Pages** (Branch `main`, Root): https://sirdenec-blip.github.io/Trainingsplan/
-- Hauptnutzung **am Handy** (Android, Chrome). Layout immer mobile-first prüfen (ca. 360–400 px Breite, keine horizontale Scrollleiste). Hell- und Dunkelmodus über CSS-Variablen auf `:root`.
+- Hauptnutzung **am Handy** (Android/Chrome, zusätzlich iPhone/Safari – iPhone-tauglich bauen). Layout mobile-first (360–400 px, keine horizontale Scrollleiste). Hell-/Dunkelmodus über CSS-Variablen auf `:root`.
 
 ## Versionierung
-- Konstante `const VERSION="…"` im Script von `index.html`, angezeigt im ⓘ-Menü.
-- Aktuell: **0.52**. Jede neue Version erhöht um 0.01 (nächste: 0.53); größere Funktionspakete springen auf die nächste Zehnerstelle (0.50 …). **1.0** ist für eine mögliche Android-App/PWA vorgesehen.
+- Konstante `const VERSION="…"` in `index.html`, angezeigt im ⓘ-Menü.
+- Aktuell: **0.90** (Testversion PWA + Drive-Sync). **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
 - Wenn der Nutzer „gleiche Versionsnummer“ sagt, Version nicht erhöhen.
-- Bei jeder Version: `VERSION` anpassen, README aktualisieren (Versionszeile oben + Eintrag unter „## Versionen“ + betroffene Abschnitte).
-- Vor größeren Umbauten: knapp Optionen nennen und nachfragen, wenn der Nutzer „erst klären“ verlangt.
+- Bei jeder Version: `VERSION` und `CACHE` in `sw.js` anpassen, README aktualisieren (Versionszeile + „## Versionen“ + betroffene Abschnitte).
+- Vor größeren Umbauten: Konzept/Optionen knapp vorlegen und nachfragen.
+
+## Speicherung (seit 0.90)
+- **Mehrere Pläne.** Jeder Plan ist ein Dokument `{app:"TTB", version:4, plan, sessions}` → in Drive **eine Datei pro Plan** im Ordner **„Trainingstagebuch“** (sichtbar), Dateiname = Planname + `.json`, Zuordnung über appProperty `ttbPlan` = Plan-ID (Umbenennen benennt die Datei um, nie zweite Datei). Berechtigung nur `drive.file`.
+- **Gerät (localStorage):** `ttb_index` `{mode:"cloud"|"local"|null, active, email?, folder?, plans:{id:{id,name,n,last,fileId?,mod?,dirty?,rev?,debug?}}}`, `ttb_doc_<planId>` (Arbeitskopie), `ttb_tok` (Google-Zugang, ~1 h), `ttb_last` (letzter Abgleich). Oberfläche: `trainingsplan_ui` `{hf, hv, tmr}`.
+- **Ablauf:** `persist()` speichert sofort lokal, markiert `dirty`/`rev` und startet `syncSoon()` (1,5 s). `syncAll()`: Drive-Liste holen, neue Pläne anderer Geräte aufnehmen, je Plan `syncPlan()` = herunterladen → mit frischer lokaler Kopie zusammenführen (`mergeDocs`: gleiche ID, neuere `ts` gewinnt, Tombstones bleiben; neuerer Plan gewinnt) → lokal schreiben → nur bei Unterschied hochladen. `dirty` wird nur gelöscht, wenn `rev` während des Abgleichs unverändert blieb. Abgleich auch beim Öffnen, Zurückkehren (visibilitychange) und `online`; beim Verlassen wird Ausstehendes sofort übertragen.
+- **Google-Zugang:** GIS-Token-Client (Popup) bzw. auf dem iPhone in der installierten App (`navigator.standalone`) Weiterleitung mit `#access_token` (Rücksprung-Aktion in `sessionStorage.ttb_after`). Zugang ~1 h; Erneuern nur aus einem Klick (`kick()` nach Speichern/Löschen, Tipp auf die Statuszeile). Ohne Zugang arbeitet alles lokal weiter. Ein eigener Server (z. B. Cloudflare Worker für Dauerzugang) ist als **spätere Ausbaustufe** vorgesehen.
+- `CLIENT_ID` oben im Speicher-Abschnitt von `index.html`; leer = nur „Ohne Cloud“ möglich.
+- **Datenschutz-Regeln:** Löschen eines Plans = Drive-Papierkorb (30 Tage). In Drive gelöschte Pläne werden lokal entfernt (vorher Rückfrage, falls offline geändert). „Von diesem Gerät entfernen“ synchronisiert vorher (offline verweigert) und löscht nur `ttb_*`. Debug-Plan (`id:"debug"`) wird **nie** hochgeladen. In Drive wird nie automatisch etwas gelöscht.
+- Keine Rückwärtskompatibilität zu Ständen vor 0.90 nötig (laut Nutzer keine echte Nutzung davor); alte Schlüssel `trainingsplan_v1/_plan_v1/_file` werden beim Start entfernt.
 
 ## Datenmodell
-- **Plan** (localStorage `trainingsplan_plan_v1`): `{name, ts, units:[{exs:[{n, m, s, bw?, max?, goal?, rest?}]}]}`, 1–6 Einheiten.
-  - `rest`: Pause in Sekunden für den Pausentimer (fehlt = Standard 120 für **alle** Übungen inkl. Körpergewicht; 0 = aus). Gespeichert nur, wenn vom Standard abweichend. „Nur Gewicht“ (`m:"w"`) hat bewusst keine Pause (kein Satz-Ereignis, das den Timer starten könnte – vom Nutzer so entschieden).
-  - `m`: `"wr"` Gewicht + Wdh. · `"w"` nur Gewicht · `"r"` nur Wdh. · `"p"` Pyramidensatz (feste Wdh., Gewicht je Satz).
-  - `s`: Anzahl Sätze (0 = beliebig viele), `bw`: Körpergewichtsübung (Zusatzgewicht, beliebig viele Sätze).
-  - Vorgabeplan **WKM**: Einheit 1 Kniebeugen, Bankdrücken, Vorgebeugtes Rudern; Einheit 2 Kreuzheben, Overhead-Press, Klimmzüge (bw, max 12 Wdh./Satz, Ziel 24).
-- **Einträge** (localStorage `trainingsplan_v1`): `{id, date:"YYYY-MM-DD", unit, ex:{Übung: Wert}, ts, ed?, del?, note?}`.
-  - `note`: freie Notiz (max. 300 Zeichen). `sig()` hängt sie nur an, wenn vorhanden – sonst würden Alt-IDs (aus `sig` gehasht) sich ändern.
-  - Wertformate: `85x8-9-10` (Gewicht+Wdh.), `85` (nur Gewicht), `x8-9-10` (nur Wdh.), `8@60-70-80` (Pyramide).
-  - `id`: eindeutig, unveränderlich; `ts`: letzte Änderung; `ed`: bearbeitet (zeigt ⓘ); `del`: Löschmarkierung (Tombstone, bleibt erhalten).
-  - **Ein Eintrag pro Kalendertag** (beim Speichern erzwungen).
-- **Datei** (Export/Import): `{version:3, plan, sessions:[…]}`. Ältere Formate (Array, version 1/2) werden weiter gelesen.
-- Zuletzt verwendete Datei: localStorage `trainingsplan_file` (dient auch als Zeitpunkt für die Export-Erinnerung).
-- Oberflächen-Einstellungen: localStorage `trainingsplan_ui` `{hf: 0|Einheit, hv: "k"|"d", tmr: true|false}` (tmr = Pausentimer an/aus).
+- **Plan:** `{id, name, ts, units:[{exs:[{n, m, s, bw?, max?, goal?, rest?}]}]}`, 1–6 Einheiten, Name eindeutig.
+  - `m`: `"wr"` Gewicht + Wdh. · `"w"` nur Gewicht · `"r"` nur Wdh. · `"p"` Pyramidensatz.
+  - `s`: Sätze (0 = beliebig viele), `bw`: Körpergewichtsübung.
+  - `rest`: Pause in Sekunden (fehlt = 120 für alle Übungen; 0 = aus), nur gespeichert, wenn abweichend. „Nur Gewicht“ hat bewusst keine Pause (kein Satz-Ereignis – vom Nutzer so entschieden).
+  - Vorgabe **WKM**: Einheit 1 Kniebeugen, Bankdrücken, Vorgebeugtes Rudern; Einheit 2 Kreuzheben, Overhead-Press, Klimmzüge (bw, max 12, Ziel 24).
+- **Einträge:** `{id, date:"YYYY-MM-DD", unit, ex:{Übung: Wert}, ts, ed?, del?, note?}`. Werte: `85x8-9-10`, `85`, `x8-9-10`, `8@60-70-80`. Ein Eintrag pro Kalendertag.
 
 ## Wichtige Regeln (vom Nutzer festgelegt)
-- **Startmenü** bei leerem Browserspeicher: „Neuen Trainingsplan anlegen“ (WKM oder Individuell) oder „Trainingsplan importieren“. Import gibt es nur dort.
-- **Eine geöffnete Datei wird nie verändert, bis „Trainingsplan exportieren“ gedrückt wird.**
-- Export-Abgleich: gleiche ID = gleicher Eintrag, neuere `ts` gewinnt, Löschungen werden mit abgeglichen; neuerer Plan (`ts`) gewinnt.
-- „Alle Daten zurücksetzen“: löscht nur Browserdaten (mit Warnung), nie die Datei.
-- Datum = heute, Einheit = nächste im Wechsel (nach der Einheit des datumsmäßig letzten Eintrags), bei jeder Aktualisierung.
-- Verlauf: so viele Einträge sichtbar wie Einheiten im Plan (je Einheit der neueste), Rest unter „Ältere Einträge“ (angeheftete Leiste zum Einklappen).
-- Verlauf-Leiste: Filter „Alle · E1 · E2 …“ (bei gewählter Einheit nur **1** Eintrag sichtbar, Rest unter „Ältere Einträge“) und Ansicht „Kompakt“ (Standard, eine Zeile je Übung, kg und jeder Satz in kleinen Bubbles `.bb`; Werte haben Vorrang, Name wird gekürzt) / „Ausführlich“. Notiz: in der Eingabe nur Sprechblasen-Symbol (klappt Textfeld aus), im Verlauf kompakt als 💬-Emoji zum Antippen, ausführlich sichtbar.
-- Symbole im Eingabeformular (Flamme, Hantel, Notiz, Uhr) sind **einfarbige Inline-SVGs** (`currentColor`), keine bunten Emojis; aktiv = volle Deckkraft, inaktiv = blass.
-- Trainingshelfer: Satz-Pausentimer nach jedem Satz („Pause vorbei“, Vibration). Timerleiste immer **oben** fixiert (unten verdeckt die Handy-Tastatur); `--tb` = Leistenhöhe, Platz oben wird freigehalten und der Scroll-Versatz ausgeglichen. Uhr-Knopf neben der Notiz: kurz = Satztimer an/aus (Standard an), lang (0,5 s) = freier Timer 2:00 mit −0:30/−0:15/+0:15/+0:30 und Start → Pause → Weiter, Ende „Zeit abgelaufen“ (bleibt bis ✕, „Neu“); während der freie Timer aktiv ist, startet kein Satztimer.
-- Debug-Modus: Käfer-Symbol hinter der Versionsnummer im ⓘ-Menü; lange drücken (1 s) → Warnung/Bestätigung → Browserdaten löschen und `demoData()` laden (WKM, ~46 Einträge bis vorgestern, deckt alle Funktionen ab; Datei-Anzeige „Beispieldaten (Debug)“). Für Browsertests kann man diese Funktion statt eigener Testdaten nutzen. Aufwärmsätze 40/60/80 % (auf 2,5 kg gerundet), Hantelsymbol = Scheibenrechner (immer 20-kg-Stange), Wake Lock während der Eingabe.
-- Export-Erinnerung unter der Titelleiste: ab **3** nicht exportierten Änderungen **oder** ≥ 1 Änderung und **1 Woche** seit letztem Export (ohne Export: seit ältester offener Änderung).
-- Vor einer Umsetzung, bei der eine Vorgabe des Nutzers technisch keine Wirkung hätte, kurz mit Begründung nachfragen (Nutzer wünscht das ausdrücklich).
-- Logo „Feuerfuchs“ als Inline-SVG-`<symbol id="lg">` (Rugbyball aubergine `#4b2142`, Fuchs orange, grüne Hantelscheiben); auch Favicon. Ersetzt das 🏋️-Emoji.
-- Letzte gleiche Einheit im Verlauf grün gestrichelt (Referenz); Bearbeiten-Modus gelb.
-- Auswertungen (aufklappbar, unter dem Verlauf): Kalender, Fortschritt, Bestleistungen, Regelmäßigkeit, Gewicht, 1RM geschätzt (Epley), Volumen, Wiederholungen. 🏆 im Verlauf bei neuem Bestwert.
-- Stil: minimalistisch und kompakt, grüne Akzentfarbe, kleine Hilfsangaben in Grau.
-- Zahlen in der Oberfläche immer mit Dezimalkomma (auch in Eingabefeldern); gespeichert wird intern mit Punkt.
+- **Start:** „Mit Google Drive starten“ (Standard, groß) → vorhandene Pläne wählen (bei genau einem direkt öffnen) oder Plan anlegen (WKM/Individuell). „Ohne Cloud nutzen“ nur als kleiner Link mit vorherigem Hinweis-Popup zu den Grenzen; später verbindbar (gleichnamige Pläne werden zusammengeführt).
+- **Plan wechseln** (Knopf unten und Planname unter dem Titel): 1. Bestehenden Plan laden, 2. Neuen Plan erstellen (WKM / Individuell / Aus bestehendem Plan übernehmen = Übungen ohne Einträge), 3. Plan löschen (Bestätigung). Dazu „Von diesem Gerät entfernen“; im lokalen Modus „Sicherungskopie teilen“/„Sicherung einspielen“.
+- **Statuszeile** unter dem Titel statt Export-Erinnerung (gespeichert / offline / Verbindung erneuern / nur auf diesem Gerät).
+- **Kein Ton / keine akustische Benachrichtigung** (ausdrücklicher Nutzerwunsch). Timer-Ende: grüne Leiste + Vibration (Android).
+- Datum = heute, Einheit = nächste im Wechsel, bei jeder Aktualisierung.
+- Verlauf: so viele Einträge sichtbar wie Einheiten (je Einheit der neueste), Rest unter „Ältere Einträge“ (angeheftet). Filter „Alle · E1 · E2 …“ (dann nur 1 sichtbar), Ansicht „Kompakt“ (Standard, Bubbles `.bb`, Name wird gekürzt) / „Ausführlich“. Notiz: Eingabe nur Symbol (klappt Feld aus), Verlauf kompakt 💬 zum Antippen.
+- Symbole im Eingabeformular (Flamme, Hantel, Notiz, Uhr, Käfer) sind **einfarbige Inline-SVGs** (`currentColor`); aktiv = voll, inaktiv = blass.
+- Trainingshelfer: Satz-Pausentimer, Leiste immer **oben** (`--tb`, Scroll-Versatz ausgeglichen). Uhr-Knopf: kurz = an/aus, lang (0,5 s) = freier Timer (±0:15/±0:30, Start → Pause → Weiter, „Zeit abgelaufen“). Aufwärmsätze 40/60/80 % (2,5-kg-Raster), Scheibenrechner (20-kg-Stange), Wake Lock.
+- **Debug-Modus:** Käfer hinter der Versionsnummer (ⓘ); lange drücken (1 s) legt Plan „🐞 Debug-WKM“ mit `demoData()` (~46 Einträge) **nur lokal** an und wechselt dorthin; keine Auswirkung auf echte Pläne.
+- Logo „Feuerfuchs“ als Inline-SVG-`<symbol id="lg">` (Rugbyball aubergine `#4b2142`), auch Favicon und App-Icons.
+- Letzte gleiche Einheit grün gestrichelt; Bearbeiten-Modus gelb. Auswertungen: Kalender, Fortschritt, Bestleistungen, Regelmäßigkeit, Gewicht, 1RM (Epley), Volumen, Wiederholungen; 🏆 bei Bestwert; Diagramme antippbar.
+- Stil: minimalistisch, grüne Akzentfarbe, Hilfsangaben grau. Zahlen in der Oberfläche mit Dezimalkomma, gespeichert mit Punkt.
+- Vor einer Umsetzung, bei der eine Vorgabe technisch keine Wirkung hätte, kurz mit Begründung nachfragen.
 
 ## Arbeitsweise
-- Nach Änderungen JavaScript-Syntax prüfen und – wo möglich – im Browser in Handybreite ansehen (360 **und** 390 px, hell und dunkel).
-- Browsertest: Kopie von `index.html` über einen lokalen Server außerhalb des Repos ausliefern; Testdaten (z. B. WKM-Plan mit 20–30 Einträgen) nur dort per localStorage anlegen, nie im Repo.
-- Git: nicht im PATH; das Git von GitHub Desktop nutzen (`%LOCALAPPDATA%\GitHubDesktop\app-*\resources\app\git\cmd\git.exe`). Im Repo ist `credential.helper=manager` gesetzt, der Nutzer ist angemeldet: Claude committet und pusht selbst auf `main`.
-- Bestehende Nutzerdaten dürfen durch Updates nie verloren gehen (Formate abwärtskompatibel lesen).
-- Commits mit kurzer deutscher Nachricht, z. B. `Version 0.44: …`.
+- Nach Änderungen im Browser in Handybreite prüfen (360 **und** 390 px, hell und dunkel), Konsole auf Fehler prüfen.
+- **Browsertest:** Testumgebung im Scratchpad: `serve.ps1` (lokaler Server, Port 8765, auch PUT für erzeugte Dateien), `build-site.ps1` (kopiert `index.html` und fügt `mock.js` ein = Ersatz für Google Drive in localStorage `mock_drive`, mit Offline-Schalter und `edit()` für „anderes Gerät“). Nie Test-Code ins Repo. `.claude/launch.json` ist per `.git/info/exclude` ausgeschlossen.
+- Die echte Google-Anmeldung kann Claude nicht selbst testen (keine Passwörter) – das testet der Nutzer am Handy/iPhone.
+- **Dateien nie per Skript „blind“ überschreiben:** PowerShell-Skripte mit `$ErrorActionPreference='Stop'` und Prüfungen vor dem Schreiben (ein fehlerhaftes Skript hat einmal `index.html` geleert; wiederhergestellt aus Git).
+- Git: nicht im PATH; Git von GitHub Desktop nutzen (`%LOCALAPPDATA%\GitHubDesktop\app-*\resources\app\git\cmd\git.exe`). `credential.helper=manager` ist gesetzt: Claude committet und pusht selbst auf `main`.
+- Commits mit kurzer deutscher Nachricht, z. B. `Version 0.91: …`.
 
 ## Offene Ideen
-- Weitere Ideen aus dem Brainstorming (noch offen): „Letztes Mal“ direkt beim Satz, Gewichtsvorschlag/Progression, Wochen-/Monatsrückblick, Plateau-Erkennung, Zeitraumwahl für Diagramme, Körpergewicht erfassen, Jahres-Heatmap, Deload-Woche, Rückgängig nach Löschen, größere Tippflächen für ✎/✕.
-- Scheibensatz ggf. einstellbar machen (aktuell fest 25/20/15/10/5/2,5/1,25).
-- Version 1.0: PWA und/oder Android-App (Capacitor) mit direktem Dateizugriff.
+- **Später:** kleiner Server (z. B. Cloudflare Worker) für dauerhaften Google-Zugang ohne stündliches Erneuern; Veröffentlichung der Google-App (Datenschutzseite) für Nutzer außerhalb der Testnutzerliste.
+- Aus dem Brainstorming: „Letztes Mal“ beim Satz, Gewichtsvorschlag/Progression, Wochen-/Monatsrückblick, Plateau-Erkennung, Zeitraumwahl für Diagramme, Körpergewicht erfassen, Jahres-Heatmap, Deload-Woche, Rückgängig nach Löschen, größere Tippflächen für ✎/✕.
+- Scheibensatz einstellbar machen (aktuell fest 25/20/15/10/5/2,5/1,25).

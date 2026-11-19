@@ -1,126 +1,113 @@
-# Trainingsplan
+# TTB – Trainingstagebuch
 
-Aktuelle Version: **0.52** (steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.90** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
-Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
+Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
-## Pläne
-- **Einheit 1:** Kniebeugen, Bankdrücken, Vorgebeugtes Rudern
-- **Einheit 2:** Kreuzheben, Overhead-Press, Klimmzüge
+Adresse: https://sirdenec-blip.github.io/Trainingsplan/
+
+## Als App installieren
+- **Android (Chrome):** Seite öffnen → Menü ⋮ → **App installieren** bzw. „Zum Startbildschirm hinzufügen“.
+- **iPhone (Safari):** Seite öffnen → Teilen-Symbol → **Zum Home-Bildschirm**.
+
+Danach erscheint „TTB“ mit dem Feuerfuchs-Symbol auf dem Startbildschirm, ohne Adressleiste, und funktioniert auch offline.
+
+## Start und Speicherung
+**Erster Start:**
+1. **Mit Google Drive starten** (empfohlen): Anmeldung mit deinem Google-Konto. Gibt es in deinem Drive schon Pläne (z. B. vom anderen Handy), wählst du einen aus – bei genau einem öffnet er sich direkt. Sonst legst du einen Plan an: *WKM* oder *Individuell*.
+2. **Ohne Cloud nutzen** (kleiner Link): erst nach einem Hinweis auf die Grenzen – Daten nur in diesem Browser, kein Abgleich, der Browser kann sie löschen (iPhone: nach 7 Tagen ohne Nutzung in Safari). Später jederzeit „Mit Google Drive verbinden“ möglich; gleichnamige Pläne werden dabei zusammengeführt.
+
+**Wo liegen die Daten?** In deinem Google Drive im Ordner **„Trainingstagebuch“**, **eine Datei pro Plan** (z. B. `WKM.json`). Benennst du einen Plan um, wird die Datei umbenannt – es entsteht nie eine zweite Datei. Auf dem Gerät liegt immer eine Arbeitskopie. Die App hat nur Zugriff auf die Dateien, die sie selbst angelegt hat (Google-Berechtigung „drive.file“), nicht auf den Rest deines Drives.
+
+**Im Alltag – alles automatisch:**
+- Jede Änderung (Eintrag speichern, bearbeiten, löschen, Plan ändern) ist sofort auf dem Gerät gesichert und wird 1–2 Sekunden später nach Google Drive übertragen.
+- **Kein Empfang im Studio:** Änderungen werden auf dem Gerät vorgemerkt und übertragen, sobald wieder Verbindung besteht.
+- Beim Öffnen und beim Zurückkehren in die App holt sie Änderungen von anderen Geräten.
+- Zwei Geräte gleichzeitig: Es wird pro Eintrag zusammengeführt (gleiche ID = gleicher Eintrag, neuere Änderung gewinnt, Löschungen werden mitgenommen). Vor jedem Hochladen liest die App den aktuellen Stand aus Drive – es wird nie blind überschrieben.
+- **Google-Zugang:** Google erlaubt Web-Apps ohne eigenen Server nur einen Zugang für ca. eine Stunde. Ist er abgelaufen, blitzt beim nächsten „Speichern“ kurz ein Google-Fenster auf (bei mehreren Google-Konten: einmal antippen). Bis dahin ist alles auf dem Gerät gesichert.
+
+**Statuszeile** unter dem Titel (neben dem Plannamen), z. B.:
+- „☁ In Google Drive gespeichert · vor 2 Min.“
+- „☁ Offline · Änderungen auf dem Gerät gesichert, werden später übertragen“
+- „⚠ Auf dem Gerät gesichert · Google-Verbindung erneuern“ (antippen)
+- „⚠ Nur auf diesem Gerät · mit Google Drive verbinden“ (Modus ohne Cloud)
+
+## Trainingspläne verwalten
+Der aktive Plan steht unter dem Titel (antippen) und unten gibt es **⇄ Plan wechseln**:
+1. **Bestehenden Plan laden:** Liste aller Pläne mit Anzahl Einträge und letztem Training.
+2. **Neuen Plan erstellen:** *WKM*, *Individuell* (Plan-Assistent) oder *Aus bestehendem Plan übernehmen* – kopiert Übungen, Sätze und Pausen, nicht die Trainingseinträge; danach öffnet sich der Assistent zum Anpassen (mindestens der Name).
+3. **Plan löschen:** mit Bestätigung. Im Cloud-Modus wandert die Datei in den **Papierkorb von Google Drive** (30 Tage wiederherstellbar) und der Plan verschwindet auf allen Geräten.
+
+Außerdem im selben Menü: **Von diesem Gerät entfernen** – löscht nur die Kopien auf dem Gerät und trennt die Google-Verbindung (vorher wird synchronisiert; ohne Verbindung wird das Entfernen verweigert, damit nichts verloren geht). In Google Drive bleibt alles erhalten. Im Modus ohne Cloud zusätzlich **Sicherungskopie teilen** und **Sicherung einspielen**.
+
+Plannamen sind eindeutig.
+
+### Schutz vor Datenverlust
+| Situation | Was passiert |
+|---|---|
+| Kein Netz | Alles bleibt auf dem Gerät gesichert und wird später automatisch übertragen. |
+| Zwei Geräte ändern denselben Plan | Zusammenführen pro Eintrag, nichts wird überschrieben. |
+| Versehentlich falsch geändert | Google Drive bewahrt frühere Versionen jeder Datei auf (Datei → Versionen verwalten). |
+| Plan gelöscht | Datei im Drive-Papierkorb (30 Tage); andere Geräte entfernen den Plan beim nächsten Abgleich. |
+| Plan gelöscht, auf einem anderen Gerät aber noch offline geändert | Dieses Gerät fragt: Plan behalten (wird neu angelegt) oder auch hier entfernen. |
+| Debug-Plan | Liegt nur auf dem Gerät, wird nie nach Drive übertragen. |
 
 ## Eingabe
-Pro Übung: **Gewicht eintippen → Enter → Wiederholungen eintippen → Enter** (wiederholen pro Satz).
-Die Striche werden automatisch gesetzt, gespeichert wird z. B. `85x8-9-10`.
+Pro Übung: **Gewicht** (vorausgefüllt vom letzten Mal, ▲▼ in 0,25-kg-Schritten) und pro Satz **Wiederholungen eintippen → ＋ bzw. Enter**. Gespeichert wird z. B. `85x8-9-10`.
 
-- Kniebeugen, Bankdrücken, Rudern, Kreuzheben, Overhead-Press: genau 3 Sätze. Nach dem 3. Satz springt der Cursor zur nächsten Übung.
-- Klimmzüge: beliebig viele Sätze (1–12 Wdh. je Satz), z. B. `0x8-6-3-2-1-1-1-1-1-1`. Fertig mit Enter auf leerem Feld. Die Gesamtzahl wird angezeigt (Ziel 24 = 3x8).
-- Gewicht 0 = Körpergewicht, bei Klimmzügen Zusatzgewicht eintragen.
-- Falsche Zahl? Auf die Zahl antippen entfernt sie, Backspace im leeren Feld löscht die letzte.
-- Am Handy ohne Enter-Taste: Button ＋ neben dem Feld.
-
-Das Gewicht vom letzten Mal ist vorausgefüllt, Datum = heute, Einheit wechselt automatisch.
+- Übungen mit fester Satzzahl (z. B. 3): nach dem letzten Satz springt der Cursor zur nächsten Übung.
+- Körpergewichtsübungen (z. B. Klimmzüge): beliebig viele Sätze, fertig mit Enter auf leerem Feld; die Gesamtzahl wird angezeigt (Ziel 24 = 3×8). Gewicht 0 = Körpergewicht, sonst Zusatzgewicht.
+- Falsche Zahl? Antippen entfernt sie, Backspace im leeren Feld löscht die letzte.
+- Datum = heute, Einheit wechselt automatisch (1 → 2 → … → 1). Pro Kalendertag ist ein Eintrag möglich.
 
 ### Helfer beim Training
-- **⏱ Pausentimer:** startet nach jedem eingetragenen Satz automatisch (Standard 2:00 für alle Übungen; pro Übung im Plan-Assistenten einstellbar, nicht bei „Nur Gewicht“). Die Leiste steht **oben** (unten würde die Handy-Tastatur sie verdecken) und zeigt die Restzeit, „+30 s“ verlängert, ✕ beendet. Am Ende vibriert das Handy und die Leiste wird grün („Pause vorbei“). Nach dem letzten Satz der Einheit und beim Speichern stoppt der Timer.
-- **Uhr-Knopf** (neben der Notiz-Sprechblase): kurz antippen schaltet den Pausentimer aus bzw. wieder an (an = Symbol hervorgehoben, Standard; wird gemerkt). **Lange drücken** öffnet einen freien Timer oben: 2:00, mit −0:30 / −0:15 / +0:15 / +0:30 einstellbar (auch während er läuft oder pausiert), „Start“ startet, „Pause“ hält ihn an, „Weiter“ setzt fort. Am Ende steht „Zeit abgelaufen“ (bleibt stehen, bis ✕), „Neu“ startet ihn erneut. Solange der freie Timer läuft, startet kein Satztimer.
-- **Aufwärmsätze:** Flammensymbol neben der Übung antippen: 40 %, 60 % und 80 % des eingetragenen Gewichts (auf 2,5 kg gerundet, mindestens 20 kg). Nur Anzeige.
-- **Scheibenrechner:** Hantelsymbol neben der Übung antippen: welche Scheiben pro Seite bei einer 20-kg-Stange (Scheiben 25 / 20 / 15 / 10 / 5 / 2,5 / 1,25). Passt sich beim Ändern des Gewichts sofort an.
-- **Notiz:** Sprechblase unter den Übungen antippen klappt ein Textfeld aus (z. B. „Schulter zwickt“). Die Notiz wird mit dem Eintrag gespeichert und abgeglichen.
-- **Bildschirm bleibt an:** Während der Eingabe hält die App den Bildschirm wach (bis zum Speichern bzw. 15 Minuten ohne Eingabe), sofern der Browser das unterstützt.
+- **⏱ Pausentimer:** startet nach jedem Satz automatisch (Standard 2:00, pro Übung im Plan-Assistenten einstellbar, nicht bei „Nur Gewicht“). Die Leiste steht **oben** (unten würde die Handy-Tastatur sie verdecken), „+30 s“ verlängert, ✕ beendet. Am Ende wird sie grün („Pause vorbei“) und das Handy vibriert (nur Android – Safari auf dem iPhone kann nicht vibrieren; einen Ton gibt es bewusst nicht). Nach dem letzten Satz und beim Speichern stoppt der Timer.
+- **Uhr-Knopf** (neben der Notiz): kurz = Pausentimer aus/an (Standard an, wird gemerkt). **Lange drücken** = freier Timer: 2:00, mit −0:30/−0:15/+0:15/+0:30 einstellbar, Start → Pause → Weiter, am Ende „Zeit abgelaufen“ (bleibt bis ✕, „Neu“ startet erneut). Solange er aktiv ist, startet kein Satztimer.
+- **Aufwärmsätze** (Flammensymbol): 40/60/80 % des Gewichts, auf 2,5 kg gerundet, mindestens 20 kg.
+- **Scheibenrechner** (Hantelsymbol): Scheiben pro Seite bei 20-kg-Stange (25/20/15/10/5/2,5/1,25).
+- **Notiz** (Sprechblase): klappt ein Textfeld aus, z. B. „Schulter zwickt“.
+- **Bildschirm bleibt an** während der Eingabe (bis zum Speichern bzw. 15 Minuten ohne Eingabe), sofern das Gerät es unterstützt.
 
-## Speicherung
-Alle Einträge werden automatisch im Browser des Geräts gespeichert (localStorage), du kannst also einfach am Handy trainieren.
-
-## Start, Speicherung und Dateien
-**Erster Start:** Menü mit zwei Optionen:
-1. **Neuen Trainingsplan anlegen:** *WKM* (2 Einheiten mit je 3 Übungen: Kniebeugen, Bankdrücken, Rudern / Kreuzheben, Overhead-Press, Klimmzüge) oder *Individuell* (Plan-Assistent, siehe unten).
-2. **Trainingsplan importieren:** Datei öffnen. Plan und Einträge der Datei werden in den Browser geladen. Dateien ohne Plan (ältere Versionen) bekommen den WKM-Plan.
-
-Danach läuft alles im Browser (localStorage). **An der geöffneten Datei wird nichts verändert, bis du „Trainingsplan exportieren“ drückst.**
-
-**📔 Trainingsplan exportieren:** schreibt Plan und Einträge in eine Datei. Optionen: in die geöffnete Datei speichern (wenn der Browser das erlaubt), neue Datei erstellen (Name = Planname) oder bestehende Datei auswählen. Bei bestehenden Dateien wird in beide Richtungen abgeglichen (neuere Änderung gewinnt, Löschungen werden mit abgeglichen). Auf dem Handy (iPhone/Safari, Chrome Android) kann der Browser Dateien nicht überschreiben: die Datei wird neu heruntergeladen und ersetzt die alte.
-
-**Export-Erinnerung:** Unter dem Titel steht dezent z. B. „💾 3 Änderungen nicht exportiert · Export vor 9 Tagen · jetzt exportieren“ (antippen öffnet den Export), sobald **3 oder mehr** Änderungen (neu, bearbeitet, gelöscht) noch nicht in einer Datei gesichert sind **oder** mindestens eine Änderung offen ist und der letzte Export **eine Woche** zurückliegt (ohne bisherigen Export: seit der ältesten offenen Änderung).
-
-**🗑 Alle Daten zurücksetzen:** entfernt Plan und alle Einträge im Browser (auch nicht exportierte) nach Warnung; danach erscheint wieder das Startmenü. Die Datei auf dem Gerät bleibt unverändert.
-
-### Eigener Trainingsplan
-Der Plan-Assistent (Startmenü → *Individuell*, später **✎ Trainingsplan bearbeiten** – auch beim WKM-Plan):
-- Name des Plans und Anzahl der Einheiten (1–6).
-- Pro Einheit beliebig viele Übungen. Pro Übung wird gewählt, wie dokumentiert wird:
-  - **Gewicht + Wiederholungen** (Standard: 3 Sätze, 1–10 wählbar). Mit Haken **Körpergewichtsübung** (wie Klimmzüge): Zusatzgewicht, beliebig viele Sätze.
-  - **Nur Gewicht** (ein Wert, z. B. `85`).
-  - **Nur Wiederholungen** (beliebig viele Sätze, z. B. `x60-45`).
-  - **Pyramidensatz:** einmal feste Wiederholungen, pro Satz das Gewicht (z. B. `8@60-70-80`), Sätze wählbar.
+## Eigener Trainingsplan (Plan-Assistent)
+Über *Individuell*, *Aus bestehendem Plan übernehmen* oder **✎ Plan bearbeiten**:
+- Name des Plans (eindeutig) und Anzahl der Einheiten (1–6).
+- Pro Einheit beliebig viele Übungen, jeweils mit Art der Erfassung:
+  - **Gewicht + Wiederholungen** (Standard 3 Sätze, 1–10 wählbar); mit Haken **Körpergewichtsübung**: Zusatzgewicht, beliebig viele Sätze.
+  - **Nur Gewicht** (z. B. `85`), **Nur Wiederholungen** (z. B. `x60-45`), **Pyramidensatz** (feste Wiederholungen, Gewicht je Satz, z. B. `8@60-70-80`).
   - **Pause** für den Pausentimer (0:30 bis 5:00 oder aus; Standard 2:00), außer bei „Nur Gewicht“.
-- Der Plan wird im Browser **und im Trainingstagebuch (Datei)** gespeichert (Dateiformat Version 3). Beim Abgleich/Import gewinnt der neuere Plan; die Meldung nennt es, wenn ein Plan aus der Datei übernommen wurde.
-- Der aktive Plan und die zuletzt verwendete Datei stehen im ⓘ-Menü oben rechts.
-- Bestehende Einträge bleiben bei Planänderungen erhalten und werden weiter angezeigt.
-- Die Einheit wechselt der Reihe nach (1 → 2 → … → 1). Der Kalender nutzt bis zu sechs Grüntöne für die Einheiten.
+- Bestehende Einträge bleiben bei Planänderungen erhalten.
 
-### Verlauf kompakt
-Angezeigt werden so viele Einträge, wie der Plan Einheiten hat – je Einheit der neueste (Referenz), mit den neuesten übrigen aufgefüllt. Alle weiteren stehen unter „Ältere Einträge“.
+## Verlauf
+Sichtbar sind so viele Einträge, wie der Plan Einheiten hat (je Einheit der neueste); alle weiteren unter „Ältere Einträge“ (angeheftete Leiste zum Einklappen). Die letzte gleiche Einheit ist grün gestrichelt umrandet.
+- **Alle · E1 · E2 …** filtert nach Einheit (dann nur der neueste Eintrag sichtbar).
+- **Kompakt** (Standard): eine Zeile pro Übung, Gewicht und Sätze in kleinen Bubbles, Notizen als 💬 zum Antippen. **Ausführlich:** mit Satz-Kästchen, Notiz sichtbar.
+- Hinter jedem Gewicht die Differenz zur letzten gleichen Einheit (+2,5 grün / −4 rot), 🏆 bei neuem Bestwert.
+- ✎ bearbeitet einen Eintrag (Formular wird gelb), ✕ löscht ihn. Bearbeitete Einträge zeigen ein ⓘ.
 
-Über dem Verlauf (Auswahl wird gemerkt):
-- **Alle · E1 · E2 …** filtert nach Einheit (dann nur der neueste Eintrag dieser Einheit sichtbar, alle anderen unter „Ältere Einträge“).
-- **Kompakt** (Standard): eine Zeile pro Übung, Gewicht und jeder Satz in kleinen Bubbles, z. B. „Kniebeugen [90 kg] +2,5 [8] [8] [7]“. Notizen als 💬 im Kopf, antippen zeigt sie.
-- **Ausführlich:** die bisherige Darstellung mit Satz-Kästchen, Notiz sichtbar darunter.
+## Auswertungen (aufklappbar)
+**Überblick:** 📅 Kalender (Tag antippen = Kurzübersicht) · 📋 Fortschritt · 🏆 Bestleistungen · 🔁 Regelmäßigkeit.
+**Verläufe pro Übung:** 📈 Gewicht · 🧮 1RM geschätzt (Epley: Gewicht × (1 + Wdh./30)) · 📊 Volumen pro Woche · 🔢 Wiederholungen. Antippen eines Punkts oder Balkens zeigt Datum und Wert.
 
-### Ein Eintrag pro Tag
-Pro Kalendertag ist nur ein Eintrag möglich. Beim Speichern (neu oder bearbeitet) erscheint sonst ein Hinweis, auch schon bei der Datumswahl. Bereits vorhandene Doppel (z. B. aus einem Abgleich) bleiben bestehen und lassen sich über Löschen/Bearbeiten bereinigen.
+## Debug-Modus
+Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücken** (1 Sekunde) legt den Plan **„🐞 Debug-WKM“** mit ca. 46 Beispiel-Einträgen an (Steigerung, Deload, Plateau, Lücke, Klimmzüge bis +2,5 kg, krumme Gewichte, Notizen, bearbeitete und gelöschte Einträge) und wechselt dorthin. Er liegt **nur auf diesem Gerät**, wird nie nach Google Drive übertragen und lässt deine Pläne unberührt. Erneuter langer Druck setzt ihn zurück; entfernen über „Plan löschen“.
 
-### Gewichtsvergleich
-- **Verlauf:** Hinter jedem Gewicht steht klein die Differenz zur vorangegangenen Einheit mit derselben Nummer (z. B. +0,5 grün oder −4 rot). Bei gleichem Gewicht oder ohne Vorgänger steht nichts.
-- **Eingabe:** Über jeder Übung steht rechts „zuletzt 85 kg“ (letzte gleiche Einheit; bei Körpergewichtsübungen „zuletzt Körpergewicht“ bzw. „zuletzt +2,5 kg“) und, sobald du ein anderes Gewicht eingibst, die Differenz (z. B. +1). Beim Bearbeiten gilt die Einheit vor dem bearbeiteten Eintrag.
-
-### Datum und Einheit
-Beim Öffnen, nach dem Speichern, Löschen, Import/Abgleich und beim Zurückkehren zur Seite (sofern noch nichts eingegeben ist) wird das Datum auf heute gesetzt und die Einheit auf diejenige, die **nicht** im datumsmäßig letzten Eintrag vorkommt. Manuell kannst du jederzeit abweichen.
-
-### Auswertungen (aufklappbar, mit Knöpfen)
-**Überblick:** 📅 Kalender · 📋 Fortschritt (Start, Aktuell, Δ, Δ %, Trend je Übung) · 🏆 Bestleistungen · 🔁 Regelmäßigkeit (Einheiten pro Woche, Serien).
-**Verläufe pro Übung** (Auswahl per Dropdown): 📈 Gewicht · 🧮 1RM geschätzt (One-Rep-Max, berechnet aus dem besten Satz nach Epley: Gewicht × (1 + Wdh./30); wird nicht gemessen) · 📊 Volumen (Gewicht × Wdh. × Sätze pro Woche, auch alle Übungen zusammen) · 🔢 Wiederholungen (Summe und bester Satz, mit Ziellinie z. B. 24 bei Klimmzügen).
-In den Diagrammen zeigt Antippen eines Punkts oder Balkens Datum und Wert.
-Im Verlauf steht 🏆 hinter einer Übung, wenn sie einen neuen Bestwert gegenüber allen früheren Einträgen erreicht hat (Leitwert: geschätztes 1RM, bei Nur-Gewicht das Gewicht, bei Körpergewicht/Nur-Wiederholungen die Wiederholungssumme).
-
-#### Kalender (Details)
-Aufklappbarer Bereich „📊 Auswertungen“ unterhalb der Einträge.
-- **Kalenderübersicht:** Tippen/Klicken auf einen markierten Tag öffnet ein kleines Fenster mit Einheit, Gewichten und Wiederholungen; erneutes Tippen oder Tippen daneben schließt es. Monatskalender (Mo–So) mit Blättern per ‹ ›. Tage mit Einheit sind grün markiert, Einheit 1 hellgrün, Einheit 2 dunkelgrün (beide am selben Tag: geteilt). Heute ist umrandet.
-
-### Eindeutige IDs und Abgleich
-Jeder Eintrag hat eine eindeutige ID und einen Änderungszeitpunkt. Beim Abgleich gilt: gleiche ID = gleicher Eintrag, die **neuere Änderung gewinnt**. So bleibt nach dem Bearbeiten kein alter Eintrag stehen. Gelöschte Einträge bleiben als „gelöscht“ markiert in Browser und Datei (unsichtbar), damit eine Löschung beim Abgleich nicht rückgängig gemacht wird. Bearbeitete Einträge zeigen ein ⓘ (antippen = Zeitpunkt der letzten Änderung).
-Alt-Einträge (vor 0.16) bekommen beim ersten Start eine ID, die aus ihrem Inhalt berechnet wird. Duplikate aus früheren Versionen (alter und bearbeiteter Eintrag) müssen einmalig von Hand gelöscht werden.
-
-### Einträge bearbeiten
-Im Verlauf gibt es neben dem ✕ einen Stift ✎. Antippen lädt den Eintrag ins Eingabeformular (Datum, Gewichte, Wiederholungen), das Formular wird hervorgehoben und der Button heißt „Änderung speichern“. Die Einheit ist beim Bearbeiten gesperrt. „Bearbeiten abbrechen“ verwirft die Änderung.
-
-### Debug-Modus (Beispieldaten)
-Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. Antippen zeigt einen Hinweis. **Lange drücken** (1 Sekunde) löscht nach Warnung und Bestätigung alle Daten im Browser (wie „Alle Daten zurücksetzen“) und lädt einen WKM-Plan mit ca. 46 Beispiel-Einträgen über gut ein halbes Jahr: Steigerungen, Deload, Plateau, eine Trainingslücke, Klimmzüge von Körpergewicht bis +2,5 kg, krumme Gewichte für den Scheibenrechner, Notizen, bearbeitete und ein gelöschter Eintrag. Die Datei auf dem Gerät bleibt unverändert; als Datei steht „Beispieldaten (Debug)“.
-
-### Datei-Indikator
-Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Aktion und Zeitpunkt: exportiert, abgeglichen oder importiert). Ohne bisherigen Export/Import steht dort „Keine Datei verknüpft“. Die Daten selbst liegen immer im Browser, die Datei ist die zuletzt abgeglichene Sicherung.
-
-## Nutzung
-GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
+## Technik
+- `index.html` (App), `manifest.webmanifest` und `icons/` (Installation als „TTB“), `sw.js` (Service Worker für den Offline-Betrieb).
+- Gehostet über GitHub Pages (*Settings → Pages → Branch `main`*).
+- Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
-- **0.52:** Pause-Standard 2:00 für alle Übungen, Timerleiste oben (nicht mehr von der Tastatur verdeckt), freier Timer mit Pause/Weiter, Kompaktansicht mit kleinen Bubbles für kg und Sätze, Debug-Modus (Käfer im ⓘ-Menü, lange drücken lädt Beispieldaten).
-- **0.51:** Einfarbige Symbole (Flamme, Notiz, Uhr), Uhr-Knopf: Pausentimer an/aus und freier Timer (lange drücken, ±0:15/±0:30, „Zeit abgelaufen“), Pause bei Körpergewichtsübungen standardmäßig aus, Filter nach Einheit zeigt nur den neuesten Eintrag, Export-Erinnerung ab 3 Änderungen oder nach einer Woche.
-- **0.50:** Logo „Feuerfuchs“ (auch als Browser-Symbol), Verlauf filterbar nach Einheit mit Kompakt-/Ausführlich-Ansicht (kompakt als Standard), Notiz pro Eintrag (💬), Pausentimer (pro Übung einstellbar), Aufwärmsätze (🔥) und Scheibenrechner, antippbare Diagramme, Export-Erinnerung, Bildschirm bleibt während der Eingabe an.
-- **0.45:** Kürzerer Platzhalter „Wdh.“ im Wiederholungsfeld, Gewichte in der Eingabe mit Komma (z. B. 110,5), bei Körpergewichtsübungen „zuletzt Körpergewicht“ bzw. „zuletzt +2,5 kg“.
-- **0.44:** Eingabezeile auch auf schmalen Handys (360 px) mit ausreichend breitem Wiederholungsfeld; README: Version steht im ⓘ-Menü.
-- **0.43:** Bugfix: Eingabezeile (Gewicht ▲▼ + Wiederholungen) auf dem Handy wieder korrekt, jetzt mit festem Raster.
-- **0.42:** Gewichtspfeile größer: ▲ links und ▼ rechts neben dem Feld, über die volle Feldhöhe.
-- **0.41:** ▲▼ für Gewichte (0,25 kg), angeheftete Leiste „Ältere Einträge“ zum Einklappen, „1RM geschätzt“, Titel „Trainingstagebuch“, Info-Menü ⓘ (Plan, Datei, Version, „created by Claude and JD“).
-- **0.40:** Auswertungen: Fortschrittsübersicht, Bestleistungen, Regelmäßigkeit, Verläufe für Gewicht, geschätztes Max, Volumen und Wiederholungen; 🏆 im Verlauf.
-- **0.31:** Pyramidensatz, neues Speichersystem (Startmenü, Import nur beim Start, Export schreibt als einziges in Dateien, „Alle Daten zurücksetzen“), Einträge je Einheit sichtbar, Layout-Fix „Sätze“ im Plan-Assistenten.
-- **0.30:** Eigene Trainingspläne (1–6 Einheiten, Dokumentationsarten pro Übung), Plan im Tagebuch gespeichert, Anzeige des aktiven Plans, Kalender mit bis zu 6 Grüntönen.
-- **0.21:** Nur letzte zwei Einträge sichtbar (Rest unter „Ältere Einträge“), Kurzübersicht beim Antippen eines Kalendertags, nur ein Eintrag pro Tag.
-- **0.20:** Gewichtsvergleich zur vorangegangenen gleichen Einheit (Verlauf und Eingabe).
-- **0.19:** Datum/Einheit werden bei jeder Aktualisierung neu gesetzt, Bereich „Auswertungen“ mit Kalenderübersicht.
-- **0.18:** Verlauf wie Eingabe angeordnet (kg links, Wiederholungen rechts), letzte gleiche Einheit grün gestrichelt, Bearbeiten-Modus gelb.
-- **0.17:** Satz-Nummern in der Eingabe, kompaktere Verlaufsansicht mit kg und Sätzen.
-- **0.16:** Eindeutige IDs, Abgleich von Änderungen und Löschungen, ⓘ bei bearbeiteten Einträgen. Dateiformat Version 2.
-- **0.15:** Einträge bearbeiten (Stift-Symbol im Verlauf).
-- **0.14:** Indikator, welche Datei zuletzt verwendet wurde.
-- **0.13:** Button „Trainingstagebuch importieren“, Versionsnummer eingeführt.
-- davor (unnummeriert): Eingabe per Enter, variable Klimmzug-Sätze, Export als Trainingstagebuch mit Abgleich.
+- **0.90:** Testversion mit neuer Speicherung: Google Drive als Hauptspeicher (Ordner „Trainingstagebuch“, eine Datei pro Plan, automatischer Abgleich, offline nutzbar), mehrere Trainingspläne (laden, neu erstellen, aus bestehendem Plan übernehmen, löschen), Modus „Ohne Cloud“ als Nebenweg, installierbar als App „TTB“ (Android und iPhone), Debug-Plan nur auf dem Gerät. Datei-Export/-Import und Export-Erinnerung entfallen.
+- **0.52:** Pause-Standard 2:00 für alle Übungen, Timerleiste oben, freier Timer mit Pause/Weiter, Kompaktansicht mit Bubbles, Debug-Modus.
+- **0.51:** Einfarbige Symbole, Uhr-Knopf (Pausentimer an/aus, freier Timer), Filter nach Einheit zeigt nur den neuesten Eintrag, Export-Erinnerung ab 3 Änderungen oder nach einer Woche.
+- **0.50:** Logo „Feuerfuchs“, Verlauf-Filter und Kompaktansicht, Notizen, Pausentimer, Aufwärmsätze, Scheibenrechner, antippbare Diagramme, Export-Erinnerung, Bildschirm bleibt an.
+- **0.45:** Platzhalter „Wdh.“, Dezimalkomma in der Eingabe, „zuletzt Körpergewicht“.
+- **0.44:** Eingabezeile auch auf 360-px-Handys.
+- **0.43:** Bugfix Eingabezeile auf dem Handy.
+- **0.42:** Größere Gewichtspfeile.
+- **0.41:** ▲▼ für Gewichte, angeheftete Leiste „Ältere Einträge“, „1RM geschätzt“, Info-Menü ⓘ.
+- **0.40:** Auswertungen und 🏆.
+- **0.31:** Pyramidensatz, Startmenü, Export als einziger Dateizugriff.
+- **0.30:** Eigene Trainingspläne (1–6 Einheiten).
+- **0.21 – 0.13:** Verlauf kompakt, Gewichtsvergleich, Kalender, Bearbeiten, eindeutige IDs mit Abgleich, Datei-Export.
+- davor (unnummeriert): Eingabe per Enter, variable Klimmzug-Sätze, Export als Trainingstagebuch.
