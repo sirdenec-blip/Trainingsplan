@@ -13,7 +13,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 
 ## Versionierung
 - Konstante `const VERSION="…"` in `index.html`, angezeigt im ⓘ-Menü.
-- Aktuell: **0.94** (Testversion PWA + Drive-Sync). Vom Nutzer bestätigt: Google-Anmeldung in der installierten Android-App, Offline-Speichern mit automatischem Nachholen, Anmeldung am PC im Browser und Synchronisierung Handy ↔ PC in beide Richtungen. Offen bis 1.0: Test auf dem iPhone (Safari + installierte App; Nutzer testet später), stilles Erneuern nach > 1 h. **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
+- Aktuell: **0.95** (Testversion PWA + Drive-Sync). Vom Nutzer bestätigt: Google-Anmeldung in der installierten Android-App, Offline-Speichern mit automatischem Nachholen, Anmeldung am PC im Browser und Synchronisierung Handy ↔ PC in beide Richtungen. Offen bis 1.0: Test auf dem iPhone (Safari + installierte App; Nutzer testet später), stilles Erneuern nach > 1 h. **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
 - Wenn der Nutzer „gleiche Versionsnummer“ sagt, Version nicht erhöhen.
 - Bei jeder Version: `VERSION` und `CACHE` in `sw.js` anpassen, README aktualisieren (Versionszeile + „## Versionen“ + betroffene Abschnitte).
 - Vor größeren Umbauten: Konzept/Optionen knapp vorlegen und nachfragen.
@@ -51,7 +51,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 - **Debug-Modus:** Käfer hinter der Versionsnummer (ⓘ); lange drücken (1 s) legt Plan „🐞 Debug-WKM“ mit `demoData()` (~46 Einträge) **nur lokal** an und wechselt dorthin; keine Auswirkung auf echte Pläne.
 - Logo „Feuerfuchs“ als Inline-SVG-`<symbol id="lg">` (Rugbyball aubergine `#4b2142`), auch Favicon und App-Icons.
 - Gewichtsdifferenz im Verlauf (+ / −): **sehr gedeckt** eingefärbt (`--dup`/`--ddn`, kaum Kontrast zu den grauen Hilfszahlen, normale Schriftstärke) – sie soll nicht im Fokus stehen.
-- Letzte gleiche Einheit grün gestrichelt; Bearbeiten-Modus gelb. Auswertungen: Kalender, Fortschritt, Bestleistungen, Regelmäßigkeit, Gewicht, 1RM (Epley), Volumen, Wiederholungen; 🏆 bei Bestwert; Diagramme antippbar.
+- Letzte gleiche Einheit grün gestrichelt; Bearbeiten-Modus gelb. Auswertungen: Kalender (Tage mit Notiz: kleines einfarbiges Sprechblasen-Symbol `NB(10)` oben rechts im Kästchen), Fortschritt, Bestleistungen, Regelmäßigkeit, Gewicht, 1RM (Epley), Volumen, Wiederholungen; 🏆 bei Bestwert; Diagramme antippbar.
 - Stil: minimalistisch, grüne Akzentfarbe, Hilfsangaben grau. Zahlen in der Oberfläche mit Dezimalkomma, gespeichert mit Punkt.
 - Vor einer Umsetzung, bei der eine Vorgabe technisch keine Wirkung hätte, kurz mit Begründung nachfragen.
 

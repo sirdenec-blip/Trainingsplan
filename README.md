@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.94** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.95** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -87,7 +87,7 @@ Sichtbar sind so viele Einträge, wie der Plan Einheiten hat (je Einheit der neu
 - ✎ bearbeitet einen Eintrag (Formular wird gelb), ✕ löscht ihn. Bearbeitete Einträge zeigen ein ⓘ.
 
 ## Auswertungen (aufklappbar)
-**Überblick:** 📅 Kalender (Tag antippen = Kurzübersicht) · 📋 Fortschritt · 🏆 Bestleistungen · 🔁 Regelmäßigkeit.
+**Überblick:** 📅 Kalender (Tag antippen = Kurzübersicht; Tage mit Notiz tragen oben rechts ein kleines Sprechblasen-Symbol) · 📋 Fortschritt · 🏆 Bestleistungen · 🔁 Regelmäßigkeit.
 **Verläufe pro Übung:** 📈 Gewicht · 🧮 1RM geschätzt (Epley: Gewicht × (1 + Wdh./30)) · 📊 Volumen pro Woche · 🔢 Wiederholungen. Antippen eines Punkts oder Balkens zeigt Datum und Wert.
 
 ## Debug-Modus
@@ -99,6 +99,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.95:** Kalender markiert Trainingstage mit Notiz durch ein kleines Sprechblasen-Symbol in der Ecke.
 - **0.94:** Gewichtsdifferenzen im Verlauf wieder leicht eingefärbt (gedecktes Grün/Rot, unaufdringlich).
 - **0.93:** Planmenü zeigt die Pläne direkt als Liste zum schnellen Wechseln, Knopf „Lokale Daten löschen & Google trennen“, einfarbige Symbole auch für Debug-Plan, Auswertungen, Statuszeile und Timer.
 - **0.92:** Bugfix: In der installierten App blieb die Google-Anmeldung auf einer weißen Seite hängen. Jetzt Anmeldung per Weiterleitung, abgelaufener Zugang wird beim Öffnen/Zurückkehren still erneuert.

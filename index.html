@@ -44,7 +44,8 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .calh button{width:auto;margin:0;background:none;border:0;color:var(--tx);font-size:1.4rem;padding:0 12px;line-height:1}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
 .cal .wd{color:var(--mu);font-size:.75rem}
-.cal .d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:.85rem;font-variant-numeric:tabular-nums}
+.cal .d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:.85rem;font-variant-numeric:tabular-nums;position:relative}
+.cal .dnt{position:absolute;top:2px;right:3px;line-height:0;opacity:.85;pointer-events:none}.cal .dnt svg{vertical-align:top}
 .d.u1{background:var(--u1);color:var(--u1t)}.d.u2{background:var(--u2);color:var(--u2t)}.d.u3{background:var(--u3);color:var(--u3t)}.d.u4{background:var(--u4);color:var(--u4t)}.d.u5{background:var(--u5);color:var(--u5t)}.d.u6{background:var(--u6);color:var(--u6t)}
 .d.both{background:linear-gradient(135deg,var(--u1) 50%,var(--u2) 50%);color:#fff;text-shadow:0 0 3px rgba(0,0,0,.7)}
 .d.today{outline:2px solid var(--tx);outline-offset:-2px}
@@ -240,7 +241,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.94";
+const VERSION="0.95";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -1027,15 +1028,15 @@ function calMove(n){const d=new Date(cal.y,cal.m+n,1);cal={y:d.getFullYear(),m:d
 function renderCal(){
   const now=new Date();if(!cal)cal={y:now.getFullYear(),m:now.getMonth()};
   const{y,m}=cal,pre=y+"-"+String(m+1).padStart(2,"0"),days=new Date(y,m+1,0).getDate(),off=(new Date(y,m,1).getDay()+6)%7;
-  const by={};let n=0;
-  live().forEach(x=>{if(x.date.slice(0,7)===pre){const d=+x.date.slice(8,10);(by[d]=by[d]||[]).push(x.unit);n++}});
+  const by={},nt=new Set();let n=0; // nt: Tage mit Notiz (kleines Symbol in der Ecke)
+  live().forEach(x=>{if(x.date.slice(0,7)===pre){const d=+x.date.slice(8,10);(by[d]=by[d]||[]).push(x.unit);n++;if(x.note)nt.add(d)}});
   const today=(now.getFullYear()===y&&now.getMonth()===m)?now.getDate():0,uc=u=>Math.min(Math.max(u,1),6);
   let h=["Mo","Di","Mi","Do","Fr","Sa","So"].map(t=>`<div class="wd">${t}</div>`).join("")+"<div></div>".repeat(off);
   for(let d=1;d<=days;d++){
     const us=[...new Set(by[d]||[])].sort((a,b)=>a-b),c=us.length>1?"both":us.length?"u"+uc(us[0]):"";
     const st2=us.length>1?` style="background:linear-gradient(135deg,var(--u${uc(us[0])}) 50%,var(--u${uc(us[1])}) 50%)"`:"";
     const tt=us.length?` title="${us.map(u=>"Einheit "+u).join(" + ")}"`:"";
-    h+=`<div class="d ${c}${d===today?" today":""}"${tt}${st2}${c?` data-d="${d}"`:""}>${d}</div>`;
+    h+=`<div class="d ${c}${d===today?" today":""}"${tt}${st2}${c?` data-d="${d}"`:""}>${d}${nt.has(d)?`<span class="dnt" title="mit Notiz">${NB(10)}</span>`:""}</div>`;
   }
   $("cal").innerHTML=h;hidePop();
   $("cmon").textContent=new Date(y,m,1).toLocaleDateString("de-DE",{month:"long",year:"numeric"});
