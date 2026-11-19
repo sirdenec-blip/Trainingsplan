@@ -12,7 +12,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 
 ## Versionierung
 - Konstante `const VERSION="…"` in `index.html`, angezeigt im ⓘ-Menü.
-- Aktuell: **0.92** (Testversion PWA + Drive-Sync). **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
+- Aktuell: **0.92** (Testversion PWA + Drive-Sync). Vom Nutzer bestätigt: Google-Anmeldung in der installierten Android-App funktioniert. Offen bis 1.0: Test auf dem iPhone (Safari + installierte App), Offline-Test, stilles Erneuern nach > 1 h. **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
 - Wenn der Nutzer „gleiche Versionsnummer“ sagt, Version nicht erhöhen.
 - Bei jeder Version: `VERSION` und `CACHE` in `sw.js` anpassen, README aktualisieren (Versionszeile + „## Versionen“ + betroffene Abschnitte).
 - Vor größeren Umbauten: Konzept/Optionen knapp vorlegen und nachfragen.
