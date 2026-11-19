@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.44** (steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.45** (steht auch im ⓘ-Menü oben rechts)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -55,7 +55,7 @@ Pro Kalendertag ist nur ein Eintrag möglich. Beim Speichern (neu oder bearbeite
 
 ### Gewichtsvergleich
 - **Verlauf:** Hinter jedem Gewicht steht klein die Differenz zur vorangegangenen Einheit mit derselben Nummer (z. B. +0,5 grün oder −4 rot). Bei gleichem Gewicht oder ohne Vorgänger steht nichts.
-- **Eingabe:** Über jeder Übung steht rechts „zuletzt 85 kg“ (letzte gleiche Einheit) und, sobald du ein anderes Gewicht eingibst, die Differenz (z. B. +1). Beim Bearbeiten gilt die Einheit vor dem bearbeiteten Eintrag.
+- **Eingabe:** Über jeder Übung steht rechts „zuletzt 85 kg“ (letzte gleiche Einheit; bei Körpergewichtsübungen „zuletzt Körpergewicht“ bzw. „zuletzt +2,5 kg“) und, sobald du ein anderes Gewicht eingibst, die Differenz (z. B. +1). Beim Bearbeiten gilt die Einheit vor dem bearbeiteten Eintrag.
 
 ### Datum und Einheit
 Beim Öffnen, nach dem Speichern, Löschen, Import/Abgleich und beim Zurückkehren zur Seite (sofern noch nichts eingegeben ist) wird das Datum auf heute gesetzt und die Einheit auf diejenige, die **nicht** im datumsmäßig letzten Eintrag vorkommt. Manuell kannst du jederzeit abweichen.
@@ -83,6 +83,7 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.45:** Kürzerer Platzhalter „Wdh.“ im Wiederholungsfeld, Gewichte in der Eingabe mit Komma (z. B. 110,5), bei Körpergewichtsübungen „zuletzt Körpergewicht“ bzw. „zuletzt +2,5 kg“.
 - **0.44:** Eingabezeile auch auf schmalen Handys (360 px) mit ausreichend breitem Wiederholungsfeld; README: Version steht im ⓘ-Menü.
 - **0.43:** Bugfix: Eingabezeile (Gewicht ▲▼ + Wiederholungen) auf dem Handy wieder korrekt, jetzt mit festem Raster.
 - **0.42:** Gewichtspfeile größer: ▲ links und ▼ rechts neben dem Feld, über die volle Feldhöhe.

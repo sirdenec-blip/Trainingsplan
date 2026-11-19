@@ -177,7 +177,7 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 </div>
 
 <script>
-const VERSION="0.44";
+const VERSION="0.45";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -330,17 +330,17 @@ $("fields").addEventListener("click",e=>{ // ▲▼: Gewicht in 0,25-Schritten
   let v=parseFloat(el.value.replace(",","."));
   if(isNaN(v)){const u=+$("unit").value,n=cur[i].n;v=k==="w"?(parseFloat(lastW(u,n))||0):(st[i].reps.length?st[i].reps[st[i].reps.length-1]:(lastPyr(u,n)||0))}
   v=Math.max(0,Math.round((v+(+b.dataset.st)*0.25)*100)/100);
-  el.value=String(v);dirty=true;
+  el.value=String(v).replace(".",",");dirty=true;
   if(k==="w"){st[i].w=el.value;updateDw(i)}
 });
 function build(defs){
   const u=+$("unit").value;dirty=false;
   cur=defs||unitDefs(u);
-  st=cur.map(e=>({w:(e.m==="r"||e.m==="p")?"":(lastW(u,e.n)??(e.bw?"0":"")),reps:[],pr:""}));
+  st=cur.map(e=>({w:(e.m==="r"||e.m==="p")?"":String(lastW(u,e.n)??(e.bw?"0":"")).replace(".",","),reps:[],pr:""}));
   $("fields").innerHTML=cur.map((e,i)=>{
     const hp=e.m==="p",hw=e.m==="wr"||e.m==="w",hr=e.m==="wr"||e.m==="r";
     const row=hp?`<div class="in g g5"><input class="pr" data-i="${i}" inputmode="numeric" placeholder="Wdh" aria-label="Wiederholungen je Satz"><span>Wdh. je Satz</span></div>
-      <div class="in g g2" style="margin-top:8px">${stw(i,"r",`<input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="Satz 1: kg" autocomplete="off">`)}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
+      <div class="in g g2" style="margin-top:8px">${stw(i,"r",`<input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="kg" autocomplete="off">`)}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
      :`<div class="in g ${hw&&hr?"g1":hw?"g3":"g4"}">${hw?`${stw(i,"w",`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg">`)}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
     return `<label class="fl"><span>${esc(e.n)}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></label>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}`}).join("");
   cur.forEach((_,i)=>{chips(i);updateDw(i)});
@@ -368,7 +368,7 @@ function chips(i){
   if(!e.s&&n)h+=`<span class="tot">Σ ${sum(r)}${e.goal?" / "+e.goal:""} Wdh.</span>`;
   const c=$("c"+i);c.innerHTML=h;
   c.querySelectorAll(".chip[data-k]").forEach(ch=>ch.onclick=()=>{st[i].reps.splice(+ch.dataset.k,1);chips(i)});
-  const el=rIn(i);if(el)el.placeholder=(e.s&&n>=e.s)?"fertig":`Satz ${n+1}: ${e.m==="p"?"kg":"Wdh."}`;
+  const el=rIn(i);if(el)el.placeholder=(e.s&&n>=e.s)?"fertig":e.m==="p"?"kg":"Wdh.";
 }
 function commit(i){
   const e=cur[i],el=rIn(i),v=el.value.trim(),r=st[i].reps;
@@ -450,7 +450,7 @@ function edit(id){
   base.forEach((p,i)=>{
     const v=e.ex[p.n];if(!v)return;
     const pv=parseVal(v);
-    if(pv.w!=null){st[i].w=pv.w;const we=document.querySelector(`.w[data-i="${i}"]`);if(we)we.value=pv.w}
+    if(pv.w!=null){st[i].w=pv.w.replace(".",",");const we=document.querySelector(`.w[data-i="${i}"]`);if(we)we.value=st[i].w}
     if(pv.reps)st[i].reps=pv.reps;
     if(pv.pyr){st[i].pr=String(pv.pyr.r);st[i].reps=pv.pyr.ws;const pe=document.querySelector(`.pr[data-i="${i}"]`);if(pe)pe.value=pv.pyr.r}
     chips(i);updateDw(i);
@@ -497,7 +497,8 @@ function updateDw(i){
   const p=baseW(e.n);
   if(p==null){out.innerHTML="";return}
   const t=el.value.trim().replace(",","."),di=/^\d+(\.\d+)?$/.test(t)?dinfo(+t,p):null;
-  out.innerHTML=`zuletzt ${String(p).replace(".",",")} kg`+(di?` <b class="${di.c}">${di.t}</b>`:"");
+  const pw=String(p).replace(".",",");
+  out.innerHTML=`zuletzt ${e.bw?(p?`+${pw} kg`:"Körpergewicht"):pw+" kg"}`+(di?` <b class="${di.c}">${di.t}</b>`:"");
 }
 // ---------- Auswertungen ----------
 let view="cal",avSel={};

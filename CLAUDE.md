@@ -11,7 +11,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 
 ## Versionierung
 - Konstante `const VERSION="…"` im Script von `index.html`, angezeigt im ⓘ-Menü.
-- Aktuell: **0.44**. Jede neue Version erhöht um 0.01 (nächste: 0.45); größere Funktionspakete springen auf die nächste Zehnerstelle (0.50 …). **1.0** ist für eine mögliche Android-App/PWA vorgesehen.
+- Aktuell: **0.45**. Jede neue Version erhöht um 0.01 (nächste: 0.46); größere Funktionspakete springen auf die nächste Zehnerstelle (0.50 …). **1.0** ist für eine mögliche Android-App/PWA vorgesehen.
 - Wenn der Nutzer „gleiche Versionsnummer“ sagt, Version nicht erhöhen.
 - Bei jeder Version: `VERSION` anpassen, README aktualisieren (Versionszeile oben + Eintrag unter „## Versionen“ + betroffene Abschnitte).
 - Vor größeren Umbauten: knapp Optionen nennen und nachfragen, wenn der Nutzer „erst klären“ verlangt.
@@ -38,6 +38,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 - Letzte gleiche Einheit im Verlauf grün gestrichelt (Referenz); Bearbeiten-Modus gelb.
 - Auswertungen (aufklappbar, unter dem Verlauf): Kalender, Fortschritt, Bestleistungen, Regelmäßigkeit, Gewicht, 1RM geschätzt (Epley), Volumen, Wiederholungen. 🏆 im Verlauf bei neuem Bestwert.
 - Stil: minimalistisch und kompakt, grüne Akzentfarbe, kleine Hilfsangaben in Grau.
+- Zahlen in der Oberfläche immer mit Dezimalkomma (auch in Eingabefeldern); gespeichert wird intern mit Punkt.
 
 ## Arbeitsweise
 - Nach Änderungen JavaScript-Syntax prüfen und – wo möglich – im Browser in Handybreite ansehen (360 **und** 390 px, hell und dunkel).
