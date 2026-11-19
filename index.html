@@ -97,11 +97,58 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 .sets span{background:var(--bg);border:1px solid var(--bd);border-radius:10px;min-width:28px;text-align:center;padding:1px 8px;font-size:.85rem;font-variant-numeric:tabular-nums}
 .inf{color:var(--mu);cursor:pointer;margin-left:6px;font-size:.95rem}.fi{color:var(--mu);font-size:.85rem;margin:-6px 0 12px}.fi b{color:var(--tx);font-weight:600}.ver{text-align:center;color:var(--mu);font-size:.8rem;margin:4px 0 20px}#gate p{color:var(--mu);line-height:1.4;font-size:.9rem}#note{color:var(--mu);font-size:.85rem;margin-top:6px}
 #msg{color:#c33;font-size:.85rem;min-height:1.2em;margin-top:8px}
+/* 0.50: Logo, Verlauf-Leiste, Kompaktansicht, Notiz, Aufwärmen/Scheiben, Pausentimer, Diagramm-Tipp, Export-Erinnerung */
+h1.lg{display:flex;align-items:center;gap:8px}.logo{width:34px;height:34px;flex:0 0 34px}
+.lb{display:flex;font-size:.85rem;color:var(--mu);margin:12px 0 4px}
+.ico{width:auto;margin:0 0 0 6px;padding:0 3px;background:none;border:0;color:var(--tx);font-size:.95rem;font-weight:400;line-height:1;opacity:.45;touch-action:manipulation}.ico.on{opacity:1}
+.aux{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.8rem;color:var(--mu);margin-top:6px}
+.aux .ax{border:1px solid var(--bd);border-radius:8px;padding:1px 7px;color:var(--tx);font-variant-numeric:tabular-nums}.aux .ax small{color:var(--mu);font-size:.7rem}
+.nrow{display:flex;gap:8px;align-items:flex-start;margin-top:12px}.nrow .ico{margin:4px 0 0;font-size:1.25rem}
+.nrow textarea{flex:1;font:inherit;font-size:.95rem;padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);resize:vertical}
+.hbar{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 10px}.hbar .vbs button{padding:4px 10px}
+.cl{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:4px 0;border-top:1px solid var(--bd);font-size:.9rem;font-variant-numeric:tabular-nums}.h+.cl{border-top:0}
+.cn{color:var(--mu);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cv{white-space:nowrap;text-align:right}.cv b{font-weight:600}.cv small{color:var(--mu);font-size:.75rem}
+.card.cmp{padding:10px 14px}.card.cmp.ref{padding:9px 13px}.card.cmp .h{margin-bottom:2px}
+.nt{color:var(--mu);font-size:.85rem;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}
+#tbar{position:fixed;left:0;right:0;bottom:0;z-index:8;display:flex;align-items:center;gap:10px;max-width:520px;margin:0 auto;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--ac);box-shadow:0 -4px 14px rgba(0,0,0,.18)}#tbar[hidden]{display:none}
+#tbar b{font-size:1.4rem;font-variant-numeric:tabular-nums}#tbar small{flex:1;min-width:0;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tbar button{width:auto;margin:0;padding:6px 12px}#tbar.fin{background:var(--ac);color:#fff}#tbar.fin small{color:#fff}body.tmo{padding-bottom:84px}
+#v-oth{position:relative}.ch .hit{fill:transparent;cursor:pointer}.ch circle.on{r:5px;stroke:var(--tx);stroke-width:1.5}.ch rect.on{fill:var(--ye)}
+.ctip{position:absolute;z-index:5;pointer-events:none;background:var(--card);border:1px solid var(--bd);border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.25);padding:4px 8px;font-size:.8rem;white-space:nowrap}
+.hbar[hidden],.aux[hidden]{display:none}
+.exr{color:var(--mu);font-size:.8rem;margin:-8px 0 12px;cursor:pointer}.exr u{color:var(--ac);text-decoration:none;font-weight:600}
 </style>
+<link rel="icon" id="fav">
 </head>
 <body>
+<!-- Logo „Feuerfuchs“: Rugbyball (aubergine), brennender Fuchs bei der Kniebeuge -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="lg" viewBox="0 0 64 64">
+<path d="M32 1.5A31 31 0 0 1 32 62.5A31 31 0 0 1 32 1.5Z" fill="#4b2142"/>
+<path d="M32 4.5A28.5 28.5 0 0 1 32 59.5A28.5 28.5 0 0 1 32 4.5Z" fill="none" stroke="#6e3664" stroke-width="1" stroke-dasharray="2 1.6"/>
+<path d="M17 35C11 27 18 21 15 12C21 16 23 12 23 5C27 11 30 7 32 1.5C34 7 37 11 41 5C41 12 43 16 49 12C46 21 53 27 47 35Z" fill="#e4572e"/>
+<path d="M21 32C18 25 22 21 20 15C24 18 26 15 26.5 10C29 14 30.5 11 32 6.5C33.5 11 35 14 37.5 10C38 15 40 18 44 15C42 21 46 25 43 32Z" fill="#ffb627"/>
+<path d="M36 40C44 46 52 44 53 34C50 38 45 39 39 37Z" fill="#f28c28" stroke="#2b1328" stroke-width=".8" stroke-linejoin="round"/>
+<path d="M53 34C54.5 39 51 43.5 46.5 45C49 42 50.5 40 50 37C51.5 37 52.5 35.5 53 34Z" fill="#ffd23f"/>
+<rect x="3" y="21.6" width="58" height="2.8" rx="1.4" fill="#e8e8e8"/>
+<rect x="4" y="15" width="4" height="16" rx="1" fill="#3fa86c"/><rect x="8.5" y="17" width="3" height="12" rx="1" fill="#2a7f50"/>
+<rect x="56" y="15" width="4" height="16" rx="1" fill="#3fa86c"/><rect x="52.5" y="17" width="3" height="12" rx="1" fill="#2a7f50"/>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M29 39L18 46L22 55M35 39L46 46L42 55M25 28L19 31L18.5 24M39 28L45 31L45.5 24" stroke="#2b1328" stroke-width="6.4"/>
+<path d="M29 39L18 46L22 55M35 39L46 46L42 55" stroke="#f28c28" stroke-width="4.8"/>
+<path d="M25 28L19 31L18.5 24M39 28L45 31L45.5 24" stroke="#f28c28" stroke-width="4.6"/></g>
+<ellipse cx="21.5" cy="57" rx="3.8" ry="1.8" fill="#2b1328"/><ellipse cx="42.5" cy="57" rx="3.8" ry="1.8" fill="#2b1328"/>
+<circle cx="18.5" cy="23" r="2.5" fill="#d9661a" stroke="#2b1328" stroke-width=".8"/><circle cx="45.5" cy="23" r="2.5" fill="#d9661a" stroke="#2b1328" stroke-width=".8"/>
+<path d="M23 26H41L37 41H27Z" fill="#f28c28" stroke="#2b1328" stroke-width=".8" stroke-linejoin="round"/>
+<path d="M28.5 29L32 40L35.5 29Z" fill="#ffe3c2"/>
+<path d="M26.5 30Q29 32.5 32 30.5Q35 32.5 37.5 30" fill="none" stroke="#c0561a" stroke-width="1" stroke-linecap="round"/>
+<path d="M32 26.5L24.5 18.5L24 8.5L29 13.5H35L40 8.5L39.5 18.5Z" fill="#f28c28" stroke="#2b1328" stroke-width=".9" stroke-linejoin="round"/>
+<path d="M25.3 11.5L27.6 13.8L25.4 15ZM38.7 11.5L36.4 13.8L38.6 15Z" fill="#2b1328"/>
+<path d="M32 26.5L27 20.3Q32 22.3 37 20.3Z" fill="#fff4e6"/>
+<path d="M28 17.3L30.6 18.4M36 17.3L33.4 18.4" stroke="#2b1328" stroke-width="1.5" stroke-linecap="round"/>
+<circle cx="32" cy="25.3" r="1.1" fill="#2b1328"/>
+</symbol></svg>
 <div id="start" hidden><div class="card">
-  <h1 style="margin-top:0">🏋️ Trainingstagebuch</h1>
+  <h1 class="lg" style="margin-top:0"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#lg"/></svg>Trainingstagebuch</h1>
   <div id="stMain"><p>Wie möchtest du starten?</p>
     <button id="stNew">1 · Neuen Trainingsplan anlegen</button>
     <button class="sec" id="stImp">2 · Trainingsplan importieren</button></div>
@@ -128,13 +175,14 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 </div></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
 
-<div class="top"><h1>🏋️ Trainingstagebuch</h1><button class="ib" id="inf" aria-label="Info">ⓘ</button></div>
+<div class="top"><h1 class="lg"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#lg"/></svg>Trainingstagebuch</h1><button class="ib" id="inf" aria-label="Info">ⓘ</button></div>
 <div class="infp" id="infp" hidden>
   <div class="fi" id="planind"></div>
   <div class="fi" id="fileind"></div>
   <div>created by Claude and JD</div>
   <div class="ver" id="ver"></div>
 </div>
+<div class="exr" id="exr" hidden></div>
 <div class="card">
   <div id="editbar" hidden></div>
   <div class="row">
@@ -142,11 +190,13 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
     <div><label style="margin-top:0">Einheit</label><select id="unit"></select></div>
   </div>
   <div id="fields"></div>
+  <div class="nrow"><button type="button" class="ico" id="nbtn" title="Notiz" aria-label="Notiz">💬</button><textarea id="noteIn" rows="2" maxlength="300" placeholder="Notiz, z. B. Schulter zwickt" hidden></textarea></div>
   <div id="msg"></div><div id="note"></div>
   <button id="save">Speichern</button>
   <button class="sec" id="cancel" hidden>Bearbeiten abbrechen</button>
 </div>
 
+<div class="hbar" id="hbar"></div>
 <div id="hist"></div>
 
 <details class="card" id="ausw">
@@ -175,9 +225,10 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
   <button id="tag" style="margin-top:0">📔 Trainingsplan exportieren</button>
   <button class="sec" id="exp">Als lesbaren Text herunterladen</button>
 </div>
+<div id="tbar" hidden><span>⏱</span><b id="tval">2:00</b><small id="tnm"></small><button class="sec" id="t30" type="button">+30 s</button><button class="sec" id="tx" type="button" aria-label="Timer beenden">✕</button></div>
 
 <script>
-const VERSION="0.45";
+const VERSION="0.50";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -216,7 +267,8 @@ function mergePlan(fp){
   if(fp&&fp.ts>plan.ts){plan=fp;savePlan();return `Trainingsplan „${plan.name}“ aus der Datei übernommen. `}
   return "";
 }
-function sig(x){return x.date+"|"+x.unit+"|"+JSON.stringify(Object.entries(x.ex).sort())}
+// Notiz nur anhängen, wenn vorhanden: Signatur (und damit Alt-IDs) bleibt für Einträge ohne Notiz unverändert
+function sig(x){return x.date+"|"+x.unit+"|"+JSON.stringify(Object.entries(x.ex).sort())+(x.note?"|"+x.note:"")}
 function hash(str){ // einfacher 53-Bit-Hash (cyrb53)
   let h1=0xdeadbeef,h2=0x41c6ce57;
   for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}
@@ -254,7 +306,16 @@ function merge(fileArr){
 const FKEY="trainingsplan_file";
 function setFile(name,action){
   try{localStorage.setItem(FKEY,JSON.stringify({name,action,ts:Date.now()}))}catch(e){}
-  renderFile();
+  renderFile();renderExr();
+}
+// Dezenter Hinweis unter der Titelleiste: nicht exportierte Änderungen und letzter Export ≥ 7 Tage (oder noch nie)
+function renderExr(){
+  const el=$("exr");let f=null;try{f=JSON.parse(localStorage.getItem(FKEY)||"null")}catch(e){}
+  if(!plan||!data.length){el.hidden=true;return}
+  const last=f?f.ts:0,mx=Math.max(plan.ts||0,...data.map(x=>x.ts||0)),d=last?Math.floor((Date.now()-last)/864e5):0;
+  if(last&&(mx<=last||d<7)){el.hidden=true;return}
+  el.innerHTML=(last?`💾 Letzter Export vor ${d} Tagen`:"💾 Noch nicht exportiert")+" · <u>jetzt exportieren</u>";
+  el.hidden=false;
 }
 function renderFile(){
   let f=null;try{f=JSON.parse(localStorage.getItem(FKEY)||"null")}catch(e){}
@@ -306,6 +367,12 @@ $("file").onchange=e=>{
   r.readAsText(f);e.target.value="";
 };
 $("ver").textContent="Version "+VERSION;renderFile();
+$("exr").onclick=()=>$("tag").click();
+$("fav").href="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'+$("lg").innerHTML+"</svg>");
+// Ansicht des Verlaufs (Filter nach Einheit, Kompakt/Ausführlich) merken
+const UKEY="trainingsplan_ui";let ui={hf:0,hv:"k"};
+try{Object.assign(ui,JSON.parse(localStorage.getItem(UKEY)||"{}"))}catch(e){}
+const saveUi=()=>{try{localStorage.setItem(UKEY,JSON.stringify(ui))}catch(e){}};
 $("inf").onclick=()=>{$("infp").hidden=!$("infp").hidden};
 document.addEventListener("click",e=>{if(!e.target.closest("#infp,#inf"))$("infp").hidden=true});
 $("tag").onclick=()=>{
@@ -324,7 +391,30 @@ const sum=a=>a.reduce((x,y)=>x+y,0);
 // Eingabefeld mit großem ▲ links und ▼ rechts über die volle Feldhöhe
 const stw=(i,k,inp)=>`<span class="stw${k==="r"?" fl1":""}"><button type="button" class="sb" data-st="1" data-k="${k}" data-i="${i}" aria-label="Erhöhen">▲</button>${inp}<button type="button" class="sb" data-st="-1" data-k="${k}" data-i="${i}" aria-label="Verringern">▼</button></span>`;
 const lastPyr=(u,n)=>{const L=live();for(let i=L.length-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[n]){const p=parseVal(L[i].ex[n]).pyr;if(p)return p.ws[0]}return null};
+// Aufwärmsätze (🔥) und Scheibenrechner (Hantel): aufklappbar je Übung, offen bleibt offen (Schlüssel "w|Name" / "p|Name")
+const AX=new Set(),PLATES=[25,20,15,10,5,2.5,1.25],BAR=20;
+const BB='<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" style="vertical-align:-3px"><path fill="currentColor" d="M1.5 10h2V8H6v8H3.5v-2h-2zM7 5.5h3v13H7zM10 11h4v2h-4zM14 5.5h3v13h-3zM18 8h2.5v2h2v4h-2v2H18z"/></svg>';
+const kgf=x=>String(Math.round(x*100)/100).replace(".",",");
+function warmHtml(w){
+  if(!(w>BAR))return "🔥 Aufwärmen: erst ab einem Arbeitsgewicht über 20 kg.";
+  return "🔥"+[40,60,80].map(p=>`<span class="ax">${kgf(Math.max(BAR,Math.round(w*p/100/2.5)*2.5))} kg <small>${p} %</small></span>`).join("");
+}
+function plateHtml(w){
+  if(isNaN(w))return "";
+  if(w<BAR)return "Unter 20 kg (Gewicht der Stange).";
+  let s=Math.round((w-BAR)/2*1000)/1000;const out=[];
+  for(const p of PLATES)while(s>=p-1e-9){out.push(p);s=Math.round((s-p)*1000)/1000}
+  return BB+" Je Seite"+(out.length?out.map(p=>`<span class="ax">${kgf(p)}</span>`).join(""):" nur Stange")+(s>0?` <span>+ ${kgf(s)} kg nicht steckbar</span>`:"")+` <small>(20-kg-Stange)</small>`;
+}
+function updateAux(i){
+  const e=cur[i],aw=$("aw"+i),ap=$("ap"+i);if(!aw||!ap)return;
+  const el=document.querySelector(`.w[data-i="${i}"]`),w=el?parseFloat(el.value.replace(",",".")):NaN;
+  aw.hidden=!AX.has("w|"+e.n);ap.hidden=!AX.has("p|"+e.n);
+  if(!aw.hidden)aw.innerHTML=warmHtml(w);if(!ap.hidden)ap.innerHTML=plateHtml(w);
+}
 $("fields").addEventListener("click",e=>{ // ▲▼: Gewicht in 0,25-Schritten
+  const a=e.target.closest("button[data-ax]");
+  if(a){const i=+a.dataset.i,key=a.dataset.ax+"|"+cur[i].n;if(AX.has(key))AX.delete(key);else AX.add(key);a.classList.toggle("on",AX.has(key));updateAux(i);return}
   const b=e.target.closest("button[data-st]");if(!b)return;
   const i=+b.dataset.i,k=b.dataset.k,el=document.querySelector(`.${k}[data-i="${i}"]`);if(!el)return;
   let v=parseFloat(el.value.replace(",","."));
@@ -342,7 +432,8 @@ function build(defs){
     const row=hp?`<div class="in g g5"><input class="pr" data-i="${i}" inputmode="numeric" placeholder="Wdh" aria-label="Wiederholungen je Satz"><span>Wdh. je Satz</span></div>
       <div class="in g g2" style="margin-top:8px">${stw(i,"r",`<input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="kg" autocomplete="off">`)}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
      :`<div class="in g ${hw&&hr?"g1":hw?"g3":"g4"}">${hw?`${stw(i,"w",`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg">`)}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
-    return `<label class="fl"><span>${esc(e.n)}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></label>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}`}).join("");
+    const ax=hw&&!e.bw,ib=(k,t,s)=>`<button type="button" class="ico${AX.has(k+"|"+e.n)?" on":""}" data-ax="${k}" data-i="${i}" title="${t}" aria-label="${t}">${s}</button>`;
+    return `<div class="fl lb"><span>${esc(e.n)}${ax?ib("w","Aufwärmsätze","🔥")+ib("p","Scheibenrechner",BB):""}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></div>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}${ax?`<div class="aux" id="aw${i}" hidden></div><div class="aux" id="ap${i}" hidden></div>`:""}`}).join("");
   cur.forEach((_,i)=>{chips(i);updateDw(i)});
   document.querySelectorAll(".w,.pr").forEach(el=>{
     el.onfocus=()=>el.select();
@@ -378,16 +469,53 @@ function commit(i){
     const t=v.replace(",",".");
     if(!/^\d+(\.\d+)?$/.test(t)||+t<=0){$("msg").textContent=`${e.n}: Gewicht je Satz in kg eingeben.`;el.select();return}
     if(r.length>=e.s){next(i);return}
-    r.push(+t);el.value="";chips(i);
+    r.push(+t);el.value="";chips(i);restAfter(i);
     if(r.length===e.s)next(i);else el.focus();
     return;
   }
   const n=+v,max=e.max||99;
   if(!/^\d+$/.test(v)||n<1||n>max){$("msg").textContent=`${e.n}: Wiederholungen von 1 bis ${max} eingeben.`;el.select();return}
   if(e.s&&r.length>=e.s){next(i);return}
-  r.push(n);el.value="";chips(i);
+  r.push(n);el.value="";chips(i);restAfter(i);
   if(e.s&&r.length===e.s)next(i);else el.focus();
 }
+// ---------- Pausentimer (startet nach jedem Satz; nach dem letzten Satz der letzten Übung nicht) ----------
+let tm=null;
+function restAfter(i){const e=cur[i];if(i===cur.length-1&&e.s&&st[i].reps.length>=e.s)tStop();else tStart(e)}
+function tStart(e){
+  const sec=e.rest??120;if(!sec)return;
+  tStop();tm={end:Date.now()+sec*1e3,iv:setInterval(tTick,250)};
+  $("tnm").textContent=e.n;$("tbar").classList.remove("fin");$("tbar").hidden=false;document.body.classList.add("tmo");tTick();wlOn();
+}
+function tTick(){
+  if(!tm||tm.fin)return;
+  const s=Math.ceil((tm.end-Date.now())/1e3);
+  if(s>0){$("tval").textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");return}
+  clearInterval(tm.iv);tm.fin=true;$("tval").textContent="Pause vorbei";$("tbar").classList.add("fin");
+  try{if(navigator.vibrate)navigator.vibrate([400,200,400,200,400])}catch(x){}
+  tm.done=setTimeout(tStop,8000);
+}
+function tStop(){if(tm){clearInterval(tm.iv);clearTimeout(tm.done)}tm=null;$("tbar").hidden=true;document.body.classList.remove("tmo")}
+$("t30").onclick=()=>{
+  if(!tm)return;
+  if(tm.fin){clearTimeout(tm.done);tm.fin=false;tm.end=Date.now()+30e3;tm.iv=setInterval(tTick,250);$("tbar").classList.remove("fin")}else tm.end+=30e3;
+  tTick();
+};
+$("tx").onclick=tStop;
+// ---------- Bildschirm wach halten (Wake Lock) während der Eingabe; aus nach Speichern oder 15 min ohne Eingabe ----------
+let wl=null,wlP=false,wlWant=false,wlT=null;
+async function wlOn(){
+  wlWant=true;clearTimeout(wlT);wlT=setTimeout(wlOff,15*60e3);
+  if(wl||wlP||!("wakeLock" in navigator)||document.visibilityState!=="visible")return;
+  wlP=true;try{wl=await navigator.wakeLock.request("screen");wl.addEventListener("release",()=>{wl=null})}catch(x){}wlP=false;
+}
+function wlOff(){wlWant=false;clearTimeout(wlT);if(wl){wl.release().catch(()=>{});wl=null}}
+["pointerdown","input"].forEach(t=>$("save").parentElement.addEventListener(t,()=>wlOn()));
+// ---------- Notiz ----------
+const nUpd=()=>$("nbtn").classList.toggle("on",!$("noteIn").hidden||!!$("noteIn").value.trim());
+function setNote(v){$("noteIn").value=v||"";$("noteIn").hidden=true;nUpd()}
+$("nbtn").onclick=()=>{const t=$("noteIn");t.hidden=!t.hidden;if(!t.hidden)t.focus();nUpd()};
+$("noteIn").oninput=()=>{dirty=true;nUpd()};
 function next(i){
   for(let j=i+1;j<cur.length;j++){const x=document.querySelector(`.w[data-i="${j}"],.pr[data-i="${j}"],.r[data-i="${j}"]`);if(x){x.focus();return}}
   $("save").focus();
@@ -422,10 +550,12 @@ $("save").onclick=()=>{
   if(!dt){$("msg").textContent="Bitte ein Datum wählen.";return}
   const clash=live().find(x=>x.date===dt&&x.id!==editId);
   if(clash){$("msg").textContent=`Am ${fmt(dt)} gibt es schon einen Eintrag (Einheit ${clash.unit}). Pro Tag ist nur ein Eintrag möglich – bitte ein anderes Datum wählen oder den vorhandenen Eintrag bearbeiten.`;return}
+  const note=$("noteIn").value.trim().slice(0,300);wlOff();tStop();
   if(editId!==null){
     data=data.map(x=>{
       if(x.id!==editId)return x;
       const n={...x,date:$("date").value,unit:+u,ex};
+      if(note)n.note=note;else delete n.note;
       if(sig(n)===sig(x))return x; // nichts geändert
       return{...n,ts:Date.now(),ed:true};
     }).sort(cmp);
@@ -434,7 +564,7 @@ $("save").onclick=()=>{
     window.scrollTo({top:0,behavior:"smooth"});
     return;
   }
-  data=[...data,{id:newId(),date:$("date").value,unit:+u,ex,ts:Date.now()}].sort(cmp);
+  data=[...data,{id:newId(),date:$("date").value,unit:+u,ex,ts:Date.now(),...(note?{note}:{})}].sort(cmp);
   const ok=persist();init();
   if(ok)$("note").textContent="✔ Gespeichert.";
   window.scrollTo({top:0,behavior:"smooth"});
@@ -455,6 +585,7 @@ function edit(id){
     if(pv.pyr){st[i].pr=String(pv.pyr.r);st[i].reps=pv.pyr.ws;const pe=document.querySelector(`.pr[data-i="${i}"]`);if(pe)pe.value=pv.pyr.r}
     chips(i);updateDw(i);
   });
+  setNote(e.note);
   $("editbar").textContent=`✎ Bearbeite Eintrag vom ${fmt(e.date)} (Einheit ${e.unit})`;
   $("editbar").hidden=false;$("cancel").hidden=false;$("editbar").parentElement.classList.add("editing");$("save").textContent="Änderung speichern";
   $("msg").textContent="";$("note").textContent="";
@@ -462,7 +593,7 @@ function edit(id){
 }
 function exitEdit(){
   editId=null;$("unit").disabled=false;$("editbar").hidden=true;$("cancel").hidden=true;$("editbar").parentElement.classList.remove("editing");
-  $("save").textContent="Speichern";init();
+  $("save").textContent="Speichern";wlOff();init();
 }
 $("cancel").onclick=exitEdit;
 const wd=d=>new Date(d+"T12:00").toLocaleDateString("de-DE",{weekday:"short"}).replace(".","");
@@ -492,6 +623,7 @@ function baseW(name){
   return null;
 }
 function updateDw(i){
+  updateAux(i);
   const e=cur[i],el=document.querySelector(`.w[data-i="${i}"]`),out=$("dw"+i);
   if(!el||!out)return;
   const p=baseW(e.n);
@@ -558,7 +690,7 @@ function line(series,goal,unit){
   if(goal!=null)h+=`<line x1="${L}" x2="${W-R}" y1="${Y(goal)}" y2="${Y(goal)}" class="go"/>`;
   series.forEach((s,k)=>{
     h+=`<polyline class="ln${k+1}" points="${s.pts.map(p=>X(p[0])+","+Y(p[1])).join(" ")}"/>`;
-    s.pts.forEach(p=>h+=`<circle class="c${k+1}" cx="${X(p[0])}" cy="${Y(p[1])}" r="3"><title>${sd(p[0])}: ${nf(p[1])} ${unit}</title></circle>`);
+    s.pts.forEach(p=>h+=`<circle class="c${k+1}" cx="${X(p[0])}" cy="${Y(p[1])}" r="3"/><circle class="hit" cx="${X(p[0])}" cy="${Y(p[1])}" r="9" data-t="${sd(p[0])}: ${nf(p[1])} ${unit}${series.length>1?" · "+s.name:""}"/>`);
   });
   h+="</svg>";
   if(series.length>1||goal!=null)h+=`<div class="leg">${series.map((s,k)=>`<span><i style="background:var(--${k?"ye":"ac"})"></i>${s.name}</span>`).join("")}${goal!=null?`<span>┄ Ziel ${goal}</span>`:""}</div>`;
@@ -570,7 +702,7 @@ function bars(items,unit){
   let h=`<svg viewBox="0 0 ${W} ${H}" class="ch">`;
   [0,1].forEach(i=>{const y=Tp+(1-i)*(H-Tp-B);h+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" class="gr"/><text x="${L-4}" y="${y+3}" class="tx" text-anchor="end">${nf(mx*i)}</text>`});
   items.forEach((it,i)=>{const hh=it.v/mx*(H-Tp-B),x=L+i*bw;
-    h+=`<rect class="bar" x="${x+1}" y="${H-B-hh}" width="${Math.max(bw-2,1)}" height="${hh}" rx="2"><title>${it.l}: ${nf(it.v)} ${unit}</title></rect>`;
+    h+=`<rect class="bar" x="${x+1}" y="${H-B-hh}" width="${Math.max(bw-2,1)}" height="${hh}" rx="2"/><rect class="hit" x="${x}" y="${Tp}" width="${bw}" height="${H-Tp-B}" data-t="Woche ab ${it.l}: ${nf(it.v)} ${unit}"/>`;
     if(i%step===0)h+=`<text x="${x+bw/2}" y="${H-6}" class="tx" text-anchor="middle">${it.l}</text>`});
   return h+"</svg>";
 }
@@ -641,6 +773,19 @@ function renderAus(){
   $("v-cal").hidden=view!=="cal";const o=$("v-oth");o.hidden=view==="cal";
   if(view!=="cal")o.innerHTML=({ov:vOv,rec:vRec,reg:vReg,w:vW,e1:vE1,vol:vVol,rp:vRp}[view]||nd)();
 }
+// Diagramme: Antippen eines Punkts/Balkens zeigt Datum und Wert
+$("v-oth").addEventListener("click",e=>{
+  const box=$("v-oth");let tip=box.querySelector(".ctip");
+  box.querySelectorAll(".ch .on").forEach(x=>x.classList.remove("on"));
+  const t=e.target.closest("[data-t]");
+  if(!t){if(tip)tip.hidden=true;return}
+  if(!tip){tip=document.createElement("div");tip.className="ctip";box.appendChild(tip)}
+  const v=t.previousElementSibling;if(v)v.classList.add("on");
+  tip.textContent=t.dataset.t;tip.hidden=false;
+  const b=box.getBoundingClientRect(),a=(v||t).getBoundingClientRect();
+  const left=Math.max(0,Math.min(a.left+a.width/2-b.left-tip.offsetWidth/2,box.clientWidth-tip.offsetWidth));
+  tip.style.left=left+"px";tip.style.top=Math.max(0,a.top-b.top-tip.offsetHeight-6)+"px";
+});
 $("avb").addEventListener("click",e=>{const b=e.target.closest("button[data-v]");if(b){view=b.dataset.v;renderAus()}});
 let cal=null;
 function calMove(n){const d=new Date(cal.y,cal.m+n,1);cal={y:d.getFullYear(),m:d.getMonth()};renderCal()}
@@ -668,7 +813,7 @@ function popHtml(date){
     `<div class="ph">${wd(e.date)} ${fmt(e.date)} · Einheit ${e.unit}</div>`+
     Object.entries(e.ex).map(([k,v])=>{
       const i=exInfo(k,v,e.unit),t=i.pyr?`${i.pyr.r} Wdh. · ${i.pyr.ws.map(x=>String(x).replace(".",",")).join(" · ")} kg`:[i.kg&&!i.z?i.kg:null,i.p.reps?i.p.reps.join(" · ")+(i.sum!=null?` (Σ ${i.sum})`:""):null].filter(Boolean).join(" · ");
-      return `<div class="pl"><span>${esc(k)}</span><span>${t||"Körpergewicht"}</span></div>`}).join("")).join("");
+      return `<div class="pl"><span>${esc(k)}</span><span>${t||"Körpergewicht"}</span></div>`}).join("")+(e.note?`<div class="nt" style="margin-top:3px">💬 ${esc(e.note)}</div>`:"")).join("");
 }
 function showPop(cell){
   const d=+cell.dataset.d,pop=$("pop");
@@ -699,15 +844,36 @@ function visIds(Lr){
   for(const e of Lr){if(v.size>=k)break;v.add(e.id)}
   return v;
 }
+// Verlaufskarte: kompakt (eine Zeile je Übung, Standard) oder ausführlich
+function card(s,ref,rec){
+  const cmp=ui.hv!=="d";
+  const nt=s.note?`<div class="nt"${cmp?" hidden":""}>💬 ${esc(s.note)}</div>`:"";
+  const head=`<div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>Einheit ${s.unit}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}${s.note&&cmp?`<span class="inf" onclick="const n=this.closest('.card').querySelector('.nt');n.hidden=!n.hidden" title="Notiz">💬</span>`:""}</span><span><button class="x" onclick="edit('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="del('${s.id}')" title="Löschen">✕</button></span></div>`;
+  const body=Object.entries(s.ex).map(([k,v])=>{
+    const i=exInfo(k,v,s.unit),hw=i.p.w!=null,di=hw?dinfo(+i.p.w,prevW(s,k)):null,df=di?`<small class="df ${di.c}">${di.t}</small>`:"",tr=rec.has(s.id+"|"+k)?" 🏆":"";
+    if(cmp){
+      const val=i.pyr?`${i.pyr.r} Wdh. · <b>${i.pyr.ws.map(kgf).join(" ")}</b> kg`
+        :[hw&&!i.z?`<b>${i.kg}</b>${df}`:null,i.p.reps?i.p.reps.join(" ")+(i.sum!=null?` <small>Σ ${i.sum}</small>`:""):null].filter(Boolean).join(" · ")||"Körpergewicht";
+      return `<div class="cl"><span class="cn">${esc(k)}${tr}</span><span class="cv">${val}</span></div>`;
+    }
+    if(i.pyr)return `<div class="ex"><div class="en">${esc(k)}${tr}</div><div class="ln"><b>${i.pyr.r} Wdh.</b><div class="sets"><small>kg</small>${i.pyr.ws.map(x=>`<span>${String(x).replace(".",",")}</span>`).join("")}</div></div></div>`;
+    return `<div class="ex"><div class="en">${esc(k)}${tr}</div><div class="ln">${hw?`<b>${i.kg}${df}</b>`:""}${i.p.reps?`<div class="sets"><small>Wdh.</small>${i.p.reps.map(x=>`<span>${x}</span>`).join("")}${i.sum!=null?`<small>Σ ${i.sum}</small>`:""}</div>`:""}</div></div>`}).join("");
+  return `<div class="card${cmp?" cmp":""}${s.id===editId?" ed":""}${s.id===ref?" ref":""}">${head}${body}${nt}</div>`;
+}
+$("hbar").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.hf!=null)ui.hf=+b.dataset.hf;if(b.dataset.hv)ui.hv=b.dataset.hv;
+  saveUi();render();
+});
 function render(){
-  const ref=refId();renderCal();const rec=recSet();renderAus();
-  const Lr=live().reverse(),vis=visIds(Lr);
-  const cards=Lr.map(s=>
-    `<div class="card${s.id===editId?" ed":""}${s.id===ref?" ref":""}"><div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>Einheit ${s.unit}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}</span><span><button class="x" onclick="edit('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="del('${s.id}')" title="Löschen">✕</button></span></div>`+
-    Object.entries(s.ex).map(([k,v])=>{
-      const i=exInfo(k,v,s.unit),hw=i.p.w!=null,di=hw?dinfo(+i.p.w,prevW(s,k)):null,df=di?`<small class="df ${di.c}">${di.t}</small>`:"";
-      if(i.pyr)return `<div class="ex"><div class="en">${esc(k)}${rec.has(s.id+"|"+k)?" 🏆":""}</div><div class="ln"><b>${i.pyr.r} Wdh.</b><div class="sets"><small>kg</small>${i.pyr.ws.map(x=>`<span>${String(x).replace(".",",")}</span>`).join("")}</div></div></div>`;
-      return `<div class="ex"><div class="en">${esc(k)}${rec.has(s.id+"|"+k)?" 🏆":""}</div><div class="ln">${hw?`<b>${i.kg}${df}</b>`:""}${i.p.reps?`<div class="sets"><small>Wdh.</small>${i.p.reps.map(x=>`<span>${x}</span>`).join("")}${i.sum!=null?`<small>Σ ${i.sum}</small>`:""}</div>`:""}</div></div>`}).join("")+`</div>`);
+  const ref=refId();renderCal();const rec=recSet();renderAus();renderExr();
+  const k=plan.units.length;if(ui.hf>k)ui.hf=0;
+  const bt=(a,v,t)=>`<button type="button" data-${a}="${v}"${ui[a]===v?' class="on"':""}>${t}</button>`;
+  $("hbar").hidden=!live().length;
+  $("hbar").innerHTML=`<div class="vbs">${k>1?[0,...plan.units.map((_,j)=>j+1)].map(u=>bt("hf",u,u?"E"+u:"Alle")).join(""):""}</div><div class="vbs">${bt("hv","k","Kompakt")}${bt("hv","d","Ausführlich")}</div>`;
+  // Filter: nur Einträge der gewählten Einheit; sichtbar bleiben so viele wie Einheiten im Plan
+  const Lr=live().reverse().filter(x=>!ui.hf||x.unit===ui.hf),vis=ui.hf?new Set(Lr.slice(0,k).map(x=>x.id)):visIds(Lr);
+  const cards=Lr.map(s=>card(s,ref,rec));
   const shown=cards.filter((_,i)=>vis.has(Lr[i].id)),older=cards.filter((_,i)=>!vis.has(Lr[i].id));
   $("hist").innerHTML=shown.join("")+(older.length?`<details class="old"${olderOpen?" open":""} ontoggle="olderOpen=this.open;if(!olderOpen)this.scrollIntoView({block:'nearest'})"><summary>Ältere Einträge (${older.length})</summary>${older.join("")}</details>`:"");
 }
@@ -721,7 +887,7 @@ function dl(name,text,type){
   a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();
 }
 $("exp").onclick=()=>dl("trainingsplan.txt",
-  live().map(s=>fmt(s.date)+" (Einheit "+s.unit+")\n"+Object.entries(s.ex).map(([k,v])=>{const i=exInfo(k,v,s.unit);return k+": "+(i.pyr?`${i.pyr.r} Wdh., ${i.pyr.ws.join(" · ")} kg`:[i.kg,i.p.reps?"Wdh.: "+i.p.reps.join(" · "):null].filter(Boolean).join(", "))}).join("\n")).join("\n\n"),"text/plain");
+  live().map(s=>fmt(s.date)+" (Einheit "+s.unit+")\n"+Object.entries(s.ex).map(([k,v])=>{const i=exInfo(k,v,s.unit);return k+": "+(i.pyr?`${i.pyr.r} Wdh., ${i.pyr.ws.join(" · ")} kg`:[i.kg,i.p.reps?"Wdh.: "+i.p.reps.join(" · "):null].filter(Boolean).join(", "))}).join("\n")+(s.note?"\nNotiz: "+s.note:"")).join("\n\n"),"text/plain");
 
 function init(){
   if(!plan){showStart();return}
@@ -730,7 +896,7 @@ function init(){
   $("unit").innerHTML=plan.units.map((_,i)=>`<option value="${i+1}">Einheit ${i+1}</option>`).join("");
   const L=live(),l=L[L.length-1];$("unit").value=l&&l.unit<plan.units.length?l.unit+1:1; // nächste Einheit im Wechsel
   $("planind").textContent="📋 Trainingsplan: "+plan.name;
-  $("msg").textContent="";$("note").textContent="";build();render();
+  $("msg").textContent="";$("note").textContent="";setNote("");build();render();
 }
 // ---------- Startmenü & Zurücksetzen ----------
 const stm=t=>{$("stMsg").textContent=t};
@@ -759,6 +925,7 @@ $("reset").onclick=()=>{
 
 // ---------- Trainingsplan anlegen / bearbeiten ----------
 let wz=null;
+const RESTS=[0,30,45,60,90,120,150,180,240,300],restL=s=>s?Math.floor(s/60)+":"+String(s%60).padStart(2,"0")+" min":"aus";
 const wzEx=()=>({n:"",m:"wr",s:3}),wzm=t=>{$("wzm").textContent=t},at=(a,b)=>`data-a="${a}" data-b="${b}"`;
 function wizOpen(fresh){
   wz=fresh?{name:"Mein Trainingsplan",units:[{exs:[wzEx()]},{exs:[wzEx()]}]}:JSON.parse(JSON.stringify(plan));
@@ -772,7 +939,7 @@ function wizRender(){
     <div class="in"><input class="wn" ${at(a,b)} maxlength="40" placeholder="Übung" value="${esc(e.n)}"><button class="x" data-act="del" ${at(a,b)} title="Übung entfernen">✕</button></div>
     <div class="wx"><select class="wm" ${at(a,b)}>${Object.entries(M).map(([k,t])=>`<option value="${k}"${e.m===k?" selected":""}>${t}</option>`).join("")}</select>
     ${e.m==="wr"?`<label><input type="checkbox" class="wb" ${at(a,b)}${e.bw?" checked":""}>Körpergewichtsübung</label>`:""}
-    ${(e.m==="wr"&&!e.bw)||e.m==="p"?`<div class="wsr"><span>Sätze</span><select class="ws" ${at(a,b)}>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option${n===e.s?" selected":""}>${n}</option>`).join("")}</select></div>`:""}</div></div>`).join("")+
+    ${e.m!=="w"?`<div class="wsr">${(e.m==="wr"&&!e.bw)||e.m==="p"?`<span>Sätze</span><select class="ws" ${at(a,b)}>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option${n===e.s?" selected":""}>${n}</option>`).join("")}</select>`:""}<span>Pause</span><select class="wp" ${at(a,b)}>${RESTS.map(s=>`<option value="${s}"${s===(e.rest??120)?" selected":""}>${restL(s)}</option>`).join("")}</select></div>`:""}</div></div>`).join("")+
     `<button class="sec" data-act="add" data-a="${a}">＋ Übung</button></div>`).join("");
 }
 $("wzb").addEventListener("input",e=>{const t=e.target;
@@ -783,6 +950,7 @@ $("wzb").addEventListener("change",e=>{
   else if(t.classList.contains("wm")){ex.m=t.value;if(ex.m!=="wr")ex.bw=false;if(((ex.m==="wr"&&!ex.bw)||ex.m==="p")&&!ex.s)ex.s=3;wizRender()}
   else if(t.classList.contains("wb")){ex.bw=t.checked;if(!ex.bw&&!ex.s)ex.s=3;wizRender()}
   else if(t.classList.contains("ws"))ex.s=+t.value;
+  else if(t.classList.contains("wp"))ex.rest=+t.value;
 });
 $("wzb").addEventListener("click",e=>{
   const b=e.target.closest("button[data-act]");if(!b)return;
@@ -803,6 +971,7 @@ $("wzSave").onclick=()=>{
       if(e.m==="wr"&&e.bw)o.bw=true;
       if(e.m!=="w"&&e.max)o.max=e.max;
       if(e.m!=="w"&&e.goal)o.goal=e.goal;
+      if(e.m!=="w"&&e.rest!=null&&e.rest!==120)o.rest=e.rest; // Pause in Sekunden (Standard 120, 0 = aus)
       exs.push(o);
     }
     if(!exs.length)return wzm(`Einheit ${a+1}: mindestens eine Übung eintragen.`);
@@ -817,7 +986,10 @@ $("plEdit").onclick=()=>wizOpen(false);
 function refresh(){if(editId!==null)exitEdit();else init()}
 // Beim Zurückkehren zur Seite (z. B. am nächsten Tag): Datum/Einheit aktualisieren, sofern nichts eingegeben ist
 document.addEventListener("visibilitychange",()=>{
-  if(document.visibilityState==="visible"&&editId===null&&!dirty&&st.every(x=>!x.reps.length))init();
+  if(document.visibilityState!=="visible")return;
+  if(wlWant)wlOn(); // Wake Lock wird beim Verlassen der Seite automatisch freigegeben
+  tTick();
+  if(editId===null&&!dirty&&st.every(x=>!x.reps.length))init();
 });
 init();
 </script>

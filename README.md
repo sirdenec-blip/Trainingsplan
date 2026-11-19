@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.45** (steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.50** (steht auch im ⓘ-Menü oben rechts)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -20,6 +20,13 @@ Die Striche werden automatisch gesetzt, gespeichert wird z. B. `85x8-9-10`.
 
 Das Gewicht vom letzten Mal ist vorausgefüllt, Datum = heute, Einheit wechselt automatisch.
 
+### Helfer beim Training
+- **⏱ Pausentimer:** startet nach jedem eingetragenen Satz automatisch (Standard 2:00, pro Übung im Plan-Assistenten einstellbar oder „aus“). Die Leiste unten zeigt die Restzeit, „+30 s“ verlängert, ✕ beendet. Am Ende vibriert das Handy und die Leiste wird grün („Pause vorbei“). Nach dem letzten Satz der Einheit und beim Speichern stoppt der Timer.
+- **🔥 Aufwärmsätze:** Flammensymbol neben der Übung antippen: 40 %, 60 % und 80 % des eingetragenen Gewichts (auf 2,5 kg gerundet, mindestens 20 kg). Nur Anzeige.
+- **Scheibenrechner:** Hantelsymbol neben der Übung antippen: welche Scheiben pro Seite bei einer 20-kg-Stange (Scheiben 25 / 20 / 15 / 10 / 5 / 2,5 / 1,25). Passt sich beim Ändern des Gewichts sofort an.
+- **💬 Notiz:** Sprechblase unter den Übungen antippen klappt ein Textfeld aus (z. B. „Schulter zwickt“). Die Notiz wird mit dem Eintrag gespeichert und abgeglichen.
+- **Bildschirm bleibt an:** Während der Eingabe hält die App den Bildschirm wach (bis zum Speichern bzw. 15 Minuten ohne Eingabe), sofern der Browser das unterstützt.
+
 ## Speicherung
 Alle Einträge werden automatisch im Browser des Geräts gespeichert (localStorage), du kannst also einfach am Handy trainieren.
 
@@ -32,6 +39,8 @@ Danach läuft alles im Browser (localStorage). **An der geöffneten Datei wird n
 
 **📔 Trainingsplan exportieren:** schreibt Plan und Einträge in eine Datei. Optionen: in die geöffnete Datei speichern (wenn der Browser das erlaubt), neue Datei erstellen (Name = Planname) oder bestehende Datei auswählen. Bei bestehenden Dateien wird in beide Richtungen abgeglichen (neuere Änderung gewinnt, Löschungen werden mit abgeglichen). Auf dem Handy (iPhone/Safari, Chrome Android) kann der Browser Dateien nicht überschreiben: die Datei wird neu heruntergeladen und ersetzt die alte.
 
+**Export-Erinnerung:** Gibt es Änderungen, die noch nicht in einer Datei gesichert sind, und liegt der letzte Export mindestens 7 Tage zurück (oder gab es noch keinen), steht unter dem Titel dezent „💾 Letzter Export vor N Tagen · jetzt exportieren“ (antippen öffnet den Export).
+
 **🗑 Alle Daten zurücksetzen:** entfernt Plan und alle Einträge im Browser (auch nicht exportierte) nach Warnung; danach erscheint wieder das Startmenü. Die Datei auf dem Gerät bleibt unverändert.
 
 ### Eigener Trainingsplan
@@ -42,6 +51,7 @@ Der Plan-Assistent (Startmenü → *Individuell*, später **✎ Trainingsplan be
   - **Nur Gewicht** (ein Wert, z. B. `85`).
   - **Nur Wiederholungen** (beliebig viele Sätze, z. B. `x60-45`).
   - **Pyramidensatz:** einmal feste Wiederholungen, pro Satz das Gewicht (z. B. `8@60-70-80`), Sätze wählbar.
+  - **Pause** für den Pausentimer (0:30 bis 5:00 oder aus, Standard 2:00), außer bei „Nur Gewicht“.
 - Der Plan wird im Browser **und im Trainingstagebuch (Datei)** gespeichert (Dateiformat Version 3). Beim Abgleich/Import gewinnt der neuere Plan; die Meldung nennt es, wenn ein Plan aus der Datei übernommen wurde.
 - Der aktive Plan und die zuletzt verwendete Datei stehen im ⓘ-Menü oben rechts.
 - Bestehende Einträge bleiben bei Planänderungen erhalten und werden weiter angezeigt.
@@ -49,6 +59,11 @@ Der Plan-Assistent (Startmenü → *Individuell*, später **✎ Trainingsplan be
 
 ### Verlauf kompakt
 Angezeigt werden so viele Einträge, wie der Plan Einheiten hat – je Einheit der neueste (Referenz), mit den neuesten übrigen aufgefüllt. Alle weiteren stehen unter „Ältere Einträge“.
+
+Über dem Verlauf (Auswahl wird gemerkt):
+- **Alle · E1 · E2 …** filtert nach Einheit (dann die neuesten Einträge dieser Einheit sichtbar, Rest unter „Ältere Einträge“).
+- **Kompakt** (Standard): eine Zeile pro Übung, z. B. „Kniebeugen 90 kg +2,5 · 8 8 7“. Notizen als 💬 im Kopf, antippen zeigt sie.
+- **Ausführlich:** die bisherige Darstellung mit Satz-Kästchen, Notiz sichtbar darunter.
 
 ### Ein Eintrag pro Tag
 Pro Kalendertag ist nur ein Eintrag möglich. Beim Speichern (neu oder bearbeitet) erscheint sonst ein Hinweis, auch schon bei der Datumswahl. Bereits vorhandene Doppel (z. B. aus einem Abgleich) bleiben bestehen und lassen sich über Löschen/Bearbeiten bereinigen.
@@ -63,6 +78,7 @@ Beim Öffnen, nach dem Speichern, Löschen, Import/Abgleich und beim Zurückkehr
 ### Auswertungen (aufklappbar, mit Knöpfen)
 **Überblick:** 📅 Kalender · 📋 Fortschritt (Start, Aktuell, Δ, Δ %, Trend je Übung) · 🏆 Bestleistungen · 🔁 Regelmäßigkeit (Einheiten pro Woche, Serien).
 **Verläufe pro Übung** (Auswahl per Dropdown): 📈 Gewicht · 🧮 1RM geschätzt (One-Rep-Max, berechnet aus dem besten Satz nach Epley: Gewicht × (1 + Wdh./30); wird nicht gemessen) · 📊 Volumen (Gewicht × Wdh. × Sätze pro Woche, auch alle Übungen zusammen) · 🔢 Wiederholungen (Summe und bester Satz, mit Ziellinie z. B. 24 bei Klimmzügen).
+In den Diagrammen zeigt Antippen eines Punkts oder Balkens Datum und Wert.
 Im Verlauf steht 🏆 hinter einer Übung, wenn sie einen neuen Bestwert gegenüber allen früheren Einträgen erreicht hat (Leitwert: geschätztes 1RM, bei Nur-Gewicht das Gewicht, bei Körpergewicht/Nur-Wiederholungen die Wiederholungssumme).
 
 #### Kalender (Details)
@@ -83,6 +99,7 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.50:** Logo „Feuerfuchs“ (auch als Browser-Symbol), Verlauf filterbar nach Einheit mit Kompakt-/Ausführlich-Ansicht (kompakt als Standard), Notiz pro Eintrag (💬), Pausentimer (pro Übung einstellbar), Aufwärmsätze (🔥) und Scheibenrechner, antippbare Diagramme, Export-Erinnerung, Bildschirm bleibt während der Eingabe an.
 - **0.45:** Kürzerer Platzhalter „Wdh.“ im Wiederholungsfeld, Gewichte in der Eingabe mit Komma (z. B. 110,5), bei Körpergewichtsübungen „zuletzt Körpergewicht“ bzw. „zuletzt +2,5 kg“.
 - **0.44:** Eingabezeile auch auf schmalen Handys (360 px) mit ausreichend breitem Wiederholungsfeld; README: Version steht im ⓘ-Menü.
 - **0.43:** Bugfix: Eingabezeile (Gewicht ▲▼ + Wiederholungen) auf dem Handy wieder korrekt, jetzt mit festem Raster.
