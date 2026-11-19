@@ -233,12 +233,12 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 <div class="toast" id="toast" hidden></div>
 <div id="tbar" hidden>
-  <div class="tr1"><span>⏱</span><b id="tval">2:00</b><small id="tnm"></small><button class="sec" id="tgo" type="button" hidden>Start</button><button class="sec" id="t30" type="button">+30 s</button><button class="sec" id="tx" type="button" aria-label="Timer beenden">✕</button></div>
+  <div class="tr1"><span id="tico"></span><b id="tval">2:00</b><small id="tnm"></small><button class="sec" id="tgo" type="button" hidden>Start</button><button class="sec" id="t30" type="button">+30 s</button><button class="sec" id="tx" type="button" aria-label="Timer beenden">✕</button></div>
   <div class="tr2" id="tadj" hidden><button class="sec" type="button" data-ad="-30">−0:30</button><button class="sec" type="button" data-ad="-15">−0:15</button><button class="sec" type="button" data-ad="15">+0:15</button><button class="sec" type="button" data-ad="30">+0:30</button></div>
 </div>
 
 <script>
-const VERSION="0.92";
+const VERSION="0.93";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -288,7 +288,7 @@ function persist(){
   Object.assign(e,docMeta(docOf()));
   if(!e.debug&&idx.mode==="cloud"){e.dirty=true;e.rev=(e.rev||0)+1}
   const ok=writeDoc(docOf());saveIdx();
-  if(!ok)toast("⚠ Gerätespeicher voll oder gesperrt – Änderung nicht gespeichert.");
+  if(!ok)toast("Achtung: Gerätespeicher voll oder gesperrt – Änderung nicht gespeichert.");
   syncSoon();renderSync();return ok;
 }
 const savePlan=persist;
@@ -479,19 +479,20 @@ const ago=t=>{const m=Math.round((Date.now()-t)/6e4);return m<1?"gerade eben":m<
 function renderSync(){
   const el=$("sst");if(!el)return;
   const e=plan&&idx.plans[plan.id],cl=idx.mode==="cloud",dt=anyDirty();let t="",w=false;
+  const C=ICO.cloud+" ",W=ICO.warn+" "; // einfarbige Symbole statt ☁/⚠ (die Android bunt darstellt)
   if(!plan)t="";
-  else if(e&&e.debug)t="🐞 Debug-Plan · nur auf diesem Gerät";
-  else if(!cl){t=cloudOk()?"⚠ Nur auf diesem Gerät · <u>mit Google Drive verbinden</u>":"⚠ Nur auf diesem Gerät gespeichert";w=true}
-  else if(syncing)t="☁ Synchronisiere …";
-  else if(netDown||!navigator.onLine)t=dt?"☁ Offline · Änderungen auf dem Gerät gesichert, werden später übertragen":"☁ Offline";
-  else if(!tokValid()){if(dt){t="⚠ Auf dem Gerät gesichert · <u>Google-Verbindung erneuern</u>";w=true}else t=`☁ Google Drive${lastSync?" · abgeglichen "+ago(lastSync):""} · <u>aktualisieren</u>`}
-  else if(syncErr){t="⚠ Synchronisierung fehlgeschlagen · <u>erneut versuchen</u>";w=true}
-  else if(dt)t="☁ Wird gespeichert …";
-  else t=`☁ In Google Drive gespeichert${lastSync?" · "+ago(lastSync):""}`;
+  else if(e&&e.debug)t=BUG+" Debug-Plan · nur auf diesem Gerät";
+  else if(!cl){t=cloudOk()?W+"Nur auf diesem Gerät · <u>mit Google Drive verbinden</u>":W+"Nur auf diesem Gerät gespeichert";w=true}
+  else if(syncing)t=C+"Synchronisiere …";
+  else if(netDown||!navigator.onLine)t=dt?C+"Offline · Änderungen auf dem Gerät gesichert, werden später übertragen":C+"Offline";
+  else if(!tokValid()){if(dt){t=W+"Auf dem Gerät gesichert · <u>Google-Verbindung erneuern</u>";w=true}else t=C+`Google Drive${lastSync?" · abgeglichen "+ago(lastSync):""} · <u>aktualisieren</u>`}
+  else if(syncErr){t=W+"Synchronisierung fehlgeschlagen · <u>erneut versuchen</u>";w=true}
+  else if(dt)t=C+"Wird gespeichert …";
+  else t=C+`In Google Drive gespeichert${lastSync?" · "+ago(lastSync):""}`;
   el.innerHTML=t;el.classList.toggle("warn",w);
-  $("pname").textContent=plan?"📋 "+plan.name+" ▾":"";
-  $("planind").textContent=plan?"📋 Trainingsplan: "+plan.name:"";
-  $("fileind").textContent=cl?"☁ Google Drive"+(idx.email?": "+idx.email:"")+" · Ordner „"+FOLDER+"“":"📱 Nur auf diesem Gerät gespeichert";
+  $("pname").innerHTML=plan?"📋 "+pName(plan,e&&e.debug)+" ▾":"";
+  $("planind").innerHTML=plan?"Trainingsplan: "+pName(plan,e&&e.debug):"";
+  $("fileind").textContent=cl?"Speicherort: Google Drive"+(idx.email?" ("+idx.email+")":"")+", Ordner „"+FOLDER+"“":"Speicherort: nur dieses Gerät";
 }
 setInterval(renderSync,30e3);
 $("sst").onclick=()=>{
@@ -526,10 +527,28 @@ const BB=svgI('<path fill="currentColor" d="M1.5 10h2V8H6v8H3.5v-2h-2zM7 5.5h3v1
 const FL=svgI('<path fill="currentColor" fill-rule="evenodd" d="M12 1c.9 3.4 4.4 5.4 5.6 8.8.7-.9 1-2 .9-3.3 2.3 2.1 3.5 5 3.5 7.7A10 10 0 0 1 2 14.2c0-3.3 1.8-6 3.8-7.8-.1 1.8.4 3.1 1.4 4.1.4-4.4 2.6-6.9 4.8-9.5zM12 21a3.7 3.7 0 0 0 3.7-3.7c0-2.3-1.9-3.6-2.8-5.8-1.5 1.7-4.6 3.5-4.6 5.8A3.7 3.7 0 0 0 12 21z"/>');
 const NB=s=>svgI('<path d="M4.5 4h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4h-1A1.5 1.5 0 0 1 3 14.5v-9A1.5 1.5 0 0 1 4.5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7.5 8.5h9M7.5 12h5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',s);
 const CK=s=>svgI('<circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9.5v4.5l3 2M9.5 2.5h5M12 2.5v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',s);
-$("nbtn").innerHTML=NB(22);$("tbtn").innerHTML=CK(22);
+$("nbtn").innerHTML=NB(22);$("tbtn").innerHTML=CK(22);$("tico").innerHTML=CK(20);
+// weitere einfarbige Piktogramme: Statuszeile und Auswertungen (Regel: keine bunten Emojis, Ausnahmen siehe CLAUDE.md)
+const sI=(d,s)=>svgI(`<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</g>`,s);
+const ICO={
+  cloud:sI('<path d="M7 18.5h10a4 4 0 0 0 .4-8 6 6 0 0 0-11.5 1A3.6 3.6 0 0 0 7 18.5z"/>',14),
+  warn:sI('<path d="M12 3.5 2.5 20h19zM12 10v4.5M12 17.3v.2"/>',14),
+  cal:sI('<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
+  ov:sI('<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'),
+  rec:sI('<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3.5 4M16 6h3a3 3 0 0 1-3.5 4M12 13v4M8.5 20.5h7M10 17h4v3.5h-4z"/>'),
+  reg:sI('<path d="M4.5 10a7.5 7.5 0 0 1 13-3.5L20 9M19.5 14a7.5 7.5 0 0 1-13 3.5L4 15M20 4v5h-5M4 20v-5h5"/>'),
+  w:sI('<path d="M3.5 3.5v17h17M7.5 15l4-5 3 3 5-6"/>'),
+  e1:BB,
+  vol:sI('<path d="M3.5 20.5h17M6.5 17v-4M10.5 17V8M14.5 17v-6M18.5 17V5"/>'),
+  rp:sI('<path d="M9.5 3.5 7.5 20.5M16.5 3.5l-2 17M4.5 8.5h16M3.5 15.5h16"/>')
+};
+document.querySelectorAll("#avb button[data-v]").forEach(b=>{b.innerHTML=ICO[b.dataset.v]+" "+esc(b.textContent.replace(/^\S+\s/,""))});
+$("ausw").querySelector("summary").innerHTML=ICO.vol+" Auswertungen";
 // ---------- Debug-Modus: Käfer hinter der Versionsnummer (ⓘ-Menü); lange drücken = Debug-Plan mit Beispieldaten ----------
 const BUG=svgI('<ellipse cx="12" cy="14.5" rx="5.5" ry="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v13M9 7.5a3 3 0 0 1 6 0M9.6 5 8 3M14.4 5 16 3M6.5 12H3M6.5 16H3.2M7.3 19.3 5 21M17.5 12H21M17.5 16h3.3M16.7 19.3 19 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',15);
-$("ver").innerHTML=`Version ${VERSION} <button type="button" class="ico" id="dbg" title="Debug: lange drücken legt einen Test-Plan an" aria-label="Debug-Modus">${BUG}</button><span id="dbgh" hidden> Debug: lange drücken legt den Plan „🐞 Debug-WKM“ mit Beispieldaten an – nur auf diesem Gerät, deine Pläne bleiben unberührt.</span>`;
+$("ver").innerHTML=`Version ${VERSION} <button type="button" class="ico" id="dbg" title="Debug: lange drücken legt einen Test-Plan an" aria-label="Debug-Modus">${BUG}</button><span id="dbgh" hidden> Debug: lange drücken legt den Plan „Debug-WKM“ mit Beispieldaten an – nur auf diesem Gerät, deine Pläne bleiben unberührt.</span>`;
+// Planname für die Anzeige (Debug-Plan mit einfarbigem Käfer davor)
+const pName=(p,dbg)=>(dbg?BUG+" ":"")+esc(p.name);
 const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 // ca. 46 Beispiel-Einträge (WKM) über gut ein halbes Jahr bis vorgestern: Steigerung, Deload, Plateau, Lücke,
 // Klimmzüge von Körpergewicht bis +2,5 kg, Notizen, bearbeitete Einträge, ein gelöschter Eintrag, krumme Gewichte (Scheibenrechner)
@@ -556,12 +575,12 @@ function demoData(){
   out.push({id:"demoDel",date:out[20].date.slice(0,8)+"28",unit:1,ex:{"Kniebeugen":"20x5-5-5"},ts:Date.now()-864e5,del:true}); // Löschmarkierung
   return out;
 }
-// Debug-Plan: eigener Plan „🐞 Debug-WKM“, nur auf diesem Gerät, wird nie nach Google Drive übertragen.
+// Debug-Plan: eigener Plan „Debug-WKM“ (mit Käfer-Symbol), nur auf diesem Gerät, wird nie nach Google Drive übertragen.
 // Erneuter langer Druck setzt ihn auf die Beispieldaten zurück.
 function demoLoad(){
   if(editId!==null){editId=null;$("unit").disabled=false;$("editbar").hidden=true;$("cancel").hidden=true;$("editbar").parentElement.classList.remove("editing");$("save").textContent="Speichern"}
   removeLocal("debug");
-  newPlan({...WKM_PLAN,name:"🐞 Debug-WKM"},demoData().sort(cmp),{id:"debug",debug:true});
+  newPlan({...WKM_PLAN,name:"Debug-WKM"},demoData().sort(cmp),{id:"debug",debug:true});
   $("infp").hidden=true;init();toast("Debug-Plan mit Beispieldaten angelegt – nur auf diesem Gerät.");
 }
 {
@@ -1143,18 +1162,18 @@ function planRows(act){
     const on=plan&&p.id===plan.id,loc=!!readDoc(p.id);
     const inf=[p.n!=null?`${p.n} ${p.n===1?"Eintrag":"Einträge"}`:"",p.last?"zuletzt "+fmt(p.last):"",
       p.debug||idx.mode!=="cloud"?"nur auf diesem Gerät":!loc?"noch nicht auf diesem Gerät geladen":""].filter(Boolean).join(" · ");
-    return `<button type="button" class="pl${on?" on":""}${act==="del"?" dl":""}" data-pid="${p.id}" data-pa="${act}"><b>${esc(p.name)}${on?" ✓":""}</b><small>${inf||"noch keine Einträge"}</small></button>`}).join("");
+    return `<button type="button" class="pl${on?" on":""}${act==="del"?" dl":""}" data-pid="${p.id}" data-pa="${act}"><b>${pName(p,p.debug)}${on?" ✓":""}</b><small>${inf||"noch keine Einträge"}</small></button>`}).join("");
 }
 function pmOpen(v){$("pm").hidden=false;pmView(v||"main")}
 function pmClose(){$("pm").hidden=true}
 function pmView(v){
   const b=$("pmb"),cl=idx.mode==="cloud",back=`<button class="sec" data-pm="main">Zurück</button>`;
-  if(v==="main")b.innerHTML=`<button data-pm="load" style="margin-top:0">1 · Bestehenden Plan laden</button><button class="sec" data-pm="new">2 · Neuen Plan erstellen</button><button class="sec" data-pm="del">3 · Plan löschen</button>`
-    +`<div class="sub">Speicherung</div><p class="mu" style="margin:0">${cl?`☁ Google Drive${idx.email?" ("+esc(idx.email)+")":""}, Ordner „${FOLDER}“ – eine Datei pro Plan, automatisch abgeglichen.`:"📱 Nur auf diesem Gerät – keine automatische Sicherung."}</p>`
+  if(v==="main")b.innerHTML=`<div class="sub" style="margin-top:0">Plan wechseln (antippen)</div>`+planRows("open")
+    +`<button data-pm="new">＋ Neuen Plan erstellen</button><button class="sec" data-pm="del">Plan löschen</button>`
+    +`<div class="sub">Speicherung</div><p class="mu" style="margin:0">${cl?`Google Drive${idx.email?" ("+esc(idx.email)+")":""}, Ordner „${FOLDER}“ – eine Datei pro Plan, automatisch abgeglichen.`:"Nur auf diesem Gerät – keine automatische Sicherung."}</p>`
     +(!cl&&cloudOk()?`<button data-pm="connect">Mit Google Drive verbinden</button>`:"")
     +(!cl?`<button class="sec" data-pm="backup">Sicherungskopie teilen</button><button class="sec" data-pm="restore">Sicherung einspielen</button>`:"")
-    +`<button class="sec dng" data-pm="wipe">Von diesem Gerät entfernen</button>`;
-  else if(v==="load")b.innerHTML=`<div class="sub" style="margin-top:0">Bestehenden Plan laden</div>`+planRows("open")+back;
+    +`<button class="sec dng" data-pm="wipe">${cl?"Lokale Daten löschen &amp; Google trennen":"Lokale Daten löschen"}</button>`;
   else if(v==="new")b.innerHTML=`<div class="sub" style="margin-top:0">Neuen Plan erstellen</div><button data-pm="nwkm" style="margin-top:0">WKM <small>(2 Einheiten mit je 3 Übungen)</small></button><button class="sec" data-pm="nind">Individuell</button><button class="sec" data-pm="copy">Aus bestehendem Plan übernehmen</button><p class="mu">„Übernehmen“ kopiert Übungen, Sätze und Pausen eines Plans – die Trainingseinträge nicht.</p>`+back;
   else if(v==="copy")b.innerHTML=`<div class="sub" style="margin-top:0">Welchen Plan übernehmen?</div>`+planRows("copy")+`<button class="sec" data-pm="new">Zurück</button>`;
   else if(v==="del")b.innerHTML=`<div class="sub" style="margin-top:0">Welchen Plan löschen?</div>`+planRows("del")+back;
@@ -1191,7 +1210,7 @@ function delPlan(id){
   if(!navigator.onLine)return toast("Zum Löschen wird eine Internetverbindung benötigt.");
   auth().then(()=>DRV.trash(e.fileId)).then(fin).catch(x=>toast("Löschen fehlgeschlagen: "+x.message));
 }
-// Von diesem Gerät entfernen: löscht nur die Kopien auf dem Gerät (vorher synchronisieren), Google Drive bleibt unverändert
+// „Lokale Daten löschen & Google trennen“: löscht nur die Kopien auf dem Gerät (vorher synchronisieren), Google Drive bleibt unverändert
 function wipe(){
   if(idx.mode==="cloud"&&anyDirty()){
     if(!navigator.onLine)return alert("Es gibt noch Änderungen, die nicht in Google Drive gespeichert sind, und keine Internetverbindung.\n\nBitte erst mit Verbindung synchronisieren – sonst gingen sie verloren.");

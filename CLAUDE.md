@@ -12,7 +12,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 
 ## Versionierung
 - Konstante `const VERSION="…"` in `index.html`, angezeigt im ⓘ-Menü.
-- Aktuell: **0.92** (Testversion PWA + Drive-Sync). Vom Nutzer bestätigt: Google-Anmeldung in der installierten Android-App, Offline-Speichern mit automatischem Nachholen, Anmeldung am PC im Browser und Synchronisierung Handy ↔ PC in beide Richtungen. Offen bis 1.0: Test auf dem iPhone (Safari + installierte App; Nutzer testet später), stilles Erneuern nach > 1 h. **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
+- Aktuell: **0.93** (Testversion PWA + Drive-Sync). Vom Nutzer bestätigt: Google-Anmeldung in der installierten Android-App, Offline-Speichern mit automatischem Nachholen, Anmeldung am PC im Browser und Synchronisierung Handy ↔ PC in beide Richtungen. Offen bis 1.0: Test auf dem iPhone (Safari + installierte App; Nutzer testet später), stilles Erneuern nach > 1 h. **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
 - Wenn der Nutzer „gleiche Versionsnummer“ sagt, Version nicht erhöhen.
 - Bei jeder Version: `VERSION` und `CACHE` in `sw.js` anpassen, README aktualisieren (Versionszeile + „## Versionen“ + betroffene Abschnitte).
 - Vor größeren Umbauten: Konzept/Optionen knapp vorlegen und nachfragen.
@@ -24,7 +24,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 - **Google-Zugang:** Im Browser-Tab GIS-Token-Client (Popup; Erneuern über `kick()` nach Speichern/Löschen oder Tipp auf die Statuszeile). In der **installierten App** (`appMode()` = `display-mode: standalone` oder `navigator.standalone`) **immer Weiterleitung** mit `#access_token` (State in `localStorage.ttb_st`, Rücksprung-Aktion in `sessionStorage.ttb_after`) – das GIS-Popup bleibt dort auf Android in einem Overlay weiß hängen (vom Nutzer gemeldet, 0.91). `silentRenew()`: beim Start und beim Zurückkehren still per `prompt=none` erneuern, nur wenn nichts eingegeben ist, höchstens alle 30 min (`ttb_silent`). Zugang ~1 h; ohne Zugang arbeitet alles lokal weiter. Ein eigener Server (z. B. Cloudflare Worker für Dauerzugang) ist als **spätere Ausbaustufe** vorgesehen.
 - `CLIENT_ID` oben im Speicher-Abschnitt von `index.html` (Google-Cloud-Projekt „TTB Trainingstagebuch“ des Nutzers, Client „TTB Web“; erlaubte Quellen `https://sirdenec-blip.github.io` und `http://localhost:8765`). Status bei Google: „Testen“ – nur eingetragene Testnutzer können sich anmelden. Leer = nur „Ohne Cloud“ möglich.
 - Im Browser-Pane von Claude öffnet sich das Google-Anmeldefenster nicht (Popups nur nach echtem Nutzerklick) – echte Anmeldung testet der Nutzer.
-- **Datenschutz-Regeln:** Löschen eines Plans = Drive-Papierkorb (30 Tage). In Drive gelöschte Pläne werden lokal entfernt (vorher Rückfrage, falls offline geändert). „Von diesem Gerät entfernen“ synchronisiert vorher (offline verweigert) und löscht nur `ttb_*`. Debug-Plan (`id:"debug"`) wird **nie** hochgeladen. In Drive wird nie automatisch etwas gelöscht.
+- **Datenschutz-Regeln:** Löschen eines Plans = Drive-Papierkorb (30 Tage). In Drive gelöschte Pläne werden lokal entfernt (vorher Rückfrage, falls offline geändert). „Lokale Daten löschen & Google trennen“ synchronisiert vorher (offline verweigert) und löscht nur `ttb_*`. Debug-Plan (`id:"debug"`) wird **nie** hochgeladen. In Drive wird nie automatisch etwas gelöscht.
 - Keine Rückwärtskompatibilität zu Ständen vor 0.90 nötig (laut Nutzer keine echte Nutzung davor); alte Schlüssel `trainingsplan_v1/_plan_v1/_file` werden beim Start entfernt.
 
 ## Datenmodell
@@ -37,12 +37,15 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 
 ## Wichtige Regeln (vom Nutzer festgelegt)
 - **Start:** „Mit Google Drive starten“ (Standard, groß) → vorhandene Pläne wählen (bei genau einem direkt öffnen) oder Plan anlegen (WKM/Individuell). „Ohne Cloud nutzen“ nur als kleiner Link mit vorherigem Hinweis-Popup zu den Grenzen; später verbindbar (gleichnamige Pläne werden zusammengeführt).
-- **Plan wechseln** (Knopf unten und Planname unter dem Titel): 1. Bestehenden Plan laden, 2. Neuen Plan erstellen (WKM / Individuell / Aus bestehendem Plan übernehmen = Übungen ohne Einträge), 3. Plan löschen (Bestätigung). Dazu „Von diesem Gerät entfernen“; im lokalen Modus „Sicherungskopie teilen“/„Sicherung einspielen“.
+- **Plan wechseln** (Knopf unten und Planname unter dem Titel): oben direkt die **Liste aller Pläne** (antippen = wechseln), darunter „＋ Neuen Plan erstellen“ (WKM / Individuell / Aus bestehendem Plan übernehmen = Übungen ohne Einträge) und „Plan löschen“ (Bestätigung). Unten „Lokale Daten löschen & Google trennen“ (lokaler Modus: „Lokale Daten löschen“); im lokalen Modus zusätzlich „Sicherungskopie teilen“/„Sicherung einspielen“.
+- Debug-Plan heißt „Debug-WKM“; der Käfer wird nur als Symbol davor angezeigt (`pName()`), nicht im Namen gespeichert.
 - **Statuszeile** unter dem Titel statt Export-Erinnerung (gespeichert / offline / Verbindung erneuern / nur auf diesem Gerät).
 - **Kein Ton / keine akustische Benachrichtigung** (ausdrücklicher Nutzerwunsch). Timer-Ende: grüne Leiste + Vibration (Android).
 - Datum = heute, Einheit = nächste im Wechsel, bei jeder Aktualisierung.
 - Verlauf: so viele Einträge sichtbar wie Einheiten (je Einheit der neueste), Rest unter „Ältere Einträge“ (angeheftet). Filter „Alle · E1 · E2 …“ (dann nur 1 sichtbar), Ansicht „Kompakt“ (Standard, Bubbles `.bb`, Name wird gekürzt) / „Ausführlich“. Notiz: Eingabe nur Symbol (klappt Feld aus), Verlauf kompakt 💬 zum Antippen.
-- Symbole im Eingabeformular (Flamme, Hantel, Notiz, Uhr, Käfer) sind **einfarbige Inline-SVGs** (`currentColor`); aktiv = voll, inaktiv = blass.
+- **Standard für Logos und Piktogramme: einfarbig** als Inline-SVG mit `currentColor` (passt sich hell/dunkel an), keine bunten Emojis – auch keine Zeichen wie ☁ ⚠ ⏱ 🐞 📱, die Android bunt darstellt. Vorhandene Sammlung: `svgI`/`sI`, `BB`, `FL`, `NB`, `CK`, `BUG`, `ICO.{cloud,warn,cal,ov,rec,reg,w,e1,vol,rp}`. Aktiv = volle Deckkraft, inaktiv = blass.
+  - **Ausnahmen** (vom Nutzer festgelegt): 🏆 Pokale (Bestwerte), 💬 Notiz-Symbol im Verlauf/Archiv, 📋 vor dem Plannamen in der Statusleiste oben. Texte in System-Dialogen (`confirm`/`alert`) sind ebenfalls ausgenommen.
+  - Das Feuerfuchs-Logo ist als einziges Bild farbig.
 - Trainingshelfer: Satz-Pausentimer, Leiste immer **oben** (`--tb`, Scroll-Versatz ausgeglichen). Uhr-Knopf: kurz = an/aus, lang (0,5 s) = freier Timer (±0:15/±0:30, Start → Pause → Weiter, „Zeit abgelaufen“). Aufwärmsätze 40/60/80 % (2,5-kg-Raster), Scheibenrechner (20-kg-Stange), Wake Lock.
 - **Debug-Modus:** Käfer hinter der Versionsnummer (ⓘ); lange drücken (1 s) legt Plan „🐞 Debug-WKM“ mit `demoData()` (~46 Einträge) **nur lokal** an und wechselt dorthin; keine Auswirkung auf echte Pläne.
 - Logo „Feuerfuchs“ als Inline-SVG-`<symbol id="lg">` (Rugbyball aubergine `#4b2142`), auch Favicon und App-Icons.

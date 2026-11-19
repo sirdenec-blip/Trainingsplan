@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.92** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.93** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -36,11 +36,11 @@ Danach erscheint „TTB“ mit dem Feuerfuchs-Symbol auf dem Startbildschirm, oh
 
 ## Trainingspläne verwalten
 Der aktive Plan steht unter dem Titel (antippen) und unten gibt es **⇄ Plan wechseln**:
-1. **Bestehenden Plan laden:** Liste aller Pläne mit Anzahl Einträge und letztem Training.
-2. **Neuen Plan erstellen:** *WKM*, *Individuell* (Plan-Assistent) oder *Aus bestehendem Plan übernehmen* – kopiert Übungen, Sätze und Pausen, nicht die Trainingseinträge; danach öffnet sich der Assistent zum Anpassen (mindestens der Name).
-3. **Plan löschen:** mit Bestätigung. Im Cloud-Modus wandert die Datei in den **Papierkorb von Google Drive** (30 Tage wiederherstellbar) und der Plan verschwindet auf allen Geräten.
+- Oben direkt die **Liste aller Pläne** mit Anzahl Einträge und letztem Training – antippen wechselt sofort.
+- **＋ Neuen Plan erstellen:** *WKM*, *Individuell* (Plan-Assistent) oder *Aus bestehendem Plan übernehmen* – kopiert Übungen, Sätze und Pausen, nicht die Trainingseinträge; danach öffnet sich der Assistent zum Anpassen (mindestens der Name).
+- **Plan löschen:** mit Bestätigung. Im Cloud-Modus wandert die Datei in den **Papierkorb von Google Drive** (30 Tage wiederherstellbar) und der Plan verschwindet auf allen Geräten.
 
-Außerdem im selben Menü: **Von diesem Gerät entfernen** – löscht nur die Kopien auf dem Gerät und trennt die Google-Verbindung (vorher wird synchronisiert; ohne Verbindung wird das Entfernen verweigert, damit nichts verloren geht). In Google Drive bleibt alles erhalten. Im Modus ohne Cloud zusätzlich **Sicherungskopie teilen** und **Sicherung einspielen**.
+Außerdem im selben Menü: **Lokale Daten löschen & Google trennen** – löscht nur die Kopien auf dem Gerät und trennt die Google-Verbindung (vorher wird synchronisiert; ohne Verbindung wird das verweigert, damit nichts verloren geht). In Google Drive bleibt alles erhalten. Im Modus ohne Cloud heißt der Knopf „Lokale Daten löschen“; zusätzlich gibt es **Sicherungskopie teilen** und **Sicherung einspielen**.
 
 Plannamen sind eindeutig.
 
@@ -91,7 +91,7 @@ Sichtbar sind so viele Einträge, wie der Plan Einheiten hat (je Einheit der neu
 **Verläufe pro Übung:** 📈 Gewicht · 🧮 1RM geschätzt (Epley: Gewicht × (1 + Wdh./30)) · 📊 Volumen pro Woche · 🔢 Wiederholungen. Antippen eines Punkts oder Balkens zeigt Datum und Wert.
 
 ## Debug-Modus
-Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücken** (1 Sekunde) legt den Plan **„🐞 Debug-WKM“** mit ca. 46 Beispiel-Einträgen an (Steigerung, Deload, Plateau, Lücke, Klimmzüge bis +2,5 kg, krumme Gewichte, Notizen, bearbeitete und gelöschte Einträge) und wechselt dorthin. Er liegt **nur auf diesem Gerät**, wird nie nach Google Drive übertragen und lässt deine Pläne unberührt. Erneuter langer Druck setzt ihn zurück; entfernen über „Plan löschen“.
+Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücken** (1 Sekunde) legt den Plan **„Debug-WKM“** (mit Käfer-Symbol) mit ca. 46 Beispiel-Einträgen an (Steigerung, Deload, Plateau, Lücke, Klimmzüge bis +2,5 kg, krumme Gewichte, Notizen, bearbeitete und gelöschte Einträge) und wechselt dorthin. Er liegt **nur auf diesem Gerät**, wird nie nach Google Drive übertragen und lässt deine Pläne unberührt. Erneuter langer Druck setzt ihn zurück; entfernen über „Plan löschen“.
 
 ## Technik
 - `index.html` (App), `manifest.webmanifest` und `icons/` (Installation als „TTB“), `sw.js` (Service Worker für den Offline-Betrieb).
@@ -99,6 +99,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.93:** Planmenü zeigt die Pläne direkt als Liste zum schnellen Wechseln, Knopf „Lokale Daten löschen & Google trennen“, einfarbige Symbole auch für Debug-Plan, Auswertungen, Statuszeile und Timer.
 - **0.92:** Bugfix: In der installierten App blieb die Google-Anmeldung auf einer weißen Seite hängen. Jetzt Anmeldung per Weiterleitung, abgelaufener Zugang wird beim Öffnen/Zurückkehren still erneuert.
 - **0.91:** Google-Anbindung aktiviert (OAuth-Client-ID eingetragen). Anmeldung zunächst nur für eingetragene Testnutzer.
 - **0.90:** Testversion mit neuer Speicherung: Google Drive als Hauptspeicher (Ordner „Trainingstagebuch“, eine Datei pro Plan, automatischer Abgleich, offline nutzbar), mehrere Trainingspläne (laden, neu erstellen, aus bestehendem Plan übernehmen, löschen), Modus „Ohne Cloud“ als Nebenweg, installierbar als App „TTB“ (Android und iPhone), Debug-Plan nur auf dem Gerät. Datei-Export/-Import und Export-Erinnerung entfallen.
