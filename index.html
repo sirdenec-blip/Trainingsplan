@@ -107,13 +107,17 @@ h1.lg{display:flex;align-items:center;gap:8px}.logo{width:34px;height:34px;flex:
 .nrow textarea{flex:1;font:inherit;font-size:.95rem;padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);resize:vertical}
 .hbar{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 10px}.hbar .vbs button{padding:4px 10px}
 .cl{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:4px 0;border-top:1px solid var(--bd);font-size:.9rem;font-variant-numeric:tabular-nums}.h+.cl{border-top:0}
-.cn{color:var(--mu);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cv{white-space:nowrap;text-align:right}.cv b{font-weight:600}.cv small{color:var(--mu);font-size:.75rem}
+.cn{color:var(--mu);min-width:4.5em;flex:1 1 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cv{flex:0 1 auto;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:3px;white-space:nowrap}.cv small{color:var(--mu);font-size:.72rem;margin:0 2px}.cv .df{margin:0 3px 0 0}
+.bb{background:var(--bg);border:1px solid var(--bd);border-radius:8px;min-width:18px;padding:0 4px;font-size:.78rem;line-height:1.45;text-align:center}.bb.kg{font-weight:600;margin-right:2px}
 .card.cmp{padding:10px 14px}.card.cmp.ref{padding:9px 13px}.card.cmp .h{margin-bottom:2px}
 .nt{color:var(--mu);font-size:.85rem;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}
-#tbar .tr1{display:flex;align-items:center;gap:10px}#tbar .tr2{display:flex;gap:6px}#tbar .tr2[hidden]{display:none}#tbar .tr2 button{flex:1;padding:6px 0}body.tmf{padding-bottom:132px}
-#tbar{position:fixed;left:0;right:0;bottom:0;z-index:8;display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--ac);box-shadow:0 -4px 14px rgba(0,0,0,.18)}#tbar[hidden]{display:none}
+#tbar .tr1{display:flex;align-items:center;gap:10px}#tbar .tr2{display:flex;gap:6px}#tbar .tr2[hidden]{display:none}#tbar .tr2 button{flex:1;padding:6px 0}
+/* Timerleiste oben (unten verdeckt die Handy-Tastatur); --tb = Höhe der Leiste, Platz wird oben freigehalten */
+#tbar{position:fixed;left:0;right:0;top:0;z-index:8;display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--card);border-bottom:2px solid var(--ac);box-shadow:0 4px 14px rgba(0,0,0,.18)}#tbar[hidden]{display:none}
+body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--tb,0px) + 8px)}details.old>summary{top:calc(env(safe-area-inset-top,0px) + var(--tb,0px))}
 #tbar b{font-size:1.4rem;font-variant-numeric:tabular-nums}#tbar small{flex:1;min-width:0;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#tbar button{width:auto;margin:0;padding:6px 12px}#tbar.fin{background:var(--ac);color:#fff}#tbar.fin small{color:#fff}body.tmo{padding-bottom:84px}
+#tbar button{width:auto;margin:0;padding:6px 12px}#tbar.fin{background:var(--ac);color:#fff}#tbar.fin small{color:#fff}
 #v-oth{position:relative}.ch .hit{fill:transparent;cursor:pointer}.ch circle.on{r:5px;stroke:var(--tx);stroke-width:1.5}.ch rect.on{fill:var(--ye)}
 .ctip{position:absolute;z-index:5;pointer-events:none;background:var(--card);border:1px solid var(--bd);border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.25);padding:4px 8px;font-size:.8rem;white-space:nowrap}
 .hbar[hidden],.aux[hidden]{display:none}
@@ -232,7 +236,7 @@ h1.lg{display:flex;align-items:center;gap:8px}.logo{width:34px;height:34px;flex:
 </div>
 
 <script>
-const VERSION="0.51";
+const VERSION="0.52";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -372,7 +376,7 @@ $("file").onchange=e=>{
   }catch(x){if(mode==="start")stm("Fehler: "+(x.message||x));else exm("Fehler: "+(x.message||x),1)}};
   r.readAsText(f);e.target.value="";
 };
-$("ver").textContent="Version "+VERSION;renderFile();
+renderFile();
 $("exr").onclick=()=>$("tag").click();
 $("fav").href="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'+$("lg").innerHTML+"</svg>");
 // Ansicht des Verlaufs (Filter nach Einheit, Kompakt/Ausführlich) merken
@@ -406,6 +410,48 @@ const FL=svgI('<path fill="currentColor" fill-rule="evenodd" d="M12 1c.9 3.4 4.4
 const NB=s=>svgI('<path d="M4.5 4h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4h-1A1.5 1.5 0 0 1 3 14.5v-9A1.5 1.5 0 0 1 4.5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7.5 8.5h9M7.5 12h5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',s);
 const CK=s=>svgI('<circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9.5v4.5l3 2M9.5 2.5h5M12 2.5v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',s);
 $("nbtn").innerHTML=NB(22);$("tbtn").innerHTML=CK(22);
+// ---------- Debug-Modus: Käfer hinter der Versionsnummer (ⓘ-Menü); lange drücken = Beispieldaten laden ----------
+const BUG=svgI('<ellipse cx="12" cy="14.5" rx="5.5" ry="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v13M9 7.5a3 3 0 0 1 6 0M9.6 5 8 3M14.4 5 16 3M6.5 12H3M6.5 16H3.2M7.3 19.3 5 21M17.5 12H21M17.5 16h3.3M16.7 19.3 19 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',15);
+$("ver").innerHTML=`Version ${VERSION} <button type="button" class="ico" id="dbg" title="Debug: lange drücken lädt Beispieldaten" aria-label="Debug-Modus">${BUG}</button><span id="dbgh" hidden> Debug: lange drücken lädt Beispieldaten</span>`;
+const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+// ca. 46 Beispiel-Einträge (WKM) über gut ein halbes Jahr bis vorgestern: Steigerung, Deload, Plateau, Lücke,
+// Klimmzüge von Körpergewicht bis +2,5 kg, Notizen, bearbeitete Einträge, ein gelöschter Eintrag, krumme Gewichte (Scheibenrechner)
+function demoData(){
+  const N=46,dates=[],d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-2);
+  for(let k=0;k<N;k++){dates.unshift(isoD(d));d.setDate(d.getDate()-(k===24?10:k%2?4:3))}
+  const r125=x=>Math.round(x/1.25)*1.25,r25=x=>Math.round(x*4)/4,REPS=[[8,8,8],[8,8,7],[8,7,6],[9,8,8],[8,8,8],[7,7,6]];
+  const NOTES={3:"Schulter zwickt",12:"Schlecht geschlafen",26:"Deload-Woche nach der Pause",33:"Neuer Rekord beim Kreuzheben!",44:"Knie leicht gereizt, Tiefe reduziert"};
+  const out=dates.map((date,i)=>{
+    const u=i%2+1,p=Math.floor(i/2),pe=p>=12&&p<=13?p-3:p>=17&&p<=19?17:p; // Deload nach der Lücke, Plateau
+    const rp=REPS[(i*5)%REPS.length].join("-"),v=(b,inc,r)=>String(r(b+inc*pe))+"x"+rp;
+    let ex;
+    if(u===1)ex={"Kniebeugen":v(60,2.5,r125),"Bankdrücken":v(50,1.25,r125),"Vorgebeugtes Rudern":v(45,1.25,r125)};
+    else{
+      const tot=Math.min(30,9+p),first=Math.min(12,5+Math.floor(p/3)),sets=[];let s=0,c=first;
+      while(s<tot){const x=Math.max(1,Math.min(c,tot-s));sets.push(x);s+=x;c=Math.max(1,c-2)}
+      ex={"Kreuzheben":v(80,2.5,r125),"Overhead-Press":v(30,0.75,r25),"Klimmzüge":(p>=16?"2.5":"0")+"x"+sets.join("-")};
+    }
+    const ts=Date.parse(date+"T19:00"),o={id:"demo"+i,date,unit:u,ex,ts};
+    if(NOTES[i])o.note=NOTES[i];
+    if(i===8||i===30){o.ts+=2*864e5;o.ed=true}
+    return o;
+  });
+  out.push({id:"demoDel",date:out[20].date.slice(0,8)+"28",unit:1,ex:{"Kniebeugen":"20x5-5-5"},ts:Date.now()-864e5,del:true}); // Löschmarkierung
+  return out;
+}
+function demoLoad(){
+  if(!confirm("⚠ Debug: Beispieldaten laden?\n\nTrainingsplan und ALLE Einträge im Browser werden gelöscht – auch Änderungen, die noch nicht exportiert wurden – und durch einen WKM-Plan mit ca. 46 Beispiel-Einträgen ersetzt.\nDie Datei auf deinem Gerät wird NICHT verändert.\n\nFortfahren?"))return;
+  try{[KEY,PKEY,FKEY].forEach(k=>localStorage.removeItem(k))}catch(e){}
+  plan=JSON.parse(JSON.stringify(WKM_PLAN));plan.ts=Date.now()-1e3;data=demoData().sort(cmp);
+  savePlan();persist();setFile("Beispieldaten (Debug)","geladen");location.reload();
+}
+{
+  const b=$("dbg");let t=null,lp=false;
+  b.addEventListener("pointerdown",()=>{lp=false;clearTimeout(t);t=setTimeout(()=>{lp=true;demoLoad()},1000)});
+  ["pointerup","pointerleave","pointercancel"].forEach(x=>b.addEventListener(x,()=>clearTimeout(t)));
+  b.addEventListener("contextmenu",e=>e.preventDefault());
+  b.onclick=()=>{if(lp){lp=false;return}$("dbgh").hidden=!$("dbgh").hidden};
+}
 const kgf=x=>String(Math.round(x*100)/100).replace(".",",");
 function warmHtml(w){
   if(!(w>BAR))return FL+" Aufwärmen: erst ab einem Arbeitsgewicht über 20 kg.";
@@ -494,7 +540,7 @@ function commit(i){
 // ---------- Pausentimer (startet nach jedem Satz; nach dem letzten Satz der letzten Übung nicht) ----------
 // tm.mode: "set" = Satzpause (automatisch), "free" = freier Timer (langer Druck auf die Uhr)
 let tm=null;
-const restOf=e=>e.rest??(e.bw?0:120); // Standard: 2:00, Körpergewichtsübungen 0 (aus)
+const restOf=e=>e.rest??120; // Standard für alle Übungen 2:00 („Nur Gewicht“ hat keinen Satztimer)
 const fmtS=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
 function restAfter(i){const e=cur[i];if(i===cur.length-1&&e.s&&st[i].reps.length>=e.s){if(tm&&tm.mode==="set")tStop()}else tStart(e)}
 function tStart(e){
@@ -504,30 +550,42 @@ function tStart(e){
   tShow();tTick();wlOn();
 }
 function tFree(){tStop();tm={mode:"free",sec:120,run:false};tShow();$("tval").textContent=fmtS(tm.sec);wlOn()}
+// freier Timer: Zustände Einstellen (Start) → läuft (Pause) → pausiert (Weiter) → abgelaufen (Neu)
 function tShow(){
   const f=tm.mode==="free";
-  $("tnm").textContent=tm.fin?"":f?"Timer":tm.name;
-  $("tgo").hidden=!f||(tm.run&&!tm.fin);$("tgo").textContent=tm.fin?"Neu":"Start";
+  $("tnm").textContent=tm.fin?"":f?(tm.paused?"pausiert":"Timer"):tm.name;
+  $("tgo").hidden=!f;$("tgo").textContent=tm.fin?"Neu":tm.run?"Pause":tm.paused?"Weiter":"Start";
   $("t30").hidden=f;$("tadj").hidden=!f;
-  $("tbar").classList.toggle("fin",!!tm.fin);$("tbar").hidden=false;
-  document.body.classList.add("tmo");document.body.classList.toggle("tmf",f);
+  $("tbar").classList.toggle("fin",!!tm.fin);$("tbar").hidden=false;tPad();
+}
+// Platz oben für die Leiste freihalten, ohne dass der sichtbare Inhalt springt
+function tPad(){
+  const h=$("tbar").hidden?0:$("tbar").offsetHeight,old=tPad.h||0;if(h===old)return;
+  tPad.h=h;document.documentElement.style.setProperty("--tb",h+"px");if(scrollY>0)scrollBy(0,h-old);
 }
 function tTick(){
   if(!tm||!tm.run||tm.fin)return;
   const s=Math.ceil((tm.end-Date.now())/1e3);
   if(s>0){$("tval").textContent=fmtS(s);return}
-  clearInterval(tm.iv);tm.fin=true;$("tval").textContent=tm.mode==="free"?"Zeit abgelaufen":"Pause vorbei";tShow();
+  clearInterval(tm.iv);tm.fin=true;tm.run=false;$("tval").textContent=tm.mode==="free"?"Zeit abgelaufen":"Pause vorbei";tShow();
   try{if(navigator.vibrate)navigator.vibrate([400,200,400,200,400])}catch(x){}
   if(tm.mode==="set")tm.done=setTimeout(tStop,8000); // freier Timer bleibt stehen, bis ✕
 }
-function tStop(){if(tm){clearInterval(tm.iv);clearTimeout(tm.done)}tm=null;$("tbar").hidden=true;document.body.classList.remove("tmo","tmf")}
-function tRun(sec){clearInterval(tm.iv);clearTimeout(tm.done);tm.fin=false;tm.run=true;tm.end=Date.now()+sec*1e3;tm.iv=setInterval(tTick,250);tShow();tTick()}
+function tStop(){if(tm){clearInterval(tm.iv);clearTimeout(tm.done)}tm=null;$("tbar").hidden=true;tPad()}
+function tRun(sec){clearInterval(tm.iv);clearTimeout(tm.done);tm.fin=false;tm.paused=false;tm.run=true;tm.end=Date.now()+sec*1e3;tm.iv=setInterval(tTick,250);tShow();tTick()}
 $("t30").onclick=()=>{if(!tm)return;if(tm.fin)tRun(30);else{tm.end+=30e3;tTick()}};
-$("tgo").onclick=()=>{if(tm)tRun(tm.sec)};
+$("tgo").onclick=()=>{
+  if(!tm)return;
+  if(tm.fin)tRun(tm.sec);
+  else if(tm.run){tm.left=Math.max(1,Math.ceil((tm.end-Date.now())/1e3));clearInterval(tm.iv);tm.run=false;tm.paused=true;$("tval").textContent=fmtS(tm.left);tShow()}
+  else if(tm.paused)tRun(tm.left);
+  else tRun(tm.sec);
+};
 $("tadj").addEventListener("click",e=>{
   const b=e.target.closest("button[data-ad]");if(!b||!tm)return;const d=+b.dataset.ad;
-  if(tm.run&&!tm.fin){tm.end=Math.max(Date.now()+1e3,tm.end+d*1e3);tTick()}
-  else{tm.sec=Math.max(15,tm.sec+d);tm.run=false;tm.fin=false;$("tval").textContent=fmtS(tm.sec);tShow()}
+  if(tm.run){tm.end=Math.max(Date.now()+1e3,tm.end+d*1e3);tTick()}
+  else if(tm.paused){tm.left=Math.max(1,tm.left+d);$("tval").textContent=fmtS(tm.left)}
+  else{tm.sec=Math.max(15,tm.sec+d);tm.fin=false;$("tval").textContent=fmtS(tm.sec);tShow()}
 });
 $("tx").onclick=tStop;
 // Uhr-Knopf: kurz = Satzpausen an/aus (Standard an), lang (0,5 s) = freier Timer
@@ -889,8 +947,9 @@ function card(s,ref,rec){
   const body=Object.entries(s.ex).map(([k,v])=>{
     const i=exInfo(k,v,s.unit),hw=i.p.w!=null,di=hw?dinfo(+i.p.w,prevW(s,k)):null,df=di?`<small class="df ${di.c}">${di.t}</small>`:"",tr=rec.has(s.id+"|"+k)?" 🏆":"";
     if(cmp){
-      const val=i.pyr?`${i.pyr.r} Wdh. · <b>${i.pyr.ws.map(kgf).join(" ")}</b> kg`
-        :[hw&&!i.z?`<b>${i.kg}</b>${df}`:null,i.p.reps?i.p.reps.join(" ")+(i.sum!=null?` <small>Σ ${i.sum}</small>`:""):null].filter(Boolean).join(" · ")||"Körpergewicht";
+      const bb=(t,c)=>`<span class="bb${c?" "+c:""}">${t}</span>`;
+      const val=i.pyr?`<small>${i.pyr.r} Wdh.</small>${i.pyr.ws.map(x=>bb(kgf(x))).join("")}<small>kg</small>`
+        :((hw&&!i.z?bb(i.kg,"kg")+df:"")+(i.p.reps?i.p.reps.map(x=>bb(x)).join("")+(i.sum!=null?`<small>Σ ${i.sum}</small>`:""):""))||"Körpergewicht";
       return `<div class="cl"><span class="cn">${esc(k)}${tr}</span><span class="cv">${val}</span></div>`;
     }
     if(i.pyr)return `<div class="ex"><div class="en">${esc(k)}${tr}</div><div class="ln"><b>${i.pyr.r} Wdh.</b><div class="sets"><small>kg</small>${i.pyr.ws.map(x=>`<span>${String(x).replace(".",",")}</span>`).join("")}</div></div></div>`;
@@ -1008,7 +1067,7 @@ $("wzSave").onclick=()=>{
       if(e.m==="wr"&&e.bw)o.bw=true;
       if(e.m!=="w"&&e.max)o.max=e.max;
       if(e.m!=="w"&&e.goal)o.goal=e.goal;
-      if(e.m!=="w"&&e.rest!=null&&e.rest!==restOf(o))o.rest=e.rest; // Pause in Sekunden (Standard 120, Körpergewicht 0 = aus)
+      if(e.m!=="w"&&e.rest!=null&&e.rest!==restOf(o))o.rest=e.rest; // Pause in Sekunden (Standard 120, 0 = aus)
       exs.push(o);
     }
     if(!exs.length)return wzm(`Einheit ${a+1}: mindestens eine Übung eintragen.`);

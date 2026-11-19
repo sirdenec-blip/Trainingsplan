@@ -11,14 +11,14 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 
 ## Versionierung
 - Konstante `const VERSION="…"` im Script von `index.html`, angezeigt im ⓘ-Menü.
-- Aktuell: **0.51**. Jede neue Version erhöht um 0.01 (nächste: 0.52); größere Funktionspakete springen auf die nächste Zehnerstelle (0.50 …). **1.0** ist für eine mögliche Android-App/PWA vorgesehen.
+- Aktuell: **0.52**. Jede neue Version erhöht um 0.01 (nächste: 0.53); größere Funktionspakete springen auf die nächste Zehnerstelle (0.50 …). **1.0** ist für eine mögliche Android-App/PWA vorgesehen.
 - Wenn der Nutzer „gleiche Versionsnummer“ sagt, Version nicht erhöhen.
 - Bei jeder Version: `VERSION` anpassen, README aktualisieren (Versionszeile oben + Eintrag unter „## Versionen“ + betroffene Abschnitte).
 - Vor größeren Umbauten: knapp Optionen nennen und nachfragen, wenn der Nutzer „erst klären“ verlangt.
 
 ## Datenmodell
 - **Plan** (localStorage `trainingsplan_plan_v1`): `{name, ts, units:[{exs:[{n, m, s, bw?, max?, goal?, rest?}]}]}`, 1–6 Einheiten.
-  - `rest`: Pause in Sekunden für den Pausentimer (fehlt = Standard: 120, bei `bw` 0; 0 = aus). Gespeichert nur, wenn vom Standard abweichend. „Nur Gewicht“ (`m:"w"`) hat bewusst keine Pause (kein Satz-Ereignis, das den Timer starten könnte – vom Nutzer so entschieden).
+  - `rest`: Pause in Sekunden für den Pausentimer (fehlt = Standard 120 für **alle** Übungen inkl. Körpergewicht; 0 = aus). Gespeichert nur, wenn vom Standard abweichend. „Nur Gewicht“ (`m:"w"`) hat bewusst keine Pause (kein Satz-Ereignis, das den Timer starten könnte – vom Nutzer so entschieden).
   - `m`: `"wr"` Gewicht + Wdh. · `"w"` nur Gewicht · `"r"` nur Wdh. · `"p"` Pyramidensatz (feste Wdh., Gewicht je Satz).
   - `s`: Anzahl Sätze (0 = beliebig viele), `bw`: Körpergewichtsübung (Zusatzgewicht, beliebig viele Sätze).
   - Vorgabeplan **WKM**: Einheit 1 Kniebeugen, Bankdrücken, Vorgebeugtes Rudern; Einheit 2 Kreuzheben, Overhead-Press, Klimmzüge (bw, max 12 Wdh./Satz, Ziel 24).
@@ -38,9 +38,10 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 - „Alle Daten zurücksetzen“: löscht nur Browserdaten (mit Warnung), nie die Datei.
 - Datum = heute, Einheit = nächste im Wechsel (nach der Einheit des datumsmäßig letzten Eintrags), bei jeder Aktualisierung.
 - Verlauf: so viele Einträge sichtbar wie Einheiten im Plan (je Einheit der neueste), Rest unter „Ältere Einträge“ (angeheftete Leiste zum Einklappen).
-- Verlauf-Leiste: Filter „Alle · E1 · E2 …“ (bei gewählter Einheit nur **1** Eintrag sichtbar, Rest unter „Ältere Einträge“) und Ansicht „Kompakt“ (Standard, eine Zeile je Übung) / „Ausführlich“. Notiz: in der Eingabe nur Sprechblasen-Symbol (klappt Textfeld aus), im Verlauf kompakt als 💬-Emoji zum Antippen, ausführlich sichtbar.
+- Verlauf-Leiste: Filter „Alle · E1 · E2 …“ (bei gewählter Einheit nur **1** Eintrag sichtbar, Rest unter „Ältere Einträge“) und Ansicht „Kompakt“ (Standard, eine Zeile je Übung, kg und jeder Satz in kleinen Bubbles `.bb`; Werte haben Vorrang, Name wird gekürzt) / „Ausführlich“. Notiz: in der Eingabe nur Sprechblasen-Symbol (klappt Textfeld aus), im Verlauf kompakt als 💬-Emoji zum Antippen, ausführlich sichtbar.
 - Symbole im Eingabeformular (Flamme, Hantel, Notiz, Uhr) sind **einfarbige Inline-SVGs** (`currentColor`), keine bunten Emojis; aktiv = volle Deckkraft, inaktiv = blass.
-- Trainingshelfer: Satz-Pausentimer nach jedem Satz (Leiste unten, „Pause vorbei“, Vibration). Uhr-Knopf neben der Notiz: kurz = Satztimer an/aus (Standard an), lang (0,5 s) = freier Timer 2:00 mit −0:30/−0:15/+0:15/+0:30 und Start, Ende „Zeit abgelaufen“ (bleibt bis ✕); während der freie Timer läuft, startet kein Satztimer. Aufwärmsätze 40/60/80 % (auf 2,5 kg gerundet), Hantelsymbol = Scheibenrechner (immer 20-kg-Stange), Wake Lock während der Eingabe.
+- Trainingshelfer: Satz-Pausentimer nach jedem Satz („Pause vorbei“, Vibration). Timerleiste immer **oben** fixiert (unten verdeckt die Handy-Tastatur); `--tb` = Leistenhöhe, Platz oben wird freigehalten und der Scroll-Versatz ausgeglichen. Uhr-Knopf neben der Notiz: kurz = Satztimer an/aus (Standard an), lang (0,5 s) = freier Timer 2:00 mit −0:30/−0:15/+0:15/+0:30 und Start → Pause → Weiter, Ende „Zeit abgelaufen“ (bleibt bis ✕, „Neu“); während der freie Timer aktiv ist, startet kein Satztimer.
+- Debug-Modus: Käfer-Symbol hinter der Versionsnummer im ⓘ-Menü; lange drücken (1 s) → Warnung/Bestätigung → Browserdaten löschen und `demoData()` laden (WKM, ~46 Einträge bis vorgestern, deckt alle Funktionen ab; Datei-Anzeige „Beispieldaten (Debug)“). Für Browsertests kann man diese Funktion statt eigener Testdaten nutzen. Aufwärmsätze 40/60/80 % (auf 2,5 kg gerundet), Hantelsymbol = Scheibenrechner (immer 20-kg-Stange), Wake Lock während der Eingabe.
 - Export-Erinnerung unter der Titelleiste: ab **3** nicht exportierten Änderungen **oder** ≥ 1 Änderung und **1 Woche** seit letztem Export (ohne Export: seit ältester offener Änderung).
 - Vor einer Umsetzung, bei der eine Vorgabe des Nutzers technisch keine Wirkung hätte, kurz mit Begründung nachfragen (Nutzer wünscht das ausdrücklich).
 - Logo „Feuerfuchs“ als Inline-SVG-`<symbol id="lg">` (Rugbyball aubergine `#4b2142`, Fuchs orange, grüne Hantelscheiben); auch Favicon. Ersetzt das 🏋️-Emoji.
