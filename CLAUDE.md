@@ -42,7 +42,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 ## Arbeitsweise
 - Nach Änderungen JavaScript-Syntax prüfen und – wo möglich – im Browser in Handybreite ansehen (360 **und** 390 px, hell und dunkel).
 - Browsertest: Kopie von `index.html` über einen lokalen Server außerhalb des Repos ausliefern; Testdaten (z. B. WKM-Plan mit 20–30 Einträgen) nur dort per localStorage anlegen, nie im Repo.
-- Git: nicht im PATH; das Git von GitHub Desktop nutzen (`%LOCALAPPDATA%\GitHubDesktop\app-*\resources\app\git\cmd\git.exe`). Pushen klappt daraus nicht (keine Zugangsdaten) – Push erfolgt durch den Nutzer in GitHub Desktop.
+- Git: nicht im PATH; das Git von GitHub Desktop nutzen (`%LOCALAPPDATA%\GitHubDesktop\app-*\resources\app\git\cmd\git.exe`). Im Repo ist `credential.helper=manager` gesetzt, der Nutzer ist angemeldet: Claude committet und pusht selbst auf `main`.
 - Bestehende Nutzerdaten dürfen durch Updates nie verloren gehen (Formate abwärtskompatibel lesen).
 - Commits mit kurzer deutscher Nachricht, z. B. `Version 0.44: …`.
 
