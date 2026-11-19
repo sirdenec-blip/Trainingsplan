@@ -12,8 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="TTB">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
-:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--dn:#b4533a;--u1:#c7ecd3;--u1t:#0f2a1d;--u2:#9bdcb2;--u2t:#0f2a1d;--u3:#6cc790;--u3t:#0f2a1d;--u4:#3fa86c;--u4t:#fff;--u5:#2a7f50;--u5t:#fff;--u6:#17573a;--u6t:#fff;--bd:#ddd}
-@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--dn:#e8866d;--u1:#1f5a40;--u1t:#fff;--u2:#2c7a57;--u2t:#fff;--u3:#3b9c70;--u3t:#fff;--u4:#5cbf91;--u4t:#0b2a1e;--u5:#8adbb2;--u5t:#0b2a1e;--u6:#bdf0d6;--u6t:#0b2a1e;--bd:#3a3a38}}
+:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--dn:#b4533a;--dup:#5e8670;--ddn:#96685c;--u1:#c7ecd3;--u1t:#0f2a1d;--u2:#9bdcb2;--u2t:#0f2a1d;--u3:#6cc790;--u3t:#0f2a1d;--u4:#3fa86c;--u4t:#fff;--u5:#2a7f50;--u5t:#fff;--u6:#17573a;--u6t:#fff;--bd:#ddd}
+@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--dn:#e8866d;--dup:#8eab98;--ddn:#b8958c;--u1:#1f5a40;--u1t:#fff;--u2:#2c7a57;--u2t:#fff;--u3:#3b9c70;--u3t:#fff;--u4:#5cbf91;--u4t:#0b2a1e;--u5:#8adbb2;--u5t:#0b2a1e;--u6:#bdf0d6;--u6t:#0b2a1e;--bd:#3a3a38}}
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;max-width:520px;margin:auto}
 h1{font-size:1.3rem;margin:.2rem 0 1rem}
@@ -53,7 +53,9 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .fl{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .dw{font-size:.8rem;color:var(--mu);white-space:nowrap}.dw b{font-weight:600}
 .up{color:var(--ac)}.dn{color:var(--dn)}
-.df{font-size:.72rem;margin-left:5px;font-weight:600}
+.df{font-size:.72rem;margin-left:5px;font-weight:400}
+/* Gewichtsdifferenz im Verlauf: bewusst gedeckt (kaum heller/dunkler als graue Hilfszahlen), nicht im Fokus */
+small.df.up{color:var(--dup)}small.df.dn{color:var(--ddn)}
 details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12px;padding:10px 0;position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--bg);border-bottom:1px solid var(--bd)}details.old[open]>summary::after{content:" · tippen zum Einklappen ▲"}
 .calw{position:relative}
 .cal .d[data-d]{cursor:pointer}
@@ -238,7 +240,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.93";
+const VERSION="0.94";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[

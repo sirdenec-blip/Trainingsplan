@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.93** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.94** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -83,7 +83,7 @@ Pro Übung: **Gewicht** (vorausgefüllt vom letzten Mal, ▲▼ in 0,25-kg-Schri
 Sichtbar sind so viele Einträge, wie der Plan Einheiten hat (je Einheit der neueste); alle weiteren unter „Ältere Einträge“ (angeheftete Leiste zum Einklappen). Die letzte gleiche Einheit ist grün gestrichelt umrandet.
 - **Alle · E1 · E2 …** filtert nach Einheit (dann nur der neueste Eintrag sichtbar).
 - **Kompakt** (Standard): eine Zeile pro Übung, Gewicht und Sätze in kleinen Bubbles, Notizen als 💬 zum Antippen. **Ausführlich:** mit Satz-Kästchen, Notiz sichtbar.
-- Hinter jedem Gewicht die Differenz zur letzten gleichen Einheit (+2,5 grün / −4 rot), 🏆 bei neuem Bestwert.
+- Hinter jedem Gewicht die Differenz zur letzten gleichen Einheit (+2,5 / −4, dezent grün bzw. rot getönt), 🏆 bei neuem Bestwert.
 - ✎ bearbeitet einen Eintrag (Formular wird gelb), ✕ löscht ihn. Bearbeitete Einträge zeigen ein ⓘ.
 
 ## Auswertungen (aufklappbar)
@@ -99,6 +99,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.94:** Gewichtsdifferenzen im Verlauf wieder leicht eingefärbt (gedecktes Grün/Rot, unaufdringlich).
 - **0.93:** Planmenü zeigt die Pläne direkt als Liste zum schnellen Wechseln, Knopf „Lokale Daten löschen & Google trennen“, einfarbige Symbole auch für Debug-Plan, Auswertungen, Statuszeile und Timer.
 - **0.92:** Bugfix: In der installierten App blieb die Google-Anmeldung auf einer weißen Seite hängen. Jetzt Anmeldung per Weiterleitung, abgelaufener Zugang wird beim Öffnen/Zurückkehren still erneuert.
 - **0.91:** Google-Anbindung aktiviert (OAuth-Client-ID eingetragen). Anmeldung zunächst nur für eingetragene Testnutzer.
