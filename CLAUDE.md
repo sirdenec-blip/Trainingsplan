@@ -11,7 +11,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 
 ## Versionierung
 - Konstante `const VERSION="…"` im Script von `index.html`, angezeigt im ⓘ-Menü.
-- Aktuell: **0.43**. Jede neue Version erhöht um 0.01 (nächste: 0.44); größere Funktionspakete springen auf die nächste Zehnerstelle (0.50 …). **1.0** ist für eine mögliche Android-App/PWA vorgesehen.
+- Aktuell: **0.44**. Jede neue Version erhöht um 0.01 (nächste: 0.45); größere Funktionspakete springen auf die nächste Zehnerstelle (0.50 …). **1.0** ist für eine mögliche Android-App/PWA vorgesehen.
 - Wenn der Nutzer „gleiche Versionsnummer“ sagt, Version nicht erhöhen.
 - Bei jeder Version: `VERSION` anpassen, README aktualisieren (Versionszeile oben + Eintrag unter „## Versionen“ + betroffene Abschnitte).
 - Vor größeren Umbauten: knapp Optionen nennen und nachfragen, wenn der Nutzer „erst klären“ verlangt.
@@ -40,11 +40,12 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 - Stil: minimalistisch und kompakt, grüne Akzentfarbe, kleine Hilfsangaben in Grau.
 
 ## Arbeitsweise
-- Nach Änderungen JavaScript-Syntax prüfen und – wo möglich – im Browser in Handybreite ansehen.
+- Nach Änderungen JavaScript-Syntax prüfen und – wo möglich – im Browser in Handybreite ansehen (360 **und** 390 px, hell und dunkel).
+- Browsertest: Kopie von `index.html` über einen lokalen Server außerhalb des Repos ausliefern; Testdaten (z. B. WKM-Plan mit 20–30 Einträgen) nur dort per localStorage anlegen, nie im Repo.
+- Git: nicht im PATH; das Git von GitHub Desktop nutzen (`%LOCALAPPDATA%\GitHubDesktop\app-*\resources\app\git\cmd\git.exe`). Pushen klappt daraus nicht (keine Zugangsdaten) – Push erfolgt durch den Nutzer in GitHub Desktop.
 - Bestehende Nutzerdaten dürfen durch Updates nie verloren gehen (Formate abwärtskompatibel lesen).
 - Commits mit kurzer deutscher Nachricht, z. B. `Version 0.44: …`.
 
 ## Offene Ideen
 - Logo statt 🏋️-Emoji im Titel.
 - Version 1.0: PWA und/oder Android-App (Capacitor) mit direktem Dateizugriff.
-- README: Hinweis „Version steht unten auf der Seite“ ist veraltet (steht jetzt im ⓘ-Menü).

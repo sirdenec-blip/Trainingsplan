@@ -81,7 +81,8 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 .stw .sb{flex:0 0 42px;width:42px;min-height:46px;margin:0;padding:0;font-size:1rem;line-height:1;background:transparent;color:var(--tx);border:1px solid var(--bd);font-weight:400;touch-action:manipulation}
 .stw .sb[data-st="1"]{border-radius:8px 0 0 8px;border-right:0}.stw .sb[data-st="-1"]{border-radius:0 8px 8px 0;border-left:0}
 .stw input{border-radius:0;min-width:0;width:auto}
-.in .stw .w{flex:0 0 72px;width:72px}.stw .r{flex:1 1 0;width:auto}
+.in .stw .w{flex:0 0 64px;width:64px;padding:10px 4px}.stw .r{flex:1 1 0;width:auto}
+.in.g{gap:6px}.in.g>.r{padding:10px 6px;text-align:center}
 .top{display:flex;justify-content:space-between;align-items:center;margin:.2rem 0 1rem}.top h1{margin:0}
 .ib{width:34px;height:34px;padding:0;margin:0;border-radius:50%;background:transparent;color:var(--mu);border:1px solid var(--bd);font-size:1rem;font-weight:400}
 .infp{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:-4px 0 14px;font-size:.85rem;color:var(--mu);line-height:1.5}
@@ -176,7 +177,7 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 </div>
 
 <script>
-const VERSION="0.43";
+const VERSION="0.44";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
