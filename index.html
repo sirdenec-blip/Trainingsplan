@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Trainingsplan</title>
+<title>Trainingstagebuch</title>
 <style>
 :root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--dn:#b4533a;--u1:#c7ecd3;--u1t:#0f2a1d;--u2:#9bdcb2;--u2t:#0f2a1d;--u3:#6cc790;--u3t:#0f2a1d;--u4:#3fa86c;--u4t:#fff;--u5:#2a7f50;--u5t:#fff;--u6:#17573a;--u6t:#fff;--bd:#ddd}
 @media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--dn:#e8866d;--u1:#1f5a40;--u1t:#fff;--u2:#2c7a57;--u2t:#fff;--u3:#3b9c70;--u3t:#fff;--u4:#5cbf91;--u4t:#0b2a1e;--u5:#8adbb2;--u5t:#0b2a1e;--u6:#bdf0d6;--u6t:#0b2a1e;--bd:#3a3a38}}
@@ -47,7 +47,7 @@ button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);mar
 .dw{font-size:.8rem;color:var(--mu);white-space:nowrap}.dw b{font-weight:600}
 .up{color:var(--ac)}.dn{color:var(--dn)}
 .df{font-size:.72rem;margin-left:5px;font-weight:600}
-details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12px}
+details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12px;padding:10px 0;position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--bg);border-bottom:1px solid var(--bd)}details.old[open]>summary::after{content:" · tippen zum Einklappen ▲"}
 .calw{position:relative}
 .cal .d[data-d]{cursor:pointer}
 .pop{position:absolute;z-index:5;width:max-content;max-width:100%;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.28);padding:8px 10px;font-size:.8rem;line-height:1.45}
@@ -62,6 +62,23 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 #start{position:fixed;inset:0;background:var(--bg);z-index:20;padding:16px;overflow:auto}#start[hidden]{display:none}#start>div{max-width:520px;margin:8vh auto 0}#start p{color:var(--mu);line-height:1.4}
 .sec.dng{color:#c33;border-color:#c33}.in .pr{flex:0 0 84px;text-align:center}
 .wsr{flex:0 0 100%;display:flex;gap:8px;align-items:center}
+.vbs{display:flex;flex-wrap:wrap;gap:6px}
+.vbs button{width:auto;margin:0;padding:6px 10px;font-size:.85rem;background:transparent;color:var(--tx);border:1px solid var(--bd);font-weight:400}
+.vbs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.mu{color:var(--mu);font-size:.85rem}.avx{margin:4px 0 8px}
+.ch{width:100%;height:auto;display:block}.ch .gr{stroke:var(--bd)}.ch .tx{fill:var(--mu);font-size:9px}
+.ch .go{stroke:var(--mu);stroke-dasharray:4 3}.ch .ln1{fill:none;stroke:var(--ac);stroke-width:2}.ch .c1,.ch .bar{fill:var(--ac)}
+.ch .ln2{fill:none;stroke:var(--ye);stroke-width:2}.ch .c2{fill:var(--ye)}
+.tb{width:100%;border-collapse:collapse;font-size:.82rem;font-variant-numeric:tabular-nums}
+.tb th,.tb td{padding:5px 4px;text-align:right;border-top:1px solid var(--bd);white-space:nowrap}.tb th{color:var(--mu);font-weight:400;border-top:0}
+.tb td:first-child,.tb th:first-child{text-align:left;white-space:normal}
+.rc{padding:6px 0;border-top:1px solid var(--bd);font-size:.85rem}.rc b{display:block;margin-bottom:2px}.rc span{display:block;color:var(--mu)}
+.stp{display:flex;flex-direction:column;gap:2px;flex:0 0 auto}
+.stp button{width:26px;height:17px;padding:0;margin:0;font-size:.55rem;line-height:1;background:transparent;color:var(--tx);border:1px solid var(--bd);border-radius:5px;font-weight:400}
+.top{display:flex;justify-content:space-between;align-items:center;margin:.2rem 0 1rem}.top h1{margin:0}
+.ib{width:34px;height:34px;padding:0;margin:0;border-radius:50%;background:transparent;color:var(--mu);border:1px solid var(--bd);font-size:1rem;font-weight:400}
+.infp{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:-4px 0 14px;font-size:.85rem;color:var(--mu);line-height:1.5}
+.infp #planind,.infp #fileind{margin:0 0 4px}.infp .ver{margin:6px 0 0;text-align:left}
 .sat{color:var(--mu);font-size:.8rem;margin-right:2px}
 .chip i{font-style:normal;font-size:.7rem;opacity:.75;margin-right:6px}
 .chip.empty.nx{border-color:var(--ac);color:var(--ac)}
@@ -76,7 +93,7 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 </head>
 <body>
 <div id="start" hidden><div class="card">
-  <h1 style="margin-top:0">🏋️ Trainingsplan</h1>
+  <h1 style="margin-top:0">🏋️ Trainingstagebuch</h1>
   <div id="stMain"><p>Wie möchtest du starten?</p>
     <button id="stNew">1 · Neuen Trainingsplan anlegen</button>
     <button class="sec" id="stImp">2 · Trainingsplan importieren</button></div>
@@ -103,9 +120,13 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 </div></div>
 <input type="file" id="file" accept=".json,application/json" hidden>
 
-<h1>🏋️ Trainingsplan</h1>
-<div class="fi" id="planind"></div>
-<div class="fi" id="fileind"></div>
+<div class="top"><h1>🏋️ Trainingstagebuch</h1><button class="ib" id="inf" aria-label="Info">ⓘ</button></div>
+<div class="infp" id="infp" hidden>
+  <div class="fi" id="planind"></div>
+  <div class="fi" id="fileind"></div>
+  <div>created by Claude and JD</div>
+  <div class="ver" id="ver"></div>
+</div>
 <div class="card">
   <div id="editbar" hidden></div>
   <div class="row">
@@ -122,10 +143,19 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 
 <details class="card" id="ausw">
   <summary>📊 Auswertungen</summary>
+  <div id="avb">
+    <div class="sub">Überblick</div>
+    <div class="vbs"><button data-v="cal">📅 Kalender</button><button data-v="ov">📋 Fortschritt</button><button data-v="rec">🏆 Bestleistungen</button><button data-v="reg">🔁 Regelmäßigkeit</button></div>
+    <div class="sub">Verläufe pro Übung</div>
+    <div class="vbs"><button data-v="w">📈 Gewicht</button><button data-v="e1">🧮 1RM geschätzt</button><button data-v="vol">📊 Volumen</button><button data-v="rp">🔢 Wiederholungen</button></div>
+  </div>
+  <div id="v-cal">
   <div class="sub">Kalenderübersicht</div>
   <div class="calh"><button id="cprev" aria-label="Voriger Monat">‹</button><span id="cmon"></span><button id="cnext" aria-label="Nächster Monat">›</button></div>
   <div class="calw" id="calw"><div class="cal" id="cal"></div><div class="pop" id="pop" hidden></div></div>
-  <div class="leg" id="cleg"></div></div>
+  <div class="leg" id="cleg"></div>
+  </div>
+  <div id="v-oth" hidden></div></div>
 </details>
 
 <div class="card">
@@ -138,10 +168,8 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
   <button class="sec" id="exp">Als lesbaren Text herunterladen</button>
 </div>
 
-<div class="ver" id="ver"></div>
-
 <script>
-const VERSION="0.31";
+const VERSION="0.41";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -270,6 +298,8 @@ $("file").onchange=e=>{
   r.readAsText(f);e.target.value="";
 };
 $("ver").textContent="Version "+VERSION;renderFile();
+$("inf").onclick=()=>{$("infp").hidden=!$("infp").hidden};
+document.addEventListener("click",e=>{if(!e.target.closest("#infp,#inf"))$("infp").hidden=true});
 $("tag").onclick=()=>{
   exm("");const o=$("exOpen");o.hidden=!openHandle;if(openHandle)o.textContent=`In „${openHandle.name}“ speichern`;
   $("gate").hidden=false;
@@ -283,6 +313,17 @@ $("exOld").onclick=exportOld;
 const lastW=(u,name)=>{const L=live();for(let i=L.length-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[name]){const w=parseVal(L[i].ex[name]).w;if(w!=null)return w}return null};
 const sum=a=>a.reduce((x,y)=>x+y,0);
 
+const stp=(i,k)=>`<span class="stp"><button type="button" data-st="1" data-k="${k}" data-i="${i}" aria-label="Erhöhen">▲</button><button type="button" data-st="-1" data-k="${k}" data-i="${i}" aria-label="Verringern">▼</button></span>`;
+const lastPyr=(u,n)=>{const L=live();for(let i=L.length-1;i>=0;i--)if(L[i].unit==u&&L[i].ex[n]){const p=parseVal(L[i].ex[n]).pyr;if(p)return p.ws[0]}return null};
+$("fields").addEventListener("click",e=>{ // ▲▼: Gewicht in 0,25-Schritten
+  const b=e.target.closest("button[data-st]");if(!b)return;
+  const i=+b.dataset.i,k=b.dataset.k,el=document.querySelector(`.${k}[data-i="${i}"]`);if(!el)return;
+  let v=parseFloat(el.value.replace(",","."));
+  if(isNaN(v)){const u=+$("unit").value,n=cur[i].n;v=k==="w"?(parseFloat(lastW(u,n))||0):(st[i].reps.length?st[i].reps[st[i].reps.length-1]:(lastPyr(u,n)||0))}
+  v=Math.max(0,Math.round((v+(+b.dataset.st)*0.25)*100)/100);
+  el.value=String(v);dirty=true;
+  if(k==="w"){st[i].w=el.value;updateDw(i)}
+});
 function build(defs){
   const u=+$("unit").value;dirty=false;
   cur=defs||unitDefs(u);
@@ -290,8 +331,8 @@ function build(defs){
   $("fields").innerHTML=cur.map((e,i)=>{
     const hp=e.m==="p",hw=e.m==="wr"||e.m==="w",hr=e.m==="wr"||e.m==="r";
     const row=hp?`<div class="in"><input class="pr" data-i="${i}" inputmode="numeric" placeholder="Wdh" aria-label="Wiederholungen je Satz"><span>Wdh. je Satz</span></div>
-      <div class="in" style="margin-top:8px"><input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="Satz 1: kg" autocomplete="off"><span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
-     :`<div class="in">${hw?`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg"><span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
+      <div class="in" style="margin-top:8px"><input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="Satz 1: kg" autocomplete="off">${stp(i,"r")}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
+     :`<div class="in">${hw?`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg">${stp(i,"w")}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
     return `<label class="fl"><span>${esc(e.n)}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></label>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}`}).join("");
   cur.forEach((_,i)=>{chips(i);updateDw(i)});
   document.querySelectorAll(".w,.pr").forEach(el=>{
@@ -449,6 +490,148 @@ function updateDw(i){
   const t=el.value.trim().replace(",","."),di=/^\d+(\.\d+)?$/.test(t)?dinfo(+t,p):null;
   out.innerHTML=`zuletzt ${String(p).replace(".",",")} kg`+(di?` <b class="${di.c}">${di.t}</b>`:"");
 }
+// ---------- Auswertungen ----------
+let view="cal",avSel={};
+const ef=(w,r)=>w*(1+r/30); // Epley: geschätztes 1RM
+const nf=x=>String(Math.round(x*10)/10).replace(".",",");
+const sg=x=>(x>0?"+":x<0?"−":"")+nf(Math.abs(x));
+const T0=ds=>Date.parse(ds+"T12:00");
+const sd=t=>new Date(t).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"2-digit"});
+const sh=t=>new Date(t).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"});
+const monT=ds=>{const d=new Date(ds+"T12:00");d.setDate(d.getDate()-(d.getDay()+6)%7);return d.getTime()};
+const addW=(t,n)=>{const d=new Date(t);d.setDate(d.getDate()+7*n);return d.getTime()};
+const ld=()=>{const t=new Date();return new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const nd=()=>`<p class="mu">Noch keine passenden Daten.</p>`;
+function allNames(){const n=[];plan.units.forEach(u=>u.exs.forEach(e=>{if(!n.includes(e.n))n.push(e.n)}));live().forEach(e=>Object.keys(e.ex).forEach(k=>{if(!n.includes(k))n.push(k)}));return n}
+// Kennzahlen eines gespeicherten Werts: w Gewicht, e1 geschätztes 1RM, vol Volumen, rb bester Satz, rt Wdh.-Summe
+function met(name,v,u){
+  const p=parseVal(v),d=defOf(name,u),o={};
+  if(p.pyr){const{r,ws}=p.pyr;o.w=Math.max(...ws);o.e1=Math.max(...ws.map(w=>ef(w,r)));o.vol=r*sum(ws);o.rb=r;o.rt=r*ws.length}
+  else{
+    if(p.w!=null)o.w=+p.w;
+    if(p.reps){o.rb=Math.max(...p.reps);o.rt=sum(p.reps);
+      if(p.w!=null&&+p.w>0&&!(d&&d.bw))o.e1=Math.max(...p.reps.map(r=>ef(+p.w,r)));
+      if(p.w!=null)o.vol=+p.w*o.rt}
+  }
+  return o;
+}
+const ser=name=>live().filter(e=>e.ex[name]).map(e=>({e,m:met(name,e.ex[name],e.unit)}));
+// Leitwert pro Einheit (Pokal / Fortschritt)
+function mainV(name,m,u){const d=defOf(name,u);
+  if(d&&d.bw)return m.rt!=null?{v:m.rt,u:"Wdh."}:null;
+  if(m.w!=null)return{v:m.w,u:"kg"};
+  return m.rt!=null?{v:m.rt,u:"Wdh."}:null}
+function prim(name,m,u){const d=defOf(name,u);
+  if(m.e1!=null)return m.e1;
+  if(m.w!=null&&m.rb==null&&!(d&&d.bw))return m.w;
+  return m.rt!=null?m.rt:null}
+// 🏆: neuer Bestwert gegenüber allen früheren Einträgen derselben Übung
+function recSet(){
+  const best={},r=new Set();
+  live().forEach(e=>Object.entries(e.ex).forEach(([k,v])=>{
+    const p=prim(k,met(k,v,e.unit),e.unit);if(p==null)return;
+    if(best[k]!=null&&p>best[k]+1e-9)r.add(e.id+"|"+k);
+    best[k]=Math.max(best[k]??-1,p);
+  }));
+  return r;
+}
+function line(series,goal,unit){
+  const all=series.flatMap(s=>s.pts);if(!all.length)return nd();
+  const W=320,H=170,L=38,R=10,Tp=10,B=24;
+  const x0=Math.min(...all.map(p=>p[0])),x1=Math.max(...all.map(p=>p[0])),ys=all.map(p=>p[1]);if(goal!=null)ys.push(goal);
+  let y0=Math.min(...ys),y1=Math.max(...ys);if(y0===y1){y0-=1;y1+=1}
+  const pd=(y1-y0)*.12;y0=Math.max(0,y0-pd);y1+=pd;
+  const X=t=>L+(x1===x0?(W-L-R)/2:(t-x0)/(x1-x0)*(W-L-R)),Y=v=>Tp+(y1-v)/(y1-y0)*(H-Tp-B);
+  let h=`<svg viewBox="0 0 ${W} ${H}" class="ch">`;
+  for(let i=0;i<=3;i++){const v=y0+(y1-y0)*i/3,y=Y(v);h+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" class="gr"/><text x="${L-4}" y="${y+3}" class="tx" text-anchor="end">${nf(v)}</text>`}
+  h+=`<text x="${L}" y="${H-6}" class="tx">${sd(x0)}</text><text x="${W-R}" y="${H-6}" class="tx" text-anchor="end">${sd(x1)}</text>`;
+  if(goal!=null)h+=`<line x1="${L}" x2="${W-R}" y1="${Y(goal)}" y2="${Y(goal)}" class="go"/>`;
+  series.forEach((s,k)=>{
+    h+=`<polyline class="ln${k+1}" points="${s.pts.map(p=>X(p[0])+","+Y(p[1])).join(" ")}"/>`;
+    s.pts.forEach(p=>h+=`<circle class="c${k+1}" cx="${X(p[0])}" cy="${Y(p[1])}" r="3"><title>${sd(p[0])}: ${nf(p[1])} ${unit}</title></circle>`);
+  });
+  h+="</svg>";
+  if(series.length>1||goal!=null)h+=`<div class="leg">${series.map((s,k)=>`<span><i style="background:var(--${k?"ye":"ac"})"></i>${s.name}</span>`).join("")}${goal!=null?`<span>┄ Ziel ${goal}</span>`:""}</div>`;
+  return h;
+}
+function bars(items,unit){
+  if(!items.length)return nd();
+  const W=320,H=150,L=38,R=6,Tp=10,B=22,mx=Math.max(...items.map(i=>i.v),1),bw=(W-L-R)/items.length,step=Math.ceil(items.length/6);
+  let h=`<svg viewBox="0 0 ${W} ${H}" class="ch">`;
+  [0,1].forEach(i=>{const y=Tp+(1-i)*(H-Tp-B);h+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" class="gr"/><text x="${L-4}" y="${y+3}" class="tx" text-anchor="end">${nf(mx*i)}</text>`});
+  items.forEach((it,i)=>{const hh=it.v/mx*(H-Tp-B),x=L+i*bw;
+    h+=`<rect class="bar" x="${x+1}" y="${H-B-hh}" width="${Math.max(bw-2,1)}" height="${hh}" rx="2"><title>${it.l}: ${nf(it.v)} ${unit}</title></rect>`;
+    if(i%step===0)h+=`<text x="${x+bw/2}" y="${H-6}" class="tx" text-anchor="middle">${it.l}</text>`});
+  return h+"</svg>";
+}
+function pick(names,all){
+  if(!names.length)return{n:null,h:""};
+  let c=avSel[view];if(c===undefined||(c===""&&!all)||(c&&!names.includes(c)))c=all?"":names[0];
+  avSel[view]=c;
+  return{n:c,h:`<select class="avx" onchange="avSel[view]=this.value;renderAus()">${all?`<option value=""${c===""?" selected":""}>Alle Übungen</option>`:""}${names.map(n=>`<option${n===c?" selected":""}>${esc(n)}</option>`).join("")}</select>`};
+}
+const pts=(n,f)=>ser(n).filter(x=>f(x.m)!=null).map(x=>[T0(x.e.date),f(x.m)]);
+function vW(){
+  const p=pick(allNames().filter(n=>ser(n).some(x=>x.m.w>0)));if(!p.n)return nd();
+  return `<div class="sub">Gewichtsverlauf (kg)</div>`+p.h+line([{name:"Gewicht",pts:pts(p.n,m=>m.w)}],null,"kg");
+}
+function vE1(){
+  const p=pick(allNames().filter(n=>ser(n).some(x=>x.m.e1!=null)));if(!p.n)return nd();
+  return `<div class="sub">1RM geschätzt (kg)</div>`+p.h+line([{name:"1RM",pts:pts(p.n,m=>m.e1)}],null,"kg")+`<p class="mu">Bester Satz je Einheit nach Epley: Gewicht × (1 + Wdh. ÷ 30). Nur für Übungen mit Gewicht und Wiederholungen.</p>`;
+}
+function vRp(){
+  const p=pick(allNames().filter(n=>ser(n).some(x=>x.m.rb!=null)));if(!p.n)return nd();
+  const d=defOf(p.n,ser(p.n).slice(-1)[0].e.unit);
+  return `<div class="sub">Wiederholungen pro Einheit</div>`+p.h+line([{name:"Summe",pts:pts(p.n,m=>m.rt)},{name:"Bester Satz",pts:pts(p.n,m=>m.rb)}],d&&d.goal?d.goal:null,"Wdh.");
+}
+function weekItems(count,fn){ // letzte `count` Wochen bis heute
+  const items=[];let t=addW(monT(ld()),-(count-1));
+  for(let i=0;i<count;i++){items.push({t,l:sh(t),v:fn(t)});t=addW(t,1)}
+  return items;
+}
+function vVol(){
+  const p=pick(allNames().filter(n=>ser(n).some(x=>x.m.vol>0)),true);if(p.n===null)return nd();
+  const by={};
+  live().forEach(e=>Object.entries(e.ex).forEach(([k,v])=>{if(!p.n||k===p.n){const m=met(k,v,e.unit);if(m.vol){const w=monT(e.date);by[w]=(by[w]||0)+m.vol}}}));
+  return `<div class="sub">Trainingsvolumen pro Woche (kg)</div>`+p.h+bars(weekItems(12,t=>by[t]||0),"kg")+`<p class="mu">Volumen = Gewicht × Wiederholungen × Sätze (letzte 12 Wochen). Körpergewicht wird nicht eingerechnet.</p>`;
+}
+function vReg(){
+  const by={};live().forEach(e=>{const w=monT(e.date);by[w]=(by[w]||0)+1});
+  const items=weekItems(12,t=>by[t]||0),ws=Object.keys(by).map(Number).sort((a,b)=>a-b);
+  if(!ws.length)return nd();
+  let cur=0,t=monT(ld());if(!by[t])t=addW(t,-1);
+  while(by[t]){cur++;t=addW(t,-1)}
+  let best=0;ws.forEach(w=>{if(by[addW(w,-1)])return;let n=0,x=w;while(by[x]){n++;x=addW(x,1)}best=Math.max(best,n)});
+  const avg=sum(items.map(i=>i.v))/12;
+  return `<div class="sub">Einheiten pro Woche (letzte 12 Wochen)</div>`+bars(items,"Einheiten")+`<p class="mu">Aktuelle Serie: <b>${cur}</b> Woche${cur===1?"":"n"} · Längste Serie: <b>${best}</b> · Ø ${nf(avg)} Einheiten/Woche</p>`;
+}
+function vOv(){
+  const rows=allNames().map(n=>{
+    const v=ser(n).map(x=>({d:mainV(n,x.m,x.e.unit)})).filter(x=>x.d);if(!v.length)return"";
+    const a=v[0].d,b=v[v.length-1].d,diff=b.v-a.v,pc=a.v?diff/a.v*100:null;
+    let tr="–";if(v.length>1){const pr=v.slice(-4,-1).map(x=>x.d.v),av=sum(pr)/pr.length,r=av?b.v/av-1:0;tr=r>.01?"▲":r<-.01?"▼":"▶"}
+    const col=diff>0?"up":diff<0?"dn":"";
+    return `<tr><td>${esc(n)}</td><td>${nf(a.v)}</td><td>${nf(b.v)} ${b.u}</td><td class="${col}">${sg(diff)}</td><td class="${col}">${pc==null?"–":sg(pc)+" %"}</td><td class="${col}">${tr}</td></tr>`}).join("");
+  return rows?`<div class="sub">Fortschritt seit dem ersten Eintrag</div><div style="overflow-x:auto"><table class="tb"><tr><th>Übung</th><th>Start</th><th>Aktuell</th><th>Δ</th><th>Δ %</th><th>Trend</th></tr>${rows}</table></div><p class="mu">Leitwert: Gewicht (kg), bei Körpergewichts- und Nur-Wiederholungs-Übungen die Wiederholungssumme; Pyramide: Höchstgewicht. Trend: letzter Wert gegenüber den bis zu drei davor.</p>`:nd();
+}
+function vRec(){
+  const out=allNames().map(n=>{
+    const S=ser(n);if(!S.length)return"";
+    const top=f=>{let b=null;S.forEach(x=>{const v=f(x.m);if(v!=null&&(b===null||v>b.v))b={v,d:x.e.date}});return b};
+    const d=defOf(n,S[S.length-1].e.unit),W=top(m=>m.w),useR=(d&&d.bw)||!W||W.v<=0,li=[];
+    const L=(t,b,u)=>{if(b&&b.v>0)li.push(`<span>${t}: <b style="display:inline;color:var(--tx)">${nf(b.v)} ${u}</b> · ${sd(T0(b.d))}</span>`)};
+    if(useR){L("Meiste Wdh. im Satz",top(m=>m.rb),"Wdh.");L("Beste Wdh.-Summe",top(m=>m.rt),"Wdh.")}
+    else{L("Höchstgewicht",W,"kg");L("1RM geschätzt",top(m=>m.e1),"kg")}
+    return li.length?`<div class="rc"><b>🏆 ${esc(n)}</b>${li.join("")}</div>`:"";
+  }).join("");
+  return out?`<div class="sub">Bestleistungen</div>${out}`:nd();
+}
+function renderAus(){
+  document.querySelectorAll("#avb button[data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
+  $("v-cal").hidden=view!=="cal";const o=$("v-oth");o.hidden=view==="cal";
+  if(view!=="cal")o.innerHTML=({ov:vOv,rec:vRec,reg:vReg,w:vW,e1:vE1,vol:vVol,rp:vRp}[view]||nd)();
+}
+$("avb").addEventListener("click",e=>{const b=e.target.closest("button[data-v]");if(b){view=b.dataset.v;renderAus()}});
 let cal=null;
 function calMove(n){const d=new Date(cal.y,cal.m+n,1);cal={y:d.getFullYear(),m:d.getMonth()};renderCal()}
 function renderCal(){
@@ -507,16 +690,16 @@ function visIds(Lr){
   return v;
 }
 function render(){
-  const ref=refId();renderCal();
+  const ref=refId();renderCal();const rec=recSet();renderAus();
   const Lr=live().reverse(),vis=visIds(Lr);
   const cards=Lr.map(s=>
     `<div class="card${s.id===editId?" ed":""}${s.id===ref?" ref":""}"><div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>Einheit ${s.unit}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}</span><span><button class="x" onclick="edit('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="del('${s.id}')" title="Löschen">✕</button></span></div>`+
     Object.entries(s.ex).map(([k,v])=>{
       const i=exInfo(k,v,s.unit),hw=i.p.w!=null,di=hw?dinfo(+i.p.w,prevW(s,k)):null,df=di?`<small class="df ${di.c}">${di.t}</small>`:"";
-      if(i.pyr)return `<div class="ex"><div class="en">${esc(k)}</div><div class="ln"><b>${i.pyr.r} Wdh.</b><div class="sets"><small>kg</small>${i.pyr.ws.map(x=>`<span>${String(x).replace(".",",")}</span>`).join("")}</div></div></div>`;
-      return `<div class="ex"><div class="en">${esc(k)}</div><div class="ln">${hw?`<b>${i.kg}${df}</b>`:""}${i.p.reps?`<div class="sets"><small>Wdh.</small>${i.p.reps.map(x=>`<span>${x}</span>`).join("")}${i.sum!=null?`<small>Σ ${i.sum}</small>`:""}</div>`:""}</div></div>`}).join("")+`</div>`);
+      if(i.pyr)return `<div class="ex"><div class="en">${esc(k)}${rec.has(s.id+"|"+k)?" 🏆":""}</div><div class="ln"><b>${i.pyr.r} Wdh.</b><div class="sets"><small>kg</small>${i.pyr.ws.map(x=>`<span>${String(x).replace(".",",")}</span>`).join("")}</div></div></div>`;
+      return `<div class="ex"><div class="en">${esc(k)}${rec.has(s.id+"|"+k)?" 🏆":""}</div><div class="ln">${hw?`<b>${i.kg}${df}</b>`:""}${i.p.reps?`<div class="sets"><small>Wdh.</small>${i.p.reps.map(x=>`<span>${x}</span>`).join("")}${i.sum!=null?`<small>Σ ${i.sum}</small>`:""}</div>`:""}</div></div>`}).join("")+`</div>`);
   const shown=cards.filter((_,i)=>vis.has(Lr[i].id)),older=cards.filter((_,i)=>!vis.has(Lr[i].id));
-  $("hist").innerHTML=shown.join("")+(older.length?`<details class="old"${olderOpen?" open":""} ontoggle="olderOpen=this.open"><summary>Ältere Einträge (${older.length})</summary>${older.join("")}</details>`:"");
+  $("hist").innerHTML=shown.join("")+(older.length?`<details class="old"${olderOpen?" open":""} ontoggle="olderOpen=this.open;if(!olderOpen)this.scrollIntoView({block:'nearest'})"><summary>Ältere Einträge (${older.length})</summary>${older.join("")}</details>`:"");
 }
 function del(id){
   if(!confirm("Eintrag löschen?"))return;

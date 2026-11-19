@@ -1,6 +1,6 @@
 # Trainingsplan
 
-Aktuelle Version: **0.31** (steht auch unten auf der Seite)
+Aktuelle Version: **0.41** (steht auch unten auf der Seite)
 
 Einfaches Trainingslog fürs Fitnessstudio (läuft komplett im Browser, keine Installation).
 
@@ -43,7 +43,7 @@ Der Plan-Assistent (Startmenü → *Individuell*, später **✎ Trainingsplan be
   - **Nur Wiederholungen** (beliebig viele Sätze, z. B. `x60-45`).
   - **Pyramidensatz:** einmal feste Wiederholungen, pro Satz das Gewicht (z. B. `8@60-70-80`), Sätze wählbar.
 - Der Plan wird im Browser **und im Trainingstagebuch (Datei)** gespeichert (Dateiformat Version 3). Beim Abgleich/Import gewinnt der neuere Plan; die Meldung nennt es, wenn ein Plan aus der Datei übernommen wurde.
-- Oben steht klein der Name des aktiven Plans („📋 Trainingsplan: …“), darunter die zuletzt verwendete Datei.
+- Der aktive Plan und die zuletzt verwendete Datei stehen im ⓘ-Menü oben rechts.
 - Bestehende Einträge bleiben bei Planänderungen erhalten und werden weiter angezeigt.
 - Die Einheit wechselt der Reihe nach (1 → 2 → … → 1). Der Kalender nutzt bis zu sechs Grüntöne für die Einheiten.
 
@@ -60,7 +60,12 @@ Pro Kalendertag ist nur ein Eintrag möglich. Beim Speichern (neu oder bearbeite
 ### Datum und Einheit
 Beim Öffnen, nach dem Speichern, Löschen, Import/Abgleich und beim Zurückkehren zur Seite (sofern noch nichts eingegeben ist) wird das Datum auf heute gesetzt und die Einheit auf diejenige, die **nicht** im datumsmäßig letzten Eintrag vorkommt. Manuell kannst du jederzeit abweichen.
 
-### Auswertungen
+### Auswertungen (aufklappbar, mit Knöpfen)
+**Überblick:** 📅 Kalender · 📋 Fortschritt (Start, Aktuell, Δ, Δ %, Trend je Übung) · 🏆 Bestleistungen · 🔁 Regelmäßigkeit (Einheiten pro Woche, Serien).
+**Verläufe pro Übung** (Auswahl per Dropdown): 📈 Gewicht · 🧮 1RM geschätzt (One-Rep-Max, berechnet aus dem besten Satz nach Epley: Gewicht × (1 + Wdh./30); wird nicht gemessen) · 📊 Volumen (Gewicht × Wdh. × Sätze pro Woche, auch alle Übungen zusammen) · 🔢 Wiederholungen (Summe und bester Satz, mit Ziellinie z. B. 24 bei Klimmzügen).
+Im Verlauf steht 🏆 hinter einer Übung, wenn sie einen neuen Bestwert gegenüber allen früheren Einträgen erreicht hat (Leitwert: geschätztes 1RM, bei Nur-Gewicht das Gewicht, bei Körpergewicht/Nur-Wiederholungen die Wiederholungssumme).
+
+#### Kalender (Details)
 Aufklappbarer Bereich „📊 Auswertungen“ unterhalb der Einträge.
 - **Kalenderübersicht:** Tippen/Klicken auf einen markierten Tag öffnet ein kleines Fenster mit Einheit, Gewichten und Wiederholungen; erneutes Tippen oder Tippen daneben schließt es. Monatskalender (Mo–So) mit Blättern per ‹ ›. Tage mit Einheit sind grün markiert, Einheit 1 hellgrün, Einheit 2 dunkelgrün (beide am selben Tag: geteilt). Heute ist umrandet.
 
@@ -78,6 +83,8 @@ Unter dem Titel steht, welche Tagebuch-Datei zuletzt verwendet wurde (Name, Akti
 GitHub Pages aktivieren (*Settings → Pages → Branch `main`*).
 
 ## Versionen
+- **0.41:** ▲▼ für Gewichte (0,25 kg), angeheftete Leiste „Ältere Einträge“ zum Einklappen, „1RM geschätzt“, Titel „Trainingstagebuch“, Info-Menü ⓘ (Plan, Datei, Version, „created by Claude and JD“).
+- **0.40:** Auswertungen: Fortschrittsübersicht, Bestleistungen, Regelmäßigkeit, Verläufe für Gewicht, geschätztes Max, Volumen und Wiederholungen; 🏆 im Verlauf.
 - **0.31:** Pyramidensatz, neues Speichersystem (Startmenü, Import nur beim Start, Export schreibt als einziges in Dateien, „Alle Daten zurücksetzen“), Einträge je Einheit sichtbar, Layout-Fix „Sätze“ im Plan-Assistenten.
 - **0.30:** Eigene Trainingspläne (1–6 Einheiten, Dokumentationsarten pro Übung), Plan im Tagebuch gespeichert, Anzeige des aktiven Plans, Kalender mit bis zu 6 Grüntönen.
 - **0.21:** Nur letzte zwei Einträge sichtbar (Rest unter „Ältere Einträge“), Kurzübersicht beim Antippen eines Kalendertags, nur ein Eintrag pro Tag.
