@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.99.4** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.99.5** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -67,7 +67,7 @@ Rechts in der Zeile mit Notiz und Timer steht ein ＋. Es öffnet ein kleines Me
 - **Einmalige Übung hinzufügen:** eine Übung nur für dieses Training, ohne sie in den Plan aufzunehmen. Die Karte ist wie im Plan-Assistenten (Art der Erfassung, Körpergewicht, Sätze, Pause, Max./Ziel). Beim Tippen schlägt die App Übungen vor, getrennt nach „Im Plan“ und „Bisher einzeln eingetragen“ (gekennzeichnet mit „einzeln“); eine Auswahl übernimmt deren Einstellungen. Die Übung erscheint im Formular mit „einzeln“ und × zum Entfernen und wird mit ihren Einstellungen im Eintrag gespeichert.
 - **Anderes Training eintragen:** für Training außerhalb des Plans, z. B. Rugby. Nur Datum und Sportart (freie Eingabe oder Auswahl aus einer langen Liste; bereits eingetragene Sportarten stehen hervorgehoben oben). Zählt nicht zur Regel „ein Eintrag pro Tag“ und nicht zu den Auswertungen des Krafttrainings.
   - Weitere Trainings sind **planunabhängig** (eigene Datei „Weitere Trainings.json“ in Google Drive) – sie bleiben auch nach einem Planwechsel sichtbar.
-  - Im Verlauf erscheinen sie als schmale, gedeckt gelbe Karte zwischen den aktuellen Einträgen, solange sie nicht älter sind als der älteste angezeigte Plan-Eintrag; ältere stehen unter „Ältere Einträge“. Im Kalender sind Tage nur mit weiterem Training gedeckt gelb, Tage mit beidem haben eine gelbe Leiste.
+  - Im Verlauf erscheinen sie als schmale, gedeckt gelbe Karte zwischen den aktuellen Einträgen, solange sie nicht älter sind als der älteste angezeigte Plan-Eintrag; ältere stehen unter „Ältere Einträge“. Im Kalender sind Tage nur mit weiterem Training gedeckt gelb, Tage mit beidem haben eine gelbe Ecke oben links.
 
 ### Helfer beim Training
 - **⏱ Pausentimer:** startet nach jedem Satz automatisch (Standard 2:00, pro Übung im Plan-Assistenten einstellbar, nicht bei „Nur Gewicht“). Die Leiste steht **oben** (unten würde die Handy-Tastatur sie verdecken), „+30 s“ verlängert, ✕ beendet. Am Ende wird sie grün („Pause vorbei“) und das Handy vibriert (nur Android – Safari auf dem iPhone kann nicht vibrieren; einen Ton gibt es bewusst nicht). Nach dem letzten Satz und beim Speichern stoppt der Timer.
@@ -123,6 +123,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.99.5:** Kalender: Tage mit Krafttraining und weiterem Training tragen eine gut sichtbare gelbe Ecke oben links (statt der schmalen Leiste unten).
 - **0.99.4:** Vorschlagslisten zeigen beim Antippen immer die komplette Liste (auch beim Bearbeiten), gefiltert wird erst beim Tippen. Filterzeile erlaubt „Keine“ Einheit – dann nur weitere Trainings (letzte 5 aktuell).
 - **0.99.3:** ＋-Menü: einmalige Übungen (mit Vorschlägen „Im Plan“ / „einzeln“) und weitere Trainings wie Rugby (planunabhängig, eigene Drive-Datei, gedeckt gelb in Verlauf und Kalender, eigene Auswertung). Neue Filterzeile mit Mehrfachauswahl, Symbolen für Ansicht und weitere Trainings, klappt bei Platzmangel in eine zweite Zeile aus. Ausführliche Ansicht mit Satznummern und Ziel bei Summen. Fehlerbehebung: Kalender-Popup-Zeilen sahen seit 0.99.1 wie Plan-Karten aus.
 - **0.99.2:** Debug-Plan erweitert: individueller Plan mit 5 Einheiten (benannt und unbenannt), allen Erfassungsarten, Übungen in mehreren Einheiten und ca. 90 Einträgen, inkl. Einträgen einer nicht vorhandenen Einheit.
