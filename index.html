@@ -266,7 +266,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.98";
+const VERSION="0.99";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -1380,9 +1380,40 @@ $("wzb").addEventListener("pointerdown",e=>{
   if(h){e.preventDefault();dragStart({...st,type:"ex",from:+h.dataset.dh,el:h.closest(".we")})}
   else if(ub&&!e.target.closest(".ubx")){drg={...st,type:"unit",from:+ub.dataset.u,el:ub,wait:setTimeout(()=>dragStart({...st,type:"unit",from:+ub.dataset.u,el:ub}),450)}}
 });
-// Übung: Karte klappt beim Ziehen auf eine schmale Zeile zusammen und rückt live an die Zielstelle (andere Karten weichen aus)
-function dragStart(d){if(drg)clearTimeout(drg.wait);drg={...d,active:true,to:null};d.el.classList.add("drag");try{navigator.vibrate&&navigator.vibrate(15)}catch(x){}}
-function dragMarks(){$("wzb").querySelectorAll(".tgt,.ta,.tb").forEach(x=>x.classList.remove("tgt","ta","tb"))}
+// Übung ziehen: Karte klappt auf eine schmale Zeile zusammen und folgt dem Finger stufenlos; sie wird live an der Zielstelle
+// einsortiert, die übrigen Karten gleiten weich zur Seite (FLIP-Animation). Am oberen/unteren Rand scrollt die Liste gleichmäßig.
+const curY=el=>{const m=getComputedStyle(el).transform;return m&&m!=="none"?new DOMMatrixReadOnly(m).m42:0};
+function flip(els,fn){ // Positionen merken → ändern → von alter zu neuer Position gleiten
+  const old=els.map(s=>s.getBoundingClientRect().top);
+  fn();
+  els.forEach((s,i)=>{s.style.transition="none";s.style.transform="";const d=old[i]-s.getBoundingClientRect().top;if(Math.abs(d)<1)return;
+    s.style.transform=`translateY(${d}px)`;s.offsetHeight;s.style.transition="transform .16s ease-out";s.style.transform=""});
+}
+const exSibs=()=>[...drg.el.parentNode.querySelectorAll(".we")].filter(s=>s!==drg.el);
+function exPlace(y){const el=drg.el,nat=el.getBoundingClientRect().top-curY(el);el.style.transform=`translateY(${y-drg.grab-nat}px)`}
+function exMove(y){
+  const el=drg.el,sib=exSibs();let k=0;
+  for(const s of sib){const r=s.getBoundingClientRect();if(r.top-curY(s)+r.height/2<y)k++} // Zielplatz nach Ruhe-Positionen
+  let nx=el.nextElementSibling;while(nx&&!nx.classList.contains("we"))nx=nx.nextElementSibling;
+  const want=sib[k]||null;
+  if(want!==nx&&!(want===null&&!nx))flip(sib,()=>{if(want)want.before(el);else sib[sib.length-1].after(el)});
+  exPlace(y);
+}
+function exTick(){ // Rand-Scrollen, auch wenn der Finger stillsteht
+  if(!drg||!drg.active||drg.type!=="ex")return;
+  const y=drg.lastY;let d=0;if(y<90)d=-Math.ceil((90-y)/6);else if(y>innerHeight-120)d=Math.ceil((y-innerHeight+120)/6);
+  if(d){$("pw").scrollBy(0,d);exMove(y)}
+  requestAnimationFrame(exTick);
+}
+function dragStart(d){
+  if(drg)clearTimeout(drg.wait);drg={...d,active:true,to:null};
+  if(d.type==="ex"){
+    flip(exSibs(),()=>d.el.classList.add("drag")); // Zusammenklappen: übrige Karten rücken weich nach
+    drg.grab=d.el.getBoundingClientRect().height/2;drg.lastY=d.y;exPlace(d.y);requestAnimationFrame(exTick);
+  }else d.el.classList.add("drag");
+  try{navigator.vibrate&&navigator.vibrate(15)}catch(x){}
+}
+function dragMarks(){$("wzb").querySelectorAll(".tgt").forEach(x=>x.classList.remove("tgt"))}
 document.addEventListener("pointermove",e=>{
   if(!drg)return;
   if(!drg.active){if(Math.hypot(e.clientX-drg.x,e.clientY-drg.y)>8){clearTimeout(drg.wait);drg=null}return}
@@ -1390,25 +1421,21 @@ document.addEventListener("pointermove",e=>{
   if(drg.type==="unit")drg.el.style.transform=`translate(${e.clientX-drg.x}px,${e.clientY-drg.y}px)`;
   drg.el.style.pointerEvents="none";const t=document.elementFromPoint(e.clientX,e.clientY);drg.el.style.pointerEvents="";
   dragMarks();drg.to=null;
-  const ub=t&&t.closest(".ub[data-u]"),we=t&&t.closest(".we");
-  if(drg.type==="unit"){if(ub&&+ub.dataset.u!==drg.from){drg.to=+ub.dataset.u;ub.classList.add("tgt")}}
-  else if(ub&&+ub.dataset.u!==wz.cur){drg.to={unit:+ub.dataset.u};ub.classList.add("tgt")}
-  else if(we&&we!==drg.el&&we.parentNode===drg.el.parentNode){ // live einsortieren: nur über die Mitte der Nachbarkarte hinweg (kein Flackern)
-    const r=we.getBoundingClientRect(),mid=r.top+r.height/2,below=!!(drg.el.compareDocumentPosition(we)&Node.DOCUMENT_POSITION_FOLLOWING);
-    if(below&&e.clientY>mid)we.after(drg.el);else if(!below&&e.clientY<mid)we.before(drg.el);
-  }
-  if(drg.type==="ex"){const pw=$("pw");if(e.clientY<80)pw.scrollBy(0,-14);else if(e.clientY>innerHeight-110)pw.scrollBy(0,14)}
+  const ub=t&&t.closest(".ub[data-u]");
+  if(drg.type==="unit"){if(ub&&+ub.dataset.u!==drg.from){drg.to=+ub.dataset.u;ub.classList.add("tgt")}return}
+  drg.lastY=e.clientY;
+  if(ub&&+ub.dataset.u!==wz.cur){drg.to={unit:+ub.dataset.u};ub.classList.add("tgt")}
+  exMove(e.clientY);
 },{passive:false});
 document.addEventListener("pointerup",()=>{
   if(!drg)return;clearTimeout(drg.wait);const d=drg;drg=null;if(!d.active)return;
   wzJust=Date.now();
-  if(d.type==="unit"&&d.to!=null){const u=wz.units.splice(d.from,1)[0];wz.units.splice(d.to,0,u);wz.cur=d.to}
-  else if(d.type==="ex"){
-    const ex=wz.units[wz.cur].exs;
-    if(d.to&&d.to.unit!=null){const it=ex.splice(d.from,1)[0];wz.units[d.to.unit].exs.push(it);toast(`„${it.n.trim()||"Übung"}“ nach ${wLab(d.to.unit)} verschoben.`)}
-    else{const p=[...d.el.parentNode.querySelectorAll(".we")].indexOf(d.el);if(p>=0&&p!==d.from)ex.splice(p,0,ex.splice(d.from,1)[0])}
-  }
-  wizRender();
+  if(d.type==="unit"){if(d.to!=null){const u=wz.units.splice(d.from,1)[0];wz.units.splice(d.to,0,u);wz.cur=d.to}return wizRender()}
+  const ex=wz.units[wz.cur].exs;
+  if(d.to&&d.to.unit!=null){const it=ex.splice(d.from,1)[0];wz.units[d.to.unit].exs.push(it);toast(`„${it.n.trim()||"Übung"}“ nach ${wLab(d.to.unit)} verschoben.`);return wizRender()}
+  const p=[...d.el.parentNode.querySelectorAll(".we")].indexOf(d.el);if(p>=0&&p!==d.from)ex.splice(p,0,ex.splice(d.from,1)[0]);
+  d.el.style.transition="transform .15s ease-out";d.el.style.transform=""; // weich an den Platz gleiten, dann neu aufbauen
+  setTimeout(wizRender,160);
 });
 document.addEventListener("pointercancel",()=>{if(!drg)return;clearTimeout(drg.wait);const a=drg.active;drg=null;if(a)wizRender()});
 // ---------- Speichern ----------
