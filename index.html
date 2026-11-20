@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Sicherheitsregel: Die Seite darf nur mit sich selbst und Google (Anmeldung, Drive) sprechen -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; img-src 'self' data: blob:; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Trainingstagebuch</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1d6b4f">
@@ -322,7 +324,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.99.5";
+const VERSION="0.99.6";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -330,7 +332,8 @@ const WKM_PLAN={name:"WKM",ts:0,units:[
   {exs:[{n:"Kreuzheben",m:"wr",s:3},{n:"Overhead-Press",m:"wr",s:3},{n:"Klimmzüge",m:"wr",bw:true,s:0,max:12,goal:24}]}]};
 function okPlan(p){return!!p&&typeof p.name==="string"&&Array.isArray(p.units)&&p.units.length>=1&&p.units.length<=6&&p.units.every(u=>u&&Array.isArray(u.exs)&&u.exs.every(e=>e&&typeof e.n==="string"&&["wr","w","r","p"].includes(e.m)))}
 let plan=null;
-const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ja=v=>esc(JSON.stringify(String(v))); // Wert als JS-Zeichenkette in einem onclick-Attribut
 const clone=o=>JSON.parse(JSON.stringify(o));
 const unitDefs=u=>(plan.units[u-1]||{exs:[]}).exs;
 // Anzeigename einer Einheit: eigener Name immer mit vorangestellter Nummer („3 - Hypertrophie“), sonst „Einheit 3“
@@ -370,7 +373,7 @@ function docMeta(d){const L=d.sessions.filter(x=>!x.del&&(!x.x||d.plan.id===XID)
 const plans=()=>{const o=idx.order||[],pos=id=>{const i=o.indexOf(id);return i<0?1e9:i};
   return Object.values(idx.plans).filter(p=>!p.xtra).sort((a,b)=>pos(a.id)-pos(b.id)||(b.last||"").localeCompare(a.last||"")||a.name.localeCompare(b.name))};
 const anyDirty=()=>Object.values(idx.plans).some(e=>e.dirty&&!e.debug);
-const nameTaken=(n,except)=>Object.values(idx.plans).some(e=>e.id!==except&&e.name.trim().toLowerCase()===n.trim().toLowerCase());
+const nameTaken=(n,except)=>n.trim().toLowerCase()===XNAME.toLowerCase()||Object.values(idx.plans).some(e=>e.id!==except&&e.name.trim().toLowerCase()===n.trim().toLowerCase());
 function uniqueName(n,except){let x=n,k=2;while(nameTaken(x,except))x=n+" "+k++;return x}
 function openPlan(id){const d=readDoc(id);if(!d)return false;plan=d.plan;data=d.sessions.slice().sort(cmp);idx.active=id;saveIdx();return true}
 // Jede Änderung am aktiven Plan: sofort auf dem Gerät speichern, kurz danach (Cloud-Modus) nach Google Drive
@@ -445,8 +448,9 @@ if(/[#&](access_token|error)=/.test(location.hash)){ // Rückkehr von der Google
   localStorage.removeItem(SKEY);history.replaceState(null,"",RURI);
 }
 let tc=null,tcWait=null;
+// Googles Anmelde-Skript nur im Cloud-Modus laden (Datenschutz: ohne Cloud und vor der Wahl auf dem Startbildschirm kein Kontakt zu Google)
 function gisLoad(){
-  if(!CLIENT_ID||MOCK||window.google&&google.accounts&&google.accounts.oauth2)return;
+  if(!CLIENT_ID||MOCK||idx.mode!=="cloud"||gisLoad.on||window.google&&google.accounts&&google.accounts.oauth2)return;gisLoad.on=true;
   const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;document.head.appendChild(s);
 }
 function tokenClient(){
@@ -460,14 +464,17 @@ function tokenClient(){
 function auth(after,silent){
   if(tokValid())return Promise.resolve();
   if(MOCK)return MOCK.auth().then(t=>setTok(t,3600));
-  if(useRedirect()){
+  const sel=!idx.email||!!acctErr; // Kontoauswahl zeigen: beim ersten Mal und wenn zuletzt das falsche Konto angemeldet war
+  // Weiterleitung: installierte App, iPhone/iPad – und immer, solange Googles Anmelde-Skript nicht geladen ist
+  // (z. B. beim ersten Verbinden: das Skript wird erst im Cloud-Modus geladen, vorher hat die App keinen Kontakt zu Google)
+  if(useRedirect()||!tokenClient()){
     const s=uid();localStorage.setItem(SKEY,s);if(after)sessionStorage.setItem("ttb_after",after);
     location.href="https://accounts.google.com/o/oauth2/v2/auth?"+new URLSearchParams({client_id:CLIENT_ID,redirect_uri:RURI,response_type:"token",scope:SCOPE,include_granted_scopes:"true",state:s,
-      ...(silent?{prompt:"none"}:idx.email?{}:{prompt:"select_account"}),...(idx.email?{login_hint:idx.email}:{})});
+      ...(silent?{prompt:"none"}:sel?{prompt:"select_account"}:{}),...(idx.email?{login_hint:idx.email}:{})});
     return new Promise(()=>{});
   }
-  const c=tokenClient();if(!c)return Promise.reject(new Error("Google ist gerade nicht erreichbar"));
-  return new Promise((res,rej)=>{tcWait={res,rej};c.requestAccessToken({prompt:idx.email?"":"select_account",...(idx.email?{login_hint:idx.email}:{})})});
+  const c=tokenClient();
+  return new Promise((res,rej)=>{tcWait={res,rej};c.requestAccessToken({prompt:sel?"select_account":"",...(idx.email?{login_hint:idx.email}:{})})});
 }
 
 // ---------- Google Drive (REST) ----------
@@ -495,9 +502,11 @@ const DRV=MOCK||{
     saveIdx();return idx.folder;
   },
   async list(){
-    const f=await this.folder(),r=await api(`drive/v3/files?q=${Qs(`'${f}' in parents and trashed=false`)}&fields=files(id,name,modifiedTime,appProperties)&pageSize=500`);
-    return r.files.filter(x=>x.appProperties&&x.appProperties.ttbPlan).map(x=>({fileId:x.id,planId:x.appProperties.ttbPlan,name:x.name.replace(/\.json$/i,""),mod:x.modifiedTime}));
+    const f=await this.folder(),r=await api(`drive/v3/files?q=${Qs(`'${f}' in parents and trashed=false`)}&fields=files(id,name,createdTime,modifiedTime,appProperties)&pageSize=500`);
+    return r.files.filter(x=>x.appProperties&&x.appProperties.ttbPlan).map(x=>({fileId:x.id,planId:x.appProperties.ttbPlan,name:x.name.replace(/\.json$/i,""),mod:x.modifiedTime,created:x.createdTime}));
   },
+  // doppelte Datei (Inhalt bereits zusammengeführt): nicht löschen, nur kennzeichnen – sie wird dann nicht mehr abgeglichen
+  retire:(id,name)=>api(`drive/v3/files/${id}?fields=id`,{method:"PATCH",headers:JH,body:JSON.stringify({name:name+" (doppelt, zusammengeführt).json",appProperties:{ttbPlan:null,ttbDup:"1"}})}),
   get:id=>api(`drive/v3/files/${id}?alt=media`),
   meta:id=>api(`drive/v3/files/${id}?fields=id,trashed`),
   async create(d){return drvUp("POST","",{name:fileName(d),parents:[await this.folder()],mimeType:"application/json",appProperties:{ttbPlan:d.plan.id}},d)},
@@ -514,16 +523,22 @@ async function syncAll(){
   if(syncing){again=true;return}
   syncing=true;renderSync();
   try{
-    const rem=new Map((await DRV.list()).map(r=>[r.planId,r]));
+    if(!await acctOk())throw Object.assign(new Error("anderes Google-Konto"),{acct:true});
+    // je Plan-ID genau eine Datei: bei Doppelten gilt auf allen Geräten dieselbe (älteste), die übrigen werden eingemischt
+    const rem=new Map(),dups=[];
+    (await DRV.list()).sort((a,b)=>(a.created||"").localeCompare(b.created||"")||String(a.fileId).localeCompare(String(b.fileId)))
+      .forEach(r=>{if(rem.has(r.planId))dups.push(r);else rem.set(r.planId,r)});
     rem.forEach(r=>{if(!idx.plans[r.planId])idx.plans[r.planId]={id:r.planId,name:r.name,fileId:r.fileId,...(r.planId===XID?{xtra:true}:{})}}); // Pläne von anderen Geräten
+    for(const r of dups)await mergeDup(r);
     for(const e of Object.values(idx.plans))if(!e.debug&&idx.plans[e.id])await syncPlan(e,rem.get(e.id));
     lastSync=Date.now();try{localStorage.setItem("ttb_last",lastSync)}catch(x){}netDown=false;syncErr="";
-  }catch(x){if(x.auth)dropTok();else if(x instanceof TypeError)netDown=true;else syncErr=x.message;console.warn("Sync:",x)}
+  }catch(x){if(x.acct){}else if(x.auth)dropTok();else if(x instanceof TypeError)netDown=true;else syncErr=x.message;console.warn("Sync:",x)}
   syncing=false;saveIdx();renderSync();
   if(again){again=false;syncSoon(300)}
 }
 async function syncPlan(e,r){
   const rev=e.rev||0,done=()=>{if((e.rev||0)===rev)e.dirty=false};
+  if(r&&e.fileId!==r.fileId){e.fileId=r.fileId;e.mod=null} // Datei gibt es schon (z. B. von anderem Gerät angelegt): diese nehmen, nie eine zweite anlegen
   if(e.fileId&&!r){ // nicht (mehr) im Ordner: im Papierkorb/gelöscht – oder nur verschoben?
     let gone=false;try{gone=!!(await DRV.meta(e.fileId)).trashed}catch(x){if(x.status===404)gone=true;else throw x}
     if(gone&&!remoteGone(e))return;
@@ -541,6 +556,26 @@ async function syncPlan(e,r){
   else if(r&&r.mod)e.mod=r.mod;
   done();
 }
+// Doppelte Datei zu einer Plan-ID: Inhalt in die lokale Kopie übernehmen (wird danach in die gültige Datei hochgeladen), Datei kennzeichnen
+async function mergeDup(r){
+  const remote=await DRV.get(r.fileId);
+  if(remote&&okPlan(remote.plan)&&Array.isArray(remote.sessions)){
+    const rd={...remote,plan:{...remote.plan,id:r.planId},sessions:remote.sessions.slice().sort(cmp)},loc=readDoc(r.planId);
+    writeDoc(loc?mergeDocs(loc,rd):rd);
+    const e=idx.plans[r.planId];if(e){e.dirty=true;e.rev=(e.rev||0)+1}
+  }
+  await DRV.retire(r.fileId,r.name);
+}
+// Neuer Google-Zugang: einmal prüfen, ob es dasselbe Google-Konto ist wie bisher – sonst nichts abgleichen
+// (ein anderes Konto sähe die Dateien nicht, die App würde sie für gelöscht halten)
+let acctErr="";
+async function acctOk(){
+  if(tok.v)return true;
+  const em=await DRV.email();
+  if(idx.email&&em&&em.toLowerCase()!==idx.email.toLowerCase()){acctErr=em;dropTok();toast(`Angemeldet ist ${em} – die Pläne liegen bei ${idx.email}. Bitte mit diesem Konto anmelden.`);return false}
+  acctErr="";if(!idx.email&&em)idx.email=em;tok.v=true;try{localStorage.setItem(TKEY,JSON.stringify(tok))}catch(x){}
+  return true;
+}
 // Plan wurde in Drive gelöscht. Rückgabe true = Plan behalten (wird neu angelegt)
 function remoteGone(e){
   if(e.dirty&&readDoc(e.id)&&confirm(`Der Plan „${e.name}“ wurde in Google Drive gelöscht. Auf diesem Gerät gibt es dazu noch nicht gespeicherte Änderungen.\n\nOK = Plan behalten (wird neu in Google Drive angelegt)\nAbbrechen = Plan auch hier entfernen`)){e.fileId=null;e.mod=null;return true}
@@ -553,15 +588,15 @@ function remoteGone(e){
 function adopt(m){
   const before=JSON.stringify(docOf());plan=m.plan;data=m.sessions.slice();
   if(JSON.stringify(docOf())===before)return;
-  if(editId===null&&!dirty&&st.every(x=>!x.reps.length))init();else render();
+  if(!busy())init();else render();
 }
 // nach einer Änderung per Klick: abgelaufenen Google-Zugang gleich mit erneuern (Fenster blitzt kurz auf)
-function kick(){if(idx.mode==="cloud"&&!tokValid()&&navigator.onLine&&cloudOk()&&!useRedirect())auth().then(()=>syncSoon(200)).catch(()=>renderSync())}
+function kick(){if(idx.mode==="cloud"&&!tokValid()&&navigator.onLine&&cloudOk()&&!useRedirect()&&(MOCK||tokenClient()))auth().then(()=>syncSoon(200)).catch(()=>renderSync())}
 // Installierte App: abgelaufenen Zugang still erneuern (Weiterleitung mit prompt=none), aber nur wenn gerade nichts eingegeben wird.
 // Höchstens alle 30 Minuten versuchen, damit bei abgemeldetem Google-Konto keine Schleife entsteht.
 function silentRenew(){
   if(idx.mode!=="cloud"||tokValid()||!useRedirect()||!navigator.onLine||!CLIENT_ID||MOCK)return false;
-  if(plan&&(editId!==null||dirty||st.some(x=>x.reps.length)||$("noteIn").value.trim()))return false;
+  if(busy()||tm||["pw","xo","xtm"].some(i=>!$(i).hidden))return false; // offener Plan-Assistent/Dialog oder laufender Timer: nicht neu laden
   const last=+(localStorage.getItem("ttb_silent")||0);if(Date.now()-last<30*60e3)return false;
   localStorage.setItem("ttb_silent",Date.now());auth(null,true);return true;
 }
@@ -573,14 +608,14 @@ async function connect(){
     const rem=await DRV.list();
     for(const e of Object.values(idx.plans)){ // vorhandene Pläne dieses Geräts mitnehmen; gleichnamige zusammenführen
       if(e.debug)continue;
-      const r=rem.find(x=>x.planId!==e.id&&x.name.toLowerCase()===e.name.toLowerCase()),loc=readDoc(e.id);
+      const r=!e.xtra&&rem.find(x=>x.planId!==e.id&&x.planId!==XID&&x.name.toLowerCase()===String(e.name).toLowerCase()),loc=readDoc(e.id);
       if(r&&loc){
         const m=mergeDocs({...loc,plan:{...loc.plan,id:r.planId}},await DRV.get(r.fileId));
         try{localStorage.removeItem(DKEY(e.id))}catch(x){}delete idx.plans[e.id];writeDoc(m);
         idx.plans[r.planId]={id:r.planId,fileId:r.fileId,dirty:true,rev:1,...docMeta(m)};if(idx.active===e.id)idx.active=r.planId;
       }else{e.dirty=true;e.rev=(e.rev||0)+1}
     }
-    idx.mode="cloud";saveIdx();stm("Lade Pläne aus Google Drive …");
+    idx.mode="cloud";saveIdx();gisLoad();stm("Lade Pläne aus Google Drive …");
     await syncAll();
     if(netDown||syncErr)throw new Error(syncErr||"keine Verbindung");
     stm("");
@@ -600,6 +635,7 @@ function renderSync(){
   else if(!cl){t=cloudOk()?W+"Nur auf diesem Gerät · <u>mit Google Drive verbinden</u>":W+"Nur auf diesem Gerät gespeichert";w=true}
   else if(syncing)t=C+"Synchronisiere …";
   else if(netDown||!navigator.onLine)t=dt?C+"Offline · Änderungen auf dem Gerät gesichert, werden später übertragen":C+"Offline";
+  else if(acctErr&&!tokValid()){t=W+`Anderes Google-Konto angemeldet · <u>mit ${esc(idx.email||"")} anmelden</u>`;w=true}
   else if(!tokValid()){if(dt){t=W+"Auf dem Gerät gesichert · <u>Google-Verbindung erneuern</u>";w=true}else t=C+`Google Drive${lastSync?" · abgeglichen "+ago(lastSync):""} · <u>aktualisieren</u>`}
   else if(syncErr){t=W+"Synchronisierung fehlgeschlagen · <u>erneut versuchen</u>";w=true}
   else if(dt)t=C+"Wird gespeichert …";
@@ -769,7 +805,7 @@ function build(defs){
     const hp=e.m==="p",hw=e.m==="wr"||e.m==="w",hr=e.m==="wr"||e.m==="r";
     const row=hp?`<div class="in g g5"><input class="pr" data-i="${i}" inputmode="numeric" placeholder="Wdh" aria-label="Wiederholungen je Satz"><span>Wdh. je Satz</span></div>
       <div class="in g g2" style="margin-top:8px">${stw(i,"r",`<input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="kg" autocomplete="off">`)}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
-     :`<div class="in g ${hw&&hr?"g1":hw?"g3":"g4"}">${hw?`${stw(i,"w",`<input class="w" data-i="${i}" inputmode="decimal" value="${st[i].w}" aria-label="Gewicht in kg">`)}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
+     :`<div class="in g ${hw&&hr?"g1":hw?"g3":"g4"}">${hw?`${stw(i,"w",`<input class="w" data-i="${i}" inputmode="decimal" value="${esc(st[i].w)}" aria-label="Gewicht in kg">`)}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
     const ax=hw&&!e.bw,ib=(k,t,s)=>`<button type="button" class="ico${AX.has(k+"|"+e.n)?" on":""}" data-ax="${k}" data-i="${i}" title="${t}" aria-label="${t}">${s}</button>`;
     return `<div class="fl lb"><span>${esc(e.n)}${e.one?` <small class="one">einzeln</small><button type="button" class="ico rmo" data-rmone="${i}" title="Aus diesem Training entfernen" aria-label="Entfernen">×</button>`:""}${ax?ib("w","Aufwärmsätze",FL)+ib("p","Scheibenrechner",BB):""}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></div>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}${ax?`<div class="aux" id="aw${i}" hidden></div><div class="aux" id="ap${i}" hidden></div>`:""}`}).join("");
   cur.forEach((_,i)=>{chips(i);updateDw(i)});
@@ -999,10 +1035,10 @@ function exitEdit(){
 }
 $("cancel").onclick=exitEdit;
 const wd=d=>new Date(d+"T12:00").toLocaleDateString("de-DE",{weekday:"short"}).replace(".","");
-const fmt=d=>d.split("-").reverse().join(".");
+const fmt=d=>esc(String(d).split("-").reverse().join("."));
 // Anzeige-Infos zu einem gespeicherten Wert
 function exInfo(k,v,u){
-  const p=parseVal(v),d=defOf(k,u),wg=p.w==null?null:p.w.replace(".",",");
+  const p=parseVal(v),d=defOf(k,u),wg=p.w==null?null:esc(p.w.replace(".",","));
   return{p,pyr:p.pyr||null,z:!!(d&&d.bw&&p.w!=null&&!+p.w),kg:wg==null?null:(d&&d.bw?(+p.w?`+${wg} kg`:"Körpergewicht"):`${wg} kg`),sum:(p.reps&&d&&!d.s)?sum(p.reps):null};
 }
 // Gewichtsvergleich
@@ -1264,7 +1300,7 @@ function visIds(Lr,units){
 function card(s,ref,rec){
   const cmp=ui.hv!=="d";
   const nt=s.note?`<div class="nt"${cmp?" hidden":""}>💬 ${esc(s.note)}</div>`:"";
-  const head=`<div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>${esc(uLab(s.unit))}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}${s.note&&cmp?`<span class="inf" onclick="const n=this.closest('.card').querySelector('.nt');n.hidden=!n.hidden" title="Notiz">💬</span>`:""}</span><span><button class="x" onclick="edit('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="del('${s.id}')" title="Löschen">✕</button></span></div>`;
+  const head=`<div class="h"><span>${wd(s.date)} ${fmt(s.date)} <small>${esc(uLab(s.unit))}</small>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</small>`:""}${s.note&&cmp?`<span class="inf" onclick="const n=this.closest('.card').querySelector('.nt');n.hidden=!n.hidden" title="Notiz">💬</span>`:""}</span><span><button class="x" onclick="edit(${ja(s.id)})" title="Bearbeiten">✎</button><button class="x" onclick="del(${ja(s.id)})" title="Löschen">✕</button></span></div>`;
   const body=Object.entries(s.ex).map(([k,v])=>{
     const i=exInfo(k,v,s.unit),hw=i.p.w!=null,di=hw?dinfo(+i.p.w,prevW(s,k)):null,df=di?`<small class="df ${di.c}">${di.t}</small>`:"",tr=rec.has(s.id+"|"+k)?" 🏆":"";
     const one=s.xd&&s.xd[k]&&!unitDefs(s.unit).some(e=>e.n===k)?` <small class="one">einzeln</small>`:""; // einmalige Übung
@@ -1281,7 +1317,7 @@ function card(s,ref,rec){
 }
 // Karte für ein weiteres Training (z. B. Rugby): schmal, gedeckt gelb abgesetzt
 function xcard(s){
-  return `<div class="card xc"><div class="h"><span>${wd(s.date)} ${fmt(s.date)} <span class="xsp">${ICO.sp} ${esc(s.sp)}</span>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</small>`:""}</span><span><button class="x" onclick="xOpen('${s.id}')" title="Bearbeiten">✎</button><button class="x" onclick="xDel('${s.id}')" title="Löschen">✕</button></span></div></div>`;
+  return `<div class="card xc"><div class="h"><span>${wd(s.date)} ${fmt(s.date)} <span class="xsp">${ICO.sp} ${esc(s.sp)}</span>${s.ed?`<span class="inf" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden" title="Geändert">ⓘ</span><small hidden> geändert ${new Date(s.ts).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</small>`:""}</span><span><button class="x" onclick="xOpen(${ja(s.id)})" title="Bearbeiten">✎</button><button class="x" onclick="xDel(${ja(s.id)})" title="Löschen">✕</button></span></div></div>`;
 }
 // Filterzeile: passt alles in eine Zeile, stehen die Einheiten direkt da; sonst ein Knopf mit dynamischer Beschriftung,
 // der die Einheiten in eine eigene Zeile darunter aus-/einklappt (bleibt offen, bis er erneut angetippt wird). Mehrfachauswahl.
@@ -1388,7 +1424,7 @@ function planRows(act,drag){
     const on=plan&&p.id===plan.id,loc=!!readDoc(p.id);
     const inf=[p.n!=null?`${p.n} ${p.n===1?"Eintrag":"Einträge"}`:"",p.last?"zuletzt "+fmt(p.last):"",
       p.debug||idx.mode!=="cloud"?"nur auf diesem Gerät":!loc?"noch nicht geladen":""].filter(Boolean);
-    return `<div class="pl${on?" on":""}${act==="del"?" dl":""}" role="button" tabindex="0" data-pid="${p.id}" data-pa="${act}"${drag?" data-drag":""}>
+    return `<div class="pl${on?" on":""}${act==="del"?" dl":""}" role="button" tabindex="0" data-pid="${esc(p.id)}" data-pa="${act}"${drag?" data-drag":""}>
       <div class="plh"><b>${pName(p,p.debug)}</b>${on?`<span class="pill">Aktiv</span>`:""}${drag?`<span class="dh" title="Ziehen: Reihenfolge ändern – oder Karte lange gedrückt halten">${DH}</span>`:""}</div>
       <div class="plm">${(inf.length?inf:["noch keine Einträge"]).map(t=>`<span class="bb">${t}</span>`).join("")}</div></div>`}).join("")+`</div>`;
 }
@@ -1440,23 +1476,32 @@ function delPlan(id){
   auth().then(()=>DRV.trash(e.fileId)).then(fin).catch(x=>toast("Löschen fehlgeschlagen: "+x.message));
 }
 // „Lokale Daten löschen & Google trennen“: löscht nur die Kopien auf dem Gerät (vorher synchronisieren), Google Drive bleibt unverändert
+// Mit Verbindung wird vorher angemeldet (gültiger Zugang nötig, um die Freigabe bei Google zu widerrufen) und synchronisiert.
 function wipe(){
-  if(idx.mode==="cloud"&&anyDirty()){
-    if(!navigator.onLine)return alert("Es gibt noch Änderungen, die nicht in Google Drive gespeichert sind, und keine Internetverbindung.\n\nBitte erst mit Verbindung synchronisieren – sonst gingen sie verloren.");
-    return auth().then(syncAll).then(()=>anyDirty()?alert("Synchronisieren hat nicht geklappt – Entfernen abgebrochen, damit nichts verloren geht."):wipe2()).catch(x=>toast("Google-Anmeldung nicht möglich: "+x.message));
+  if(idx.mode!=="cloud")return wipe2();
+  if(!navigator.onLine){
+    if(anyDirty())return alert("Es gibt noch Änderungen, die nicht in Google Drive gespeichert sind, und keine Internetverbindung.\n\nBitte erst mit Verbindung synchronisieren – sonst gingen sie verloren.");
+    return wipe2();
   }
-  wipe2();
+  auth("wipe").then(syncAll).then(()=>anyDirty()?alert("Synchronisieren hat nicht geklappt – Entfernen abgebrochen, damit nichts verloren geht."):wipe2()).catch(x=>toast("Google-Anmeldung nicht möglich: "+x.message));
 }
 function wipe2(){
-  const cl=idx.mode==="cloud";
-  if(!confirm(cl?"Alle Pläne von diesem Gerät entfernen und die Verbindung zu Google trennen?\n\nIn Google Drive bleibt alles erhalten – beim nächsten Verbinden ist alles wieder da.":"⚠ Alle Pläne und Einträge auf diesem Gerät löschen?\n\nOhne Cloud sind sie danach unwiderruflich weg (außer du hast eine Sicherungskopie)."))return;
-  try{if(tok&&window.google&&google.accounts&&google.accounts.oauth2)google.accounts.oauth2.revoke(tok.t,()=>{})}catch(x){}
-  try{Object.keys(localStorage).filter(k=>k.startsWith("ttb_")).forEach(k=>localStorage.removeItem(k))}catch(x){}
+  const cl=idx.mode==="cloud",rv=cl&&tokValid();
+  if(!confirm(cl?"Alle Pläne von diesem Gerät entfernen und die Verbindung zu Google trennen?\n\nIn Google Drive bleibt alles erhalten – beim nächsten Verbinden ist alles wieder da."
+    +(rv?"":"\n\nHinweis: Ohne gültige Google-Verbindung kann die Freigabe nicht automatisch widerrufen werden. Das geht jederzeit im Google-Konto unter „Sicherheit → Drittanbieter-Apps mit Kontozugriff“.")
+    :"⚠ Alle Pläne und Einträge auf diesem Gerät löschen?\n\nOhne Cloud sind sie danach unwiderruflich weg (außer du hast eine Sicherungskopie)."))return;
+  // Freigabe bei Google widerrufen (ohne Googles Skript; keepalive, damit die Anfrage das Neuladen übersteht)
+  if(rv&&!MOCK)try{fetch("https://oauth2.googleapis.com/revoke",{method:"POST",mode:"no-cors",keepalive:true,headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"token="+encodeURIComponent(tok.t)}).catch(()=>{})}catch(x){}
+  try{Object.keys(localStorage).filter(k=>k.startsWith("ttb_")||k===UKEY).forEach(k=>localStorage.removeItem(k))}catch(x){}
+  try{Object.keys(sessionStorage).filter(k=>k.startsWith("ttb_")).forEach(k=>sessionStorage.removeItem(k))}catch(x){}
   location.reload();
 }
 // Sicherungskopie (nur Modus „Ohne Cloud“): teilen bzw. herunterladen, und wieder einspielen
+// Die Sicherung enthält alle Pläne dieses Geräts und die weiteren Trainings (nicht den Debug-Plan): {app,version,backup:1,docs:[…]}
 async function backup(){
-  const d=docOf(),txt=JSON.stringify(d,null,1),name=fileName(d);
+  const docs=Object.values(idx.plans).filter(e=>!e.debug).map(e=>readDoc(e.id)).filter(Boolean);
+  if(!docs.length)return toast("Es gibt noch nichts zu sichern.");
+  const txt=JSON.stringify({app:"TTB",version:DOCV,backup:1,date:ld(),docs},null,1),name=`TTB-Sicherung ${ld()}.json`;
   try{const f=new File([txt],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return}}catch(x){if(x.name==="AbortError")return}
   dl(name,txt,"application/json");
 }
@@ -1464,12 +1509,21 @@ $("file").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=()=>{try{
-    const d=JSON.parse(r.result);if(!d||!okPlan(d.plan)||!Array.isArray(d.sessions))throw new Error("Das ist keine TTB-Sicherung.");
-    const id=d.plan.id||uid(),loc=readDoc(id),inp={app:"TTB",version:DOCV,plan:{...d.plan,id},sessions:d.sessions};
-    const m=loc?mergeDocs(loc,inp):{...inp,plan:{...inp.plan,name:uniqueName(d.plan.name)}};
-    writeDoc(m);idx.plans[id]={...(idx.plans[id]||{}),id,...docMeta(m)};
-    if(editId!==null)exitEdit();
-    openPlan(id);persist();pmClose();init();toast(`Sicherung „${m.plan.name}“ eingespielt (${docMeta(m).n} Einträge).`);
+    // Gesamtsicherung (docs) oder ältere Sicherung eines einzelnen Plans
+    const j=JSON.parse(r.result),ok=d=>d&&okPlan(d.plan)&&Array.isArray(d.sessions)&&d.sessions.every(x=>x&&typeof x==="object"&&x.id!=null&&typeof x.date==="string"&&x.ex&&typeof x.ex==="object");
+    const docs=j&&Array.isArray(j.docs)?j.docs:[j];
+    if(!docs.length||!docs.every(ok))throw new Error("Das ist keine (vollständige) TTB-Sicherung.");
+    let first=null,np=0,nx=0;
+    docs.forEach(d=>{
+      if(d.plan.id==="debug")return;
+      const id=String(d.plan.id||uid()),xt=id===XID,loc=readDoc(id),inp={app:"TTB",version:DOCV,plan:{...d.plan,id,...(xt?{name:XNAME}:{})},sessions:d.sessions.map(x=>({...x,id:String(x.id)}))};
+      const m=loc?mergeDocs(loc,inp):{...inp,plan:{...inp.plan,name:xt?XNAME:uniqueName(d.plan.name,id)}};
+      writeDoc(m);idx.plans[id]={...(idx.plans[id]||{}),id,...docMeta(m),...(xt?{xtra:true}:{})};
+      if(xt)nx=docMeta(m).n;else{np++;if(!first)first=id}
+    });
+    saveIdx();if(editId!==null)exitEdit();
+    if(plan&&readDoc(plan.id))openPlan(plan.id);else if(first)openPlan(first); // offenen Plan neu einlesen (kann ergänzt worden sein)
+    pmClose();init();toast(`Sicherung eingespielt: ${np} ${np===1?"Plan":"Pläne"}${nx?`, ${nx} ${nx===1?"weiteres Training":"weitere Trainings"}`:""}.`);
   }catch(x){toast("Fehler: "+x.message)}};
   r.readAsText(f);e.target.value="";
 };
@@ -1510,7 +1564,7 @@ function wizRender(){
     return `<div class="we" data-b="${b}">
     <div class="weh"><input class="wn" data-b="${b}" list="exnames" maxlength="40" placeholder="Übung" value="${esc(e.n)}" autocomplete="off"><span class="dh" data-dh="${b}" title="Ziehen: verschieben (auch auf eine andere Einheit) – oder die Karte lange gedrückt halten">${DH}</span></div>
     <div class="wmc">${MODES.map(([k,t])=>`<button type="button" class="mc${e.m===k?" on":""}" data-m="${k}" data-b="${b}">${t}</button>`).join("")}</div>
-    ${e.m!=="w"?`<div class="wset">${wr?`<label class="bwt"><input type="checkbox" data-bw="${b}"${e.bw?" checked":""}>Körpergewichtsübung <small>(Gewicht = Zusatzgewicht)</small></label>`:""}<div class="wsr">${wr?`<label>Sätze ${sel("ws",b,[0,...N10],e.s??3,v=>v||"beliebig")}</label>`:e.m==="p"?`<label>Sätze ${sel("ws",b,N10,e.s||3)}</label>`:`<span>beliebig viele Sätze</span>`}<label>Pause ${sel("wp",b,RESTS,restOf(e),restL)}</label>${lim?`<label>Max./Satz <input class="wl" data-k="max" data-b="${b}" inputmode="numeric" placeholder="–" value="${e.max||""}"></label><label>Ziel Σ <input class="wl" data-k="goal" data-b="${b}" inputmode="numeric" placeholder="–" value="${e.goal||""}"></label>`:""}</div></div>`:""}
+    ${e.m!=="w"?`<div class="wset">${wr?`<label class="bwt"><input type="checkbox" data-bw="${b}"${e.bw?" checked":""}>Körpergewichtsübung <small>(Gewicht = Zusatzgewicht)</small></label>`:""}<div class="wsr">${wr?`<label>Sätze ${sel("ws",b,[0,...N10],e.s??3,v=>v||"beliebig")}</label>`:e.m==="p"?`<label>Sätze ${sel("ws",b,N10,e.s||3)}</label>`:`<span>beliebig viele Sätze</span>`}<label>Pause ${sel("wp",b,RESTS,restOf(e),restL)}</label>${lim?`<label>Max./Satz <input class="wl" data-k="max" data-b="${b}" inputmode="numeric" placeholder="–" value="${esc(e.max||"")}"></label><label>Ziel Σ <input class="wl" data-k="goal" data-b="${b}" inputmode="numeric" placeholder="–" value="${esc(e.goal||"")}"></label>`:""}</div></div>`:""}
     <div class="wdel"><button type="button" class="wdx" data-act="del" data-b="${b}">${TRASH} Entfernen</button></div>
     </div>`};
   $("wzb").innerHTML=`<label style="margin-top:0">Name des Plans</label><input id="wzName" maxlength="40" value="${esc(wz.name)}">
@@ -1653,6 +1707,7 @@ $("wzSave").onclick=()=>{
     const un=(w.name||"").trim();
     units.push(un?{name:un,exs}:{exs});
   }
+  if(name.toLowerCase()===XNAME.toLowerCase())return wzm(`„${XNAME}“ ist für Trainings außerhalb der Pläne reserviert – bitte einen anderen Namen wählen.`);
   if(nameTaken(name,wzMode==="edit"?plan.id:null))return wzm(`Es gibt schon einen Plan „${name}“ – bitte einen anderen Namen wählen.`);
   if(wzMode!=="edit"){if(editId!==null)exitEdit();newPlan({name,units});$("pw").hidden=true;init();kick();toast(`Plan „${plan.name}“ angelegt.`);return}
   // Bisherige Einträge anpassen: Einheiten umnummerieren (verschoben/gelöscht), auf Wunsch umbenannte Übungen mitziehen
@@ -1663,6 +1718,7 @@ $("wzSave").onclick=()=>{
     return c&&confirm(`Übung „${r.from}“ heißt jetzt „${r.to}“.\n\nAuch in den ${c} bisherigen Einträgen umbenennen? Empfohlen – dann bleiben Verlauf, Bestwerte und Diagramme zusammen.\n\nOK = umbenennen\nAbbrechen = alte Einträge behalten den alten Namen`)});
   const now=Date.now();let changed=0;
   data=data.map(x=>{
+    if(x.x)return x; // weitere Trainings (nur im Debug-Plan im selben Dokument) haben keine Einheit
     const u=x.unit>oldK?x.unit-oldK+newK+extra:map[x.unit];let ex=x.ex;
     doRen.forEach(r=>{if(x.unit===r.o&&ex[r.from]!=null&&ex[r.to]==null)ex=Object.fromEntries(Object.entries(ex).map(([k,v])=>[k===r.from?r.to:k,v]))});
     if(u===x.unit&&ex===x.ex)return x;
@@ -1683,8 +1739,10 @@ document.addEventListener("visibilitychange",()=>{
 
   if(wlWant)wlOn(); // Wake Lock wird beim Verlassen der Seite automatisch freigegeben
   tTick();
-  if(plan&&editId===null&&!dirty&&st.every(x=>!x.reps.length))init();
+  if(plan&&!busy())init();
 });
+// Formular in Benutzung (Eingaben, Bearbeiten, Notiz, einmalige Übungen) – dann nichts automatisch neu aufbauen
+function busy(){return!!plan&&(editId!==null||dirty||st.some(x=>x.reps.length||String(x.pr).trim())||!!$("noteIn").value.trim()||oneOff.length>0)}
 // ---------- Vorschlagsliste unter einem Eingabefeld (Gruppen, hervorgehobene Einträge, Filter beim Tippen) ----------
 function sugAttach(inp,groups,onPick){
   const box=document.createElement("div");box.className="sug";box.hidden=true;inp.after(box);
@@ -1720,7 +1778,7 @@ function xoRender(){
   const sel=(cls,vals,cur,lab)=>`<select class="${cls}">${vals.map(v=>`<option value="${v}"${v===cur?" selected":""}>${lab?lab(v):v}</option>`).join("")}</select>`;
   $("xob").innerHTML=`<div class="wu" style="border:0;padding:0;margin:0"><div class="we" style="margin:0"><div class="weh"><div class="sgw" style="flex:1"><input class="wn" maxlength="40" placeholder="Übung (Vorschläge beim Antippen)" value="${esc(e.n)}" autocomplete="off"></div></div>
     <div class="wmc">${MODES.map(([k,t])=>`<button type="button" class="mc${e.m===k?" on":""}" data-m="${k}">${t}</button>`).join("")}</div>
-    ${e.m!=="w"?`<div class="wset">${wr?`<label class="bwt"><input type="checkbox" class="xbw"${e.bw?" checked":""}>Körpergewichtsübung <small>(Gewicht = Zusatzgewicht)</small></label>`:""}<div class="wsr">${wr?`<label>Sätze ${sel("ws",[0,...N10],e.s??3,v=>v||"beliebig")}</label>`:e.m==="p"?`<label>Sätze ${sel("ws",N10,e.s||3)}</label>`:`<span>beliebig viele Sätze</span>`}<label>Pause ${sel("wp",RESTS,restOf(e),restL)}</label>${lim?`<label>Max./Satz <input class="wl" data-k="max" inputmode="numeric" placeholder="–" value="${e.max||""}"></label><label>Ziel Σ <input class="wl" data-k="goal" inputmode="numeric" placeholder="–" value="${e.goal||""}"></label>`:""}</div></div>`:""}
+    ${e.m!=="w"?`<div class="wset">${wr?`<label class="bwt"><input type="checkbox" class="xbw"${e.bw?" checked":""}>Körpergewichtsübung <small>(Gewicht = Zusatzgewicht)</small></label>`:""}<div class="wsr">${wr?`<label>Sätze ${sel("ws",[0,...N10],e.s??3,v=>v||"beliebig")}</label>`:e.m==="p"?`<label>Sätze ${sel("ws",N10,e.s||3)}</label>`:`<span>beliebig viele Sätze</span>`}<label>Pause ${sel("wp",RESTS,restOf(e),restL)}</label>${lim?`<label>Max./Satz <input class="wl" data-k="max" inputmode="numeric" placeholder="–" value="${esc(e.max||"")}"></label><label>Ziel Σ <input class="wl" data-k="goal" inputmode="numeric" placeholder="–" value="${esc(e.goal||"")}"></label>`:""}</div></div>`:""}
   </div></div>`;
   const inp=$("xob").querySelector(".wn");
   sugAttach(inp,()=>{const p=exPools();return[{t:"Im Plan",items:p.inPlan},{t:"Bisher einzeln eingetragen",items:p.one,tag:"einzeln"}]},
@@ -1771,6 +1829,21 @@ $("xtSave").onclick=()=>{
   xPut(old?{...old,date:d,sp,ts:now,ed:true}:{id:newId(),date:d,unit:0,ex:{},x:1,sp,ts:now});
   $("xtm").hidden=true;ui.hx=true;saveUi();kick();render();toast(old?"Training geändert.":`„${sp}“ am ${fmt(d)} eingetragen.`);
 };
+// ---------- Mehrere Tabs/Fenster gleichzeitig: Änderungen der anderen sofort übernehmen, damit keines veraltete Daten zurückschreibt ----------
+window.addEventListener("storage",e=>{
+  if(!e.key)return location.reload(); // Speicher komplett geleert
+  if(!e.key.startsWith("ttb_"))return;
+  if(e.key===IKEY){
+    let n=null;try{n=JSON.parse(e.newValue||"null")}catch(x){}
+    if(!n||n.mode!==idx.mode)return location.reload(); // getrennt/gelöscht oder Modus gewechselt
+    const a=idx.active;idx={mode:null,active:null,plans:{},...n,active:a}; // eigener offener Plan bleibt
+    if(plan&&!idx.plans[plan.id]){plan=null;data=[];const o=plans().find(p=>readDoc(p.id));if(o)openPlan(o.id);if(editId!==null)exitEdit();else init()}
+    else renderSync();
+  }else if(e.key===TKEY){try{tok=JSON.parse(e.newValue||"null")}catch(x){tok=null}renderSync()}
+  else if(e.key==="ttb_last"){lastSync=+(e.newValue||0);renderSync()}
+  else if(plan&&e.key===DKEY(plan.id)){const d=readDoc(plan.id);if(d)adopt({...d,sessions:d.sessions.slice().sort(cmp)})}
+  else if(plan&&e.key===DKEY(XID))render();
+});
 // ---------- Start ----------
 try{["trainingsplan_v1","trainingsplan_plan_v1","trainingsplan_file"].forEach(k=>localStorage.removeItem(k))}catch(e){} // Altbestände vor 0.90
 gisLoad();
@@ -1780,6 +1853,7 @@ const after=sessionStorage.getItem("ttb_after");sessionStorage.removeItem("ttb_a
 const autherr=sessionStorage.getItem("ttb_autherr");sessionStorage.removeItem("ttb_autherr");
 if(autherr)toast(autherr==="access_denied"?"Google-Anmeldung abgebrochen.":"Google-Anmeldung fehlgeschlagen ("+autherr+").");
 if(after==="connect"&&tokValid())connect(); // nach Google-Weiterleitung (installierte App)
+else if(after==="wipe"&&tokValid())wipe();
 else if(!silentRenew()&&idx.mode==="cloud")syncAll();
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register("sw.js").catch(()=>{});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{}); // Gerätespeicher möglichst nicht automatisch räumen

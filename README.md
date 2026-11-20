@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.99.5** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.99.6** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -17,7 +17,7 @@ Danach erscheint „TTB“ mit dem Feuerfuchs-Symbol auf dem Startbildschirm, oh
 1. **Mit Google Drive starten** (empfohlen): Anmeldung mit deinem Google-Konto. Gibt es in deinem Drive schon Pläne (z. B. vom anderen Handy), wählst du einen aus – bei genau einem öffnet er sich direkt. Sonst legst du einen Plan an: *WKM* oder *Individuell*.
 2. **Ohne Cloud nutzen** (kleiner Link): erst nach einem Hinweis auf die Grenzen – Daten nur in diesem Browser, kein Abgleich, der Browser kann sie löschen (iPhone: nach 7 Tagen ohne Nutzung in Safari). Später jederzeit „Mit Google Drive verbinden“ möglich; gleichnamige Pläne werden dabei zusammengeführt.
 
-**Wo liegen die Daten?** In deinem Google Drive im Ordner **„Trainingstagebuch“**, **eine Datei pro Plan** (z. B. `WKM.json`). Benennst du einen Plan um, wird die Datei umbenannt – es entsteht nie eine zweite Datei. Auf dem Gerät liegt immer eine Arbeitskopie. Die App hat nur Zugriff auf die Dateien, die sie selbst angelegt hat (Google-Berechtigung „drive.file“), nicht auf den Rest deines Drives.
+**Wo liegen die Daten?** In deinem Google Drive im Ordner **„Trainingstagebuch“**, **eine Datei pro Plan** (z. B. `WKM.json`). Benennst du einen Plan um, wird die Datei umbenannt – es entsteht keine zweite Datei. Sollte doch einmal eine doppelte Datei entstanden sein, führt die App ihren Inhalt automatisch zusammen und kennzeichnet sie mit „(doppelt, zusammengeführt)“ im Namen; sie wird nicht gelöscht und kann von Hand entfernt werden. Auf dem Gerät liegt immer eine Arbeitskopie. Die App hat nur Zugriff auf die Dateien, die sie selbst angelegt hat (Google-Berechtigung „drive.file“), nicht auf den Rest deines Drives.
 
 **Im Alltag – alles automatisch:**
 - Jede Änderung (Eintrag speichern, bearbeiten, löschen, Plan ändern) ist sofort auf dem Gerät gesichert und wird 1–2 Sekunden später nach Google Drive übertragen.
@@ -26,7 +26,9 @@ Danach erscheint „TTB“ mit dem Feuerfuchs-Symbol auf dem Startbildschirm, oh
 - Zwei Geräte gleichzeitig: Es wird pro Eintrag zusammengeführt (gleiche ID = gleicher Eintrag, neuere Änderung gewinnt, Löschungen werden mitgenommen). Vor jedem Hochladen liest die App den aktuellen Stand aus Drive – es wird nie blind überschrieben.
 - **Google-Zugang:** Google erlaubt Web-Apps ohne eigenen Server nur einen Zugang für ca. eine Stunde. Bis zur Erneuerung ist alles auf dem Gerät gesichert.
   - **Installierte App (Android/iPhone) und iPhone/iPad im Browser:** Anmeldung per Weiterleitung im selben Fenster (die App wechselt kurz zur Google-Seite und kommt zurück). Ein abgelaufener Zugang wird beim Öffnen oder Zurückkehren zur App still erneuert, solange gerade nichts eingegeben wird (kurzes Neuladen). Klappt das nicht, zeigt die Statuszeile „Google-Verbindung erneuern“.
-  - **Im Browser-Tab:** Beim nächsten „Speichern“ blitzt kurz ein Google-Fenster auf (bei mehreren Google-Konten: einmal antippen).
+  - **Im Browser-Tab:** Beim nächsten „Speichern“ blitzt kurz ein Google-Fenster auf (bei mehreren Google-Konten: einmal antippen). Das erste Verbinden läuft auch hier per Weiterleitung – Googles Anmelde-Skript wird erst im Cloud-Modus geladen.
+  - **Falsches Google-Konto:** Meldet sich ein anderes Konto an als das, mit dem die Pläne verbunden sind, gleicht die App nichts ab und zeigt „Anderes Google-Konto angemeldet“ (antippen = Konto wählen).
+- **Mehrere Tabs/Fenster** gleichzeitig (PC): Änderungen in einem Tab erscheinen sofort im anderen.
 
 **Statuszeile** unter dem Titel (neben dem Plannamen), z. B.:
 - „☁ In Google Drive gespeichert · vor 2 Min.“
@@ -40,9 +42,9 @@ Der aktive Plan steht unter dem Titel (antippen) und unten gibt es **⇄ Plan we
 - **＋ Neuer Plan:** *WKM*, *Individuell* (Plan-Assistent) oder *Aus bestehendem Plan übernehmen* – kopiert Übungen, Sätze und Pausen, nicht die Trainingseinträge; danach öffnet sich der Assistent zum Anpassen (mindestens der Name).
 - **Löschen:** Plan auswählen, mit Bestätigung. Im Cloud-Modus wandert die Datei in den **Papierkorb von Google Drive** (30 Tage wiederherstellbar) und der Plan verschwindet auf allen Geräten.
 
-Außerdem im selben Menü: **Lokale Daten löschen & Google trennen** – löscht nur die Kopien auf dem Gerät und trennt die Google-Verbindung (vorher wird synchronisiert; ohne Verbindung wird das verweigert, damit nichts verloren geht). In Google Drive bleibt alles erhalten. Im Modus ohne Cloud heißt der Knopf „Lokale Daten löschen“; zusätzlich gibt es **Sicherungskopie teilen** und **Sicherung einspielen**.
+Außerdem im selben Menü: **Lokale Daten löschen & Google trennen** – löscht die Daten der App auf dem Gerät (auch die Ansichts-Einstellungen) und widerruft die Freigabe bei Google (vorher wird angemeldet und synchronisiert; gibt es ungespeicherte Änderungen und keine Verbindung, wird das verweigert, damit nichts verloren geht – ohne Verbindung die Freigabe im Google-Konto unter „Drittanbieter-Apps mit Kontozugriff“ entfernen). In Google Drive bleibt alles erhalten. Im Modus ohne Cloud heißt der Knopf „Lokale Daten löschen“; zusätzlich gibt es **Sicherungskopie teilen** (eine Datei mit allen Plänen und den weiteren Trainings) und **Sicherung einspielen** (auch ältere Sicherungen eines einzelnen Plans).
 
-Plannamen sind eindeutig.
+Plannamen sind eindeutig; „Weitere Trainings“ ist als Name reserviert (Datei der Trainings außerhalb der Pläne).
 
 ### Schutz vor Datenverlust
 | Situation | Was passiert |
@@ -123,6 +125,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.99.6:** Prüfung vor 1.0. Synchronisierung: nie mehr eine zweite Drive-Datei zum selben Plan (vorhandene doppelte werden zusammengeführt und gekennzeichnet), Prüfung des Google-Kontos nach jeder Anmeldung. Datenschutz: Googles Anmelde-Skript wird nur noch im Cloud-Modus geladen (ohne Cloud und auf dem Startbildschirm kein Kontakt zu Google), Trennen widerruft die Freigabe zuverlässig und löscht alle App-Daten auf dem Gerät. Sicherungskopie (ohne Cloud) enthält alle Pläne und weitere Trainings. Stilles Erneuern lädt nicht neu, solange Plan-Assistent, ein Dialog oder ein Timer offen ist oder einmalige Übungen eingetragen sind. Mehrere Tabs übernehmen Änderungen voneinander. Sicherheit: gespeicherte Werte werden vor der Anzeige maskiert, Sicherheitsregel (Content-Security-Policy). Datenschutzerklärung auch offline verfügbar. Name „Weitere Trainings“ für Pläne reserviert.
 - **0.99.5:** Kalender: Tage mit Krafttraining und weiterem Training tragen eine gut sichtbare gelbe Ecke oben links (statt der schmalen Leiste unten); reine „Weitere“-Tage und Legende im selben kräftigeren Gelb.
 - **0.99.4:** Vorschlagslisten zeigen beim Antippen immer die komplette Liste (auch beim Bearbeiten), gefiltert wird erst beim Tippen. Filterzeile erlaubt „Keine“ Einheit – dann nur weitere Trainings (letzte 5 aktuell).
 - **0.99.3:** ＋-Menü: einmalige Übungen (mit Vorschlägen „Im Plan“ / „einzeln“) und weitere Trainings wie Rugby (planunabhängig, eigene Drive-Datei, gedeckt gelb in Verlauf und Kalender, eigene Auswertung). Neue Filterzeile mit Mehrfachauswahl, Symbolen für Ansicht und weitere Trainings, klappt bei Platzmangel in eine zweite Zeile aus. Ausführliche Ansicht mit Satznummern und Ziel bei Summen. Fehlerbehebung: Kalender-Popup-Zeilen sahen seit 0.99.1 wie Plan-Karten aus.

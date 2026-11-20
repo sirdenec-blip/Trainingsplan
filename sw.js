@@ -1,8 +1,8 @@
 // Service Worker für TTB: macht die App offline nutzbar.
 // Strategie: erst das Netz (damit Updates sofort ankommen), bei fehlendem/schlechtem Empfang nach 3 s die gespeicherte Kopie.
 // Anfragen an Google (Anmeldung, Drive) werden nicht angefasst.
-const CACHE="ttb-0.99.5";
-const CORE=["./","./index.html","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png"];
+const CACHE="ttb-0.99.6";
+const CORE=["./","./index.html","./datenschutz.html","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png"];
 
 self.addEventListener("install",e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
