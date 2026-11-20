@@ -118,6 +118,12 @@ details.old>summary{cursor:pointer;color:var(--mu);font-size:.9rem;margin:0 0 12
 /* 0.50: Logo, Verlauf-Leiste, Kompaktansicht, Notiz, Aufwärmen/Scheiben, Pausentimer, Diagramm-Tipp, Export-Erinnerung */
 h1.lg{display:flex;align-items:center;gap:8px}.logo{width:34px;height:34px;flex:0 0 34px}
 .lb{display:flex;font-size:.85rem;color:var(--mu);margin:12px 0 4px}
+/* 0.99.8: jede Übung der Eingabe als dezent grün umrandete Bubble, Übungsname in Grün hervorgehoben */
+.exb{border:1px solid color-mix(in srgb,var(--ac) 40%,var(--bd));border-radius:12px;padding:8px 8px 6px;margin-top:10px}
+.exb .lb{margin:0 0 6px;align-items:center}.exb .chips{margin-top:6px}
+.exn{color:var(--ac);font-weight:600;font-size:.95rem}
+.card.ein{padding:14px 10px}.exb .stw .sb{flex-basis:38px;width:38px} /* Platz für die Bubbles: Wdh.-Feld bleibt breit genug */
+.exb .one{vertical-align:1px}
 .ico{width:auto;margin:0 0 0 6px;padding:0 3px;background:none;border:0;color:var(--tx);font-size:.95rem;font-weight:400;line-height:1;opacity:.45;touch-action:manipulation}.ico.on{opacity:1}
 .aux{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.8rem;color:var(--mu);margin-top:6px}
 .aux .ax{border:1px solid var(--bd);border-radius:8px;padding:1px 7px;color:var(--tx);font-variant-numeric:tabular-nums}.aux .ax small{color:var(--mu);font-size:.7rem}
@@ -190,7 +196,9 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 /* 0.99.3: weitere Trainings, einmalige Übungen, Vorschlagslisten, Filterzeile */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:26;padding:16px;overflow:auto}.ov[hidden]{display:none}.ov>div{max-width:520px;margin:6vh auto}
 .err{color:#c33;font-size:.85rem;min-height:1.2em;margin-top:8px}
-.sgw{position:relative}.sug{position:absolute;left:0;right:0;top:100%;z-index:14;margin-top:4px;max-height:260px;overflow:auto;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 22px rgba(0,0,0,.35)}.sug[hidden]{display:none}
+.sgw{position:relative}.sgw input{padding-right:38px}
+.sgx{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:32px;height:32px;margin:0;padding:0;display:flex;align-items:center;justify-content:center;background:none;border:0;color:var(--mu);border-radius:50%}.sgx[hidden]{display:none}
+.sug{position:absolute;left:0;right:0;top:100%;z-index:14;margin-top:4px;max-height:260px;overflow:auto;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 22px rgba(0,0,0,.35)}.sug[hidden]{display:none}
 .sgh{font-size:.72rem;color:var(--mu);padding:8px 12px 2px;text-transform:uppercase;letter-spacing:.03em}
 .sgi{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;margin:0;padding:9px 12px;border:0;border-radius:0;background:none;color:var(--tx);font-weight:400;text-align:left}
 .sgi small{color:var(--mu);font-size:.72rem}.sgi.hl{font-weight:600;color:var(--xtx2)}
@@ -278,7 +286,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
   <div class="ver" id="ver"></div>
 </div>
 <div class="pbar"><button type="button" class="pn" id="pname" title="Plan wechseln"></button><span class="sst" id="sst"></span></div>
-<div class="card">
+<div class="card ein">
   <div id="editbar" hidden></div>
   <div class="row">
     <div><label style="margin-top:0">Datum</label><input type="date" id="date"></div>
@@ -325,7 +333,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.99.7";
+const VERSION="0.99.8";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -808,7 +816,7 @@ function build(defs){
       <div class="in g g2" style="margin-top:8px">${stw(i,"r",`<input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="kg" autocomplete="off">`)}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
      :`<div class="in g ${hw&&hr?"g1":hw?"g3":"g4"}">${hw?`${stw(i,"w",`<input class="w" data-i="${i}" inputmode="decimal" value="${esc(st[i].w)}" aria-label="Gewicht in kg">`)}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
     const ax=hw&&!e.bw,ib=(k,t,s)=>`<button type="button" class="ico${AX.has(k+"|"+e.n)?" on":""}" data-ax="${k}" data-i="${i}" title="${t}" aria-label="${t}">${s}</button>`;
-    return `<div class="fl lb"><span>${esc(e.n)}${e.one?` <small class="one">einzeln</small><button type="button" class="ico rmo" data-rmone="${i}" title="Aus diesem Training entfernen" aria-label="Entfernen">×</button>`:""}${ax?ib("w","Aufwärmsätze",FL)+ib("p","Scheibenrechner",BB):""}${hr&&!e.s?" (beliebig viele Sätze, Enter ohne Zahl = fertig)":""}</span><small class="dw" id="dw${i}"></small></div>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}${ax?`<div class="aux" id="aw${i}" hidden></div><div class="aux" id="ap${i}" hidden></div>`:""}`}).join("");
+    return `<div class="exb"><div class="fl lb"><span><b class="exn">${esc(e.n)}</b>${e.one?` <small class="one">einzeln</small><button type="button" class="ico rmo" data-rmone="${i}" title="Aus diesem Training entfernen" aria-label="Entfernen">×</button>`:""}${ax?ib("w","Aufwärmsätze",FL)+ib("p","Scheibenrechner",BB):""}${hr&&!e.s?` <small class="one" title="Beliebig viele Sätze – Enter ohne Zahl = fertig">beliebig</small>`:""}</span><small class="dw" id="dw${i}"></small></div>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}${ax?`<div class="aux" id="aw${i}" hidden></div><div class="aux" id="ap${i}" hidden></div>`:""}</div>`}).join("");
   cur.forEach((_,i)=>{chips(i);updateDw(i)});
   document.querySelectorAll(".w,.pr").forEach(el=>{
     el.onfocus=()=>el.select();
@@ -1747,15 +1755,21 @@ function busy(){return!!plan&&(editId!==null||dirty||st.some(x=>x.reps.length||S
 // ---------- Vorschlagsliste unter einem Eingabefeld (Gruppen, hervorgehobene Einträge, Filter beim Tippen) ----------
 function sugAttach(inp,groups,onPick){
   const box=document.createElement("div");box.className="sug";box.hidden=true;inp.after(box);
+  // kleines × rechts im Feld: Text löschen, Fokus bleibt im Feld (Vorschläge erscheinen wieder komplett)
+  const x=document.createElement("button");x.type="button";x.className="sgx";x.setAttribute("aria-label","Eingabe löschen");x.innerHTML=sI('<path d="M7 7l10 10M17 7 7 17"/>',16);inp.after(x);
+  const xUpd=()=>{x.hidden=!inp.value};xUpd();
+  x.addEventListener("pointerdown",e=>e.preventDefault());
+  x.addEventListener("click",()=>{inp.value="";inp.dispatchEvent(new Event("input",{bubbles:true}));inp.focus()});
   let typed=false; // beim Antippen immer die komplette Liste zeigen, erst beim Tippen filtern (auch wenn schon ein Wert drinsteht)
   const show=()=>{const q=typed?inp.value.trim().toLowerCase():"";let h="";
     groups().forEach(g=>{const it=g.items.filter(s=>!q||s.toLowerCase().includes(q)).slice(0,300);
       if(it.length)h+=`<div class="sgh">${g.t}</div>`+it.map(s=>`<button type="button" class="sgi${g.hl?" hl":""}" data-v="${esc(s)}"><span>${esc(s)}</span>${g.tag?`<small>${g.tag}</small>`:""}</button>`).join("")});
     box.innerHTML=h;box.hidden=!h};
-  inp.addEventListener("focus",()=>{typed=false;show()});inp.addEventListener("input",()=>{typed=true;show()});
+  inp.addEventListener("focus",()=>{typed=false;show()});inp.addEventListener("input",()=>{typed=true;xUpd();show()});
   inp.addEventListener("blur",()=>setTimeout(()=>{box.hidden=true},150));
   box.addEventListener("pointerdown",e=>e.preventDefault()); // Fokus im Feld behalten
-  box.addEventListener("click",e=>{const b=e.target.closest(".sgi");if(!b)return;inp.value=b.dataset.v;box.hidden=true;onPick(b.dataset.v)});
+  box.addEventListener("click",e=>{const b=e.target.closest(".sgi");if(!b)return;inp.value=b.dataset.v;box.hidden=true;xUpd();onPick(b.dataset.v)});
+  return xUpd; // nach Setzen des Werts von außen aufrufen
 }
 // ---------- ＋-Menü in der Zeile mit Notiz und Timer ----------
 let oneOff=[],xo=null,xEditId=null; // oneOff: einmalige Übungen im aktuellen Formular
@@ -1815,10 +1829,10 @@ function sportPools(){
   const used=Object.keys(c).sort((a,b)=>c[b].n-c[a].n||c[b].last.localeCompare(c[a].last));
   return{used,rest:SPORTS.filter(s=>!used.some(u=>u.toLowerCase()===s.toLowerCase()))};
 }
-sugAttach($("xts"),()=>{const p=sportPools();return[{t:"Bisher eingetragen",items:p.used,hl:true},{t:"Sportarten",items:p.rest}]},()=>{});
+const xtsUpd=sugAttach($("xts"),()=>{const p=sportPools();return[{t:"Bisher eingetragen",items:p.used,hl:true},{t:"Sportarten",items:p.rest}]},()=>{});
 function xOpen(id){
   const x=id?xAll().find(s=>s.id===id):null;xEditId=x?x.id:null;
-  $("xtd").value=x?x.date:($("date").value||ld());$("xts").value=x?x.sp:"";$("xtmm").textContent="";
+  $("xtd").value=x?x.date:($("date").value||ld());$("xts").value=x?x.sp:"";xtsUpd();$("xtmm").textContent="";
   $("xtm").querySelector("h1").textContent=x?"Training bearbeiten":"Anderes Training";$("xtm").hidden=false;
 }
 $("xtClose").onclick=()=>{$("xtm").hidden=true};
