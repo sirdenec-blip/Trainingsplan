@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.99.9** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.99.10** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -125,6 +125,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.99.10:** „Nur Gewicht“-Übungen haben rechts einen Haken-Knopf (an der Stelle des ＋): antippen = Übung abgeschlossen (grüner Rand + Haken), erneut antippen = wieder offen. Enter im Gewichtsfeld schließt die Übung ebenfalls ab.
 - **0.99.9:** Eingabe: Die Übung, an der du gerade bist, ist blassgrün hinterlegt; erledigte Übungen (alle Sätze eingetragen, bei „beliebig“: Ziel erreicht oder zur nächsten Übung gewechselt) bekommen einen kräftig grünen Rand und einen Haken. Überschriften „Datum“/„Einheit“ entfallen (spart eine Zeile). Datenschutzerklärung mit Kontakt-E-Mail (vor Adress-Sammelprogrammen geschützt).
 - **0.99.8:** Eingabe: jede Übung steht in einer eigenen, dezent grün umrandeten Bubble, der Übungsname ist grün hervorgehoben; „beliebig viele Sätze“ als kleine Plakette „beliebig“. Vorschlagsfelder (einmalige Übung, Sportart) mit kleinem × rechts zum Leeren.
 - **0.99.7:** App und Datenschutzseite werden nicht mehr in Suchmaschinen aufgenommen (`noindex`) – private App, nur über den direkten Link erreichbar.
