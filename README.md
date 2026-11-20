@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.99.1** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.99.2** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -100,7 +100,12 @@ Sichtbar sind so viele Einträge, wie der Plan Einheiten hat (je Einheit der neu
 **Verläufe pro Übung:** 📈 Gewicht · 🧮 1RM geschätzt (Epley: Gewicht × (1 + Wdh./30)) · 📊 Volumen pro Woche · 🔢 Wiederholungen. Antippen eines Punkts oder Balkens zeigt Datum und Wert.
 
 ## Debug-Modus
-Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücken** (1 Sekunde) legt den Plan **„Debug-WKM“** (mit Käfer-Symbol) mit ca. 46 Beispiel-Einträgen an (Steigerung, Deload, Plateau, Lücke, Klimmzüge bis +2,5 kg, krumme Gewichte, Notizen, bearbeitete und gelöschte Einträge) und wechselt dorthin. Er liegt **nur auf diesem Gerät**, wird nie nach Google Drive übertragen und lässt deine Pläne unberührt. Erneuter langer Druck setzt ihn zurück; entfernen über „Plan löschen“.
+Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücken** (1 Sekunde) legt den Plan **„Debug-Plan“** (mit Käfer-Symbol) an und wechselt dorthin. Er ist so gebaut, dass sich möglichst alle Funktionen prüfen lassen:
+- **5 Einheiten:** „1 - Push“, „2 - Pull“, „3 - Beine“, „Einheit 4“ (ohne Namen), „5 - Hypertrophie“.
+- **Alle Erfassungsarten:** feste Sätze (3/4), „beliebig“ mit Gewicht, Körpergewicht mit Max./Ziel (Dips, Klimmzüge bis +5 kg), Nur Wdh. mit Ziel, Nur Gewicht, Pyramiden; verschiedene Pausen (0:45 bis 3:00, „aus“).
+- **Dieselbe Übung in mehreren Einheiten** (Bankdrücken 1+5, Kniebeugen 3+5) für die einheitenübergreifende Auswertung.
+- **ca. 90 Einträge über gut 8 Monate:** Steigerung, Deload (rote Differenzen), Plateau, 2-Wochen-Lücke, krumme Gewichte (Scheibenrechner), 8 Notizen, 3 bearbeitete Einträge, 2 Löschmarkierungen.
+- **3 Einträge einer Einheit 6**, die es im Plan nicht gibt – zum Testen von „Einheit beim Bearbeiten neu zuweisen“. Er liegt **nur auf diesem Gerät**, wird nie nach Google Drive übertragen und lässt deine Pläne unberührt. Erneuter langer Druck setzt ihn zurück; entfernen über „Plan löschen“.
 
 ## Technik
 - `index.html` (App), `manifest.webmanifest` und `icons/` (Installation als „TTB“), `sw.js` (Service Worker für den Offline-Betrieb), `datenschutz.html` (Datenschutzerklärung, verlinkt auf dem Startbildschirm und im ⓘ-Menü; von Google für die Veröffentlichung verlangt).
@@ -108,6 +113,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.99.2:** Debug-Plan erweitert: individueller Plan mit 5 Einheiten (benannt und unbenannt), allen Erfassungsarten, Übungen in mehreren Einheiten und ca. 90 Einträgen, inkl. Einträgen einer nicht vorhandenen Einheit.
 - **0.99.1:** Planmenü als Karten (aktiver Plan mit Plakette „Aktiv“, Kennzahlen als Bubbles, Reihenfolge per Ziehen). Übungskarten: Ziehgriff rechts, lange gedrückt halten zum Verschieben, „Entfernen“ unten rechts. iPhone: Datum und Einheit überschneiden sich nicht mehr; Anmeldung im Safari-Browser per Weiterleitung (vorher blieb das Google-Fenster weiß).
 - **0.99:** Ziehen von Übungen wieder flüssig: Karte folgt dem Finger stufenlos, die anderen Karten gleiten weich zur Seite, gleichmäßiges Rand-Scrollen.
 - **0.98:** Ziehen von Übungen: Karte klappt zusammen und rückt live an die Zielstelle (auch ganz oben/unten sicher). Körpergewicht als Häkchen in eigener Zeile, Erfassungsart und Einstellungen optisch getrennt, Sätze „beliebig“ bei Gewicht + Wdh. Einträge einer nicht mehr vorhandenen Einheit lassen sich beim Bearbeiten einer bestehenden Einheit zuweisen.

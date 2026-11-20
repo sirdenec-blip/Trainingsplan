@@ -282,7 +282,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.99.1";
+const VERSION="0.99.2";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -597,41 +597,54 @@ document.querySelectorAll("#avb button[data-v]").forEach(b=>{b.innerHTML=ICO[b.d
 $("ausw").querySelector("summary").innerHTML=ICO.vol+" Auswertungen";
 // ---------- Debug-Modus: Käfer hinter der Versionsnummer (ⓘ-Menü); lange drücken = Debug-Plan mit Beispieldaten ----------
 const BUG=svgI('<ellipse cx="12" cy="14.5" rx="5.5" ry="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v13M9 7.5a3 3 0 0 1 6 0M9.6 5 8 3M14.4 5 16 3M6.5 12H3M6.5 16H3.2M7.3 19.3 5 21M17.5 12H21M17.5 16h3.3M16.7 19.3 19 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',15);
-$("ver").innerHTML=`Version ${VERSION} <button type="button" class="ico" id="dbg" title="Debug: lange drücken legt einen Test-Plan an" aria-label="Debug-Modus">${BUG}</button><span id="dbgh" hidden> Debug: lange drücken legt den Plan „Debug-WKM“ mit Beispieldaten an – nur auf diesem Gerät, deine Pläne bleiben unberührt.</span>`;
+$("ver").innerHTML=`Version ${VERSION} <button type="button" class="ico" id="dbg" title="Debug: lange drücken legt einen Test-Plan an" aria-label="Debug-Modus">${BUG}</button><span id="dbgh" hidden> Debug: lange drücken legt den Plan „Debug-Plan“ (5 Einheiten, ca. 90 Beispiel-Einträge) an – nur auf diesem Gerät, deine Pläne bleiben unberührt.</span>`;
 // Planname für die Anzeige (Debug-Plan mit einfarbigem Käfer davor)
 const pName=(p,dbg)=>(dbg?BUG+" ":"")+esc(p.name);
 const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-// ca. 46 Beispiel-Einträge (WKM) über gut ein halbes Jahr bis vorgestern: Steigerung, Deload, Plateau, Lücke,
-// Klimmzüge von Körpergewicht bis +2,5 kg, Notizen, bearbeitete Einträge, ein gelöschter Eintrag, krumme Gewichte (Scheibenrechner)
+// Debug-Plan: individueller Plan mit 5 Einheiten (4 benannt, Einheit 4 ohne Namen), alle Erfassungsarten, verschiedene Pausen,
+// Übungen in mehreren Einheiten (Bankdrücken 1+5, Kniebeugen 3+5) – zum Prüfen der Auswertung über Einheiten hinweg
+const DEBUG_PLAN={name:"Debug-Plan",ts:0,units:[
+  {name:"Push",exs:[{n:"Bankdrücken",m:"wr",s:3},{n:"Overhead-Press",m:"wr",s:4,rest:90},{n:"Dips",m:"wr",bw:true,s:0,max:15,goal:30}]},
+  {name:"Pull",exs:[{n:"Klimmzüge",m:"wr",bw:true,s:0,max:12,goal:24},{n:"Vorgebeugtes Rudern",m:"wr",s:3},{n:"Bizeps-Curls",m:"wr",s:0,goal:40,rest:60}]},
+  {name:"Beine",exs:[{n:"Kniebeugen",m:"wr",s:3,rest:180},{n:"Beinpresse",m:"p",s:4},{n:"Wadenheben",m:"r",s:0,goal:60,rest:45}]},
+  {exs:[{n:"Kreuzheben",m:"wr",s:3,rest:180},{n:"Farmer's Walk",m:"w",s:0},{n:"Liegestütze",m:"r",s:0,max:40,goal:100}]},
+  {name:"Hypertrophie",exs:[{n:"Bankdrücken",m:"wr",s:4},{n:"Kniebeugen",m:"wr",s:0,goal:30},{n:"Seitheben",m:"p",s:3,rest:60},{n:"Bauchpresse",m:"r",s:0,rest:0}]}]};
+// ca. 90 Beispiel-Einträge über gut 8 Monate bis vorgestern (Einheiten 1–5 im Wechsel): Steigerung, Deload (rote Differenzen),
+// Plateau, 2-Wochen-Lücke, Körpergewicht bis +5 kg, „beliebig“-Sätze, Pyramiden, krumme Gewichte (Scheibenrechner),
+// 8 Notizen, 3 bearbeitete Einträge, 2 Löschmarkierungen, 3 Einträge einer Einheit 6, die es im Plan nicht gibt
 function demoData(){
-  const N=46,dates=[],d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-2);
-  for(let k=0;k<N;k++){dates.unshift(isoD(d));d.setDate(d.getDate()-(k===24?10:k%2?4:3))}
-  const r125=x=>Math.round(x/1.25)*1.25,r25=x=>Math.round(x*4)/4,REPS=[[8,8,8],[8,8,7],[8,7,6],[9,8,8],[8,8,8],[7,7,6]];
-  const NOTES={3:"Schulter zwickt",12:"Schlecht geschlafen",26:"Deload-Woche nach der Pause",33:"Neuer Rekord beim Kreuzheben!",44:"Knie leicht gereizt, Tiefe reduziert"};
+  const N=90,dates=[],d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-2);
+  for(let k=0;k<N;k++){dates.unshift(isoD(d));d.setDate(d.getDate()-(k===44?14:[2,2,3][k%3]))}
+  const r125=x=>Math.round(x/1.25)*1.25,r25=x=>Math.round(x*4)/4;
+  const PAT=[[8,8,8,7],[8,8,7,6],[9,8,8,8],[8,7,7,6],[10,9,8,8],[8,8,8,8]];
+  const NOTES={4:"Schulter zwickt",11:"Schlecht geschlafen",23:"Neuer Griff ausprobiert",46:"Erste Einheit nach zwei Wochen Pause",50:"Deload-Woche",63:"Rekordversuch Kreuzheben geglückt!",77:"Ellbogen leicht gereizt",88:"Sehr gutes Training"};
   const out=dates.map((date,i)=>{
-    const u=i%2+1,p=Math.floor(i/2),pe=p>=12&&p<=13?p-3:p>=17&&p<=19?17:p; // Deload nach der Lücke, Plateau
-    const rp=REPS[(i*5)%REPS.length].join("-"),v=(b,inc,r)=>String(r(b+inc*pe))+"x"+rp;
+    let u=i%5+1;const p=Math.floor(i/5),pe=p>=9&&p<=10?p-3:p>=13&&p<=14?13:p,v=i*7,pat=PAT[v%PAT.length]; // Deload nach der Lücke, Plateau
+    const fix=(b,inc,n,r=r125)=>String(r(b+inc*pe))+"x"+pat.slice(0,n).join("-");                                   // feste Sätze
+    const free=(w,first,n)=>(w==null?"":String(w))+"x"+Array.from({length:n},(_,k)=>Math.max(1,first-2*k-(v%3))).join("-"); // beliebig / Nur Wdh.
+    const pyr=(r,b,inc,n,step)=>r+"@"+Array.from({length:n},(_,k)=>r25(b+inc*pe+k*step)).join("-");                   // Pyramide
     let ex;
-    if(u===1)ex={"Kniebeugen":v(60,2.5,r125),"Bankdrücken":v(50,1.25,r125),"Vorgebeugtes Rudern":v(45,1.25,r125)};
-    else{
-      const tot=Math.min(30,9+p),first=Math.min(12,5+Math.floor(p/3)),sets=[];let s=0,c=first;
-      while(s<tot){const x=Math.max(1,Math.min(c,tot-s));sets.push(x);s+=x;c=Math.max(1,c-2)}
-      ex={"Kreuzheben":v(80,2.5,r125),"Overhead-Press":v(30,0.75,r25),"Klimmzüge":(p>=16?"2.5":"0")+"x"+sets.join("-")};
-    }
+    if(u===1)ex={"Bankdrücken":fix(50,1.25,3),"Overhead-Press":fix(30,0.75,4,r25),"Dips":free(pe>=14?5:pe>=10?2.5:0,Math.min(15,8+Math.floor(pe/2)),3+v%3)};
+    else if(u===2)ex={"Klimmzüge":free(pe>=12?2.5:0,Math.min(12,5+Math.floor(pe/2)),4+v%3),"Vorgebeugtes Rudern":fix(45,1.25,3),"Bizeps-Curls":free(r125(12+pe*.5),12,3+v%2)};
+    else if(u===3)ex={"Kniebeugen":fix(60,2.5,3),"Beinpresse":pyr(10,80,5,4,20),"Wadenheben":free(null,20+Math.floor(pe/2),3)};
+    else if(u===4)ex={"Kreuzheben":fix(80,2.5,3),"Farmer's Walk":String(r25(30+pe*1.5)),"Liegestütze":free(null,Math.min(40,18+pe),4+v%2)};
+    else ex={"Bankdrücken":fix(45,1.25,4),"Kniebeugen":free(r125(50+pe*2.5),12,3+v%2),"Seitheben":pyr(12,6,.25,3,1),"Bauchpresse":free(null,25,3)};
+    if(i===2||i===7||i===12){u=6;ex={"Hip Thrust":fix(60,5,3),"Ausfallschritte":free(20,12,2)}} // Einheit 6 gibt es im Plan nicht
     const ts=Date.parse(date+"T19:00"),o={id:"demo"+i,date,unit:u,ex,ts};
     if(NOTES[i])o.note=NOTES[i];
-    if(i===8||i===30){o.ts+=2*864e5;o.ed=true}
+    if(i===20||i===55||i===71){o.ts+=864e5;o.ed=true}
     return o;
   });
-  out.push({id:"demoDel",date:out[20].date.slice(0,8)+"28",unit:1,ex:{"Kniebeugen":"20x5-5-5"},ts:Date.now()-864e5,del:true}); // Löschmarkierung
+  out.push({id:"demoDel1",date:dates[30],unit:1,ex:{"Bankdrücken":"20x5-5-5"},ts:Date.now()-2*864e5,del:true}); // Löschmarkierungen
+  out.push({id:"demoDel2",date:dates[70],unit:3,ex:{"Kniebeugen":"20x5-5-5"},ts:Date.now()-864e5,del:true});
   return out;
 }
-// Debug-Plan: eigener Plan „Debug-WKM“ (mit Käfer-Symbol), nur auf diesem Gerät, wird nie nach Google Drive übertragen.
+// Debug-Plan: eigener Plan „Debug-Plan“ (mit Käfer-Symbol), nur auf diesem Gerät, wird nie nach Google Drive übertragen.
 // Erneuter langer Druck setzt ihn auf die Beispieldaten zurück.
 function demoLoad(){
   if(editId!==null){editId=null;$("unit").disabled=false;$("editbar").hidden=true;$("cancel").hidden=true;$("editbar").parentElement.classList.remove("editing");$("save").textContent="Speichern"}
   removeLocal("debug");
-  newPlan({...WKM_PLAN,name:"Debug-WKM"},demoData().sort(cmp),{id:"debug",debug:true});
+  newPlan(DEBUG_PLAN,demoData().sort(cmp),{id:"debug",debug:true});
   $("infp").hidden=true;init();toast("Debug-Plan mit Beispieldaten angelegt – nur auf diesem Gerät.");
 }
 {
