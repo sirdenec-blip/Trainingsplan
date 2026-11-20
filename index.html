@@ -320,7 +320,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.99.3";
+const VERSION="0.99.4";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -619,10 +619,10 @@ window.addEventListener("online",()=>{netDown=false;syncSoon(300)});
 window.addEventListener("offline",renderSync);
 $("fav").href="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'+$("lg").innerHTML+"</svg>");
 // Ansicht des Verlaufs (Filter nach Einheit, Kompakt/Ausführlich) und Pausentimer an/aus merken
-// hs: gewählte Einheiten im Filter ([] = alle), hv: "k"|"d", hx: weitere Trainings im Verlauf zeigen, hexp: Filterzeile ausgeklappt
-const UKEY="trainingsplan_ui";let ui={hs:[],hv:"k",hx:true,hexp:false};
+// fs: gewählte Einheiten im Filter (null = alle, [] = keine, sonst Auswahl), hv: "k"|"d", hx: weitere Trainings im Verlauf zeigen, hexp: Filterzeile ausgeklappt
+const UKEY="trainingsplan_ui";let ui={fs:null,hv:"k",hx:true,hexp:false};
 try{Object.assign(ui,JSON.parse(localStorage.getItem(UKEY)||"{}"))}catch(e){}
-if(!Array.isArray(ui.hs))ui.hs=ui.hf?[ui.hf]:[];delete ui.hf; // alte Einzelauswahl übernehmen
+if(ui.fs===undefined)ui.fs=null;if("hs"in ui||"hf"in ui){if(Array.isArray(ui.hs)&&ui.hs.length)ui.fs=ui.hs;else if(ui.hf)ui.fs=[ui.hf];delete ui.hs;delete ui.hf} // ältere Formate übernehmen
 const saveUi=()=>{try{localStorage.setItem(UKEY,JSON.stringify(ui))}catch(e){}};
 $("inf").onclick=()=>{$("infp").hidden=!$("infp").hidden};
 document.addEventListener("click",e=>{if(!e.target.closest("#infp,#inf"))$("infp").hidden=true});
@@ -1283,29 +1283,29 @@ function xcard(s){
 }
 // Filterzeile: passt alles in eine Zeile, stehen die Einheiten direkt da; sonst ein Knopf mit dynamischer Beschriftung,
 // der die Einheiten in eine eigene Zeile darunter aus-/einklappt (bleibt offen, bis er erneut angetippt wird). Mehrfachauswahl.
+// gewählte Einheiten des Filters (bei nur einer Einheit im Plan immer alle)
+function selUnits(){const k=plan.units.length,all=plan.units.map((_,j)=>j+1);if(k<2||!Array.isArray(ui.fs))return all;return ui.fs.filter(u=>u>=1&&u<=k)}
 function renderHbar(){
-  const k=plan.units.length,hb=$("hbar"),hasX=xLive().length>0;
-  ui.hs=ui.hs.filter(u=>u>=1&&u<=k);if(ui.hs.length===k)ui.hs=[];
-  const all=!ui.hs.length,lab=u=>esc(plan.units[u-1].name?uLab(u):"E"+u);
+  const k=plan.units.length,hb=$("hbar"),hasX=xLive().length>0,sel=selUnits(),all=sel.length===k,none=!sel.length,lab=u=>esc(plan.units[u-1].name?uLab(u):"E"+u);
   hb.hidden=!live().length&&!hasX;
-  const chips=k>1?`<button type="button" data-hs="0" class="${all?"on":""}">Alle</button>`+plan.units.map((_,j)=>`<button type="button" data-hs="${j+1}" class="${all?"on2":ui.hs.includes(j+1)?"on":""}">${lab(j+1)}</button>`).join(""):"";
+  const chips=k>1?`<button type="button" data-hs="0" class="${all?"on":""}">Alle</button>`+plan.units.map((_,j)=>`<button type="button" data-hs="${j+1}" class="${all?"on2":sel.includes(j+1)?"on":""}">${lab(j+1)}</button>`).join(""):"";
   const ib=(a,v,on,ic,t)=>`<button type="button" class="hi${on?" on":""}" data-${a}="${v}" title="${t}" aria-label="${t}">${ic}</button>`;
   const icons=`<span class="hic">${ib("hv","k",ui.hv!=="d",ICO.lk,"Kompakte Ansicht")}${ib("hv","d",ui.hv==="d",ICO.ld,"Ausführliche Ansicht")}${hasX?ib("hx",1,ui.hx!==false,ICO.plus,"Weitere Trainings im Verlauf anzeigen"):""}</span>`;
   hb.innerHTML=`<div class="hrow"><div class="hfl">${chips}</div>${icons}</div><div class="hfx" hidden>${chips}</div>`;
   const fl=hb.querySelector(".hfl");
   if(k>1&&fl.scrollWidth>fl.clientWidth+1){
-    const t=all?"Alle":ui.hs.length===1?lab(ui.hs[0]):ui.hs.length+" Einheiten";
-    fl.innerHTML=`<button type="button" class="hdd${all?"":" on"}" data-hexp="1">${t} ${ui.hexp?"▴":"▾"}</button>`;
+    const t=all?"Alle":none?"Keine":sel.length===1?lab(sel[0]):sel.length+" Einheiten";
+    fl.innerHTML=`<button type="button" class="hdd${all||none?"":" on"}" data-hexp="1">${t} ${ui.hexp?"▴":"▾"}</button>`;
     hb.querySelector(".hfx").hidden=!ui.hexp;
   }
 }
 $("hbar").addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
   const k=plan.units.length;
-  if(b.dataset.hs!=null){
-    const u=+b.dataset.hs;
-    if(!u)ui.hs=[];
-    else{let s=ui.hs.length?ui.hs.slice():plan.units.map((_,j)=>j+1);s=s.includes(u)?s.filter(x=>x!==u):[...s,u].sort((a,c)=>a-c);ui.hs=!s.length||s.length===k?[]:s}
+  if(b.dataset.hs!=null){ // Mehrfachauswahl; „Alle“ schaltet zwischen alle und keine; keine Einheit gewählt = nur weitere Trainings
+    const u=+b.dataset.hs,sel=selUnits();
+    if(!u)ui.fs=sel.length===k?[]:null;
+    else{const s=sel.includes(u)?sel.filter(x=>x!==u):[...sel,u].sort((a,c)=>a-c);ui.fs=s.length===k?null:s}
   }
   if(b.dataset.hv)ui.hv=b.dataset.hv;
   if(b.dataset.hx)ui.hx=ui.hx===false;
@@ -1315,15 +1315,18 @@ $("hbar").addEventListener("click",e=>{
 let rsT=null;window.addEventListener("resize",()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(plan)renderHbar()},150)});
 function render(){
   const ref=refId();renderCal();const rec=recSet();renderAus();renderSync();renderHbar();
-  const units=ui.hs.length?ui.hs:plan.units.map((_,j)=>j+1);
-  const Lr=live().reverse().filter(x=>!ui.hs.length||ui.hs.includes(x.unit)),vis=visIds(Lr,units);
+  const units=selUnits(),allU=units.length===plan.units.length;
+  const Lr=live().reverse().filter(x=>allU||units.includes(x.unit)),vis=visIds(Lr,units);
   const items=Lr.map(s=>({s,old:!vis.has(s.id),h:card(s,ref,rec)}));
-  // weitere Trainings: bei den aktuellen, solange sie nicht älter sind als der älteste angezeigte Plan-Eintrag
+  // weitere Trainings: bei den aktuellen, solange sie nicht älter sind als der älteste angezeigte Plan-Eintrag;
+  // ist keine Einheit gewählt, sind die letzten 5 weiteren Trainings aktuell
   if(ui.hx!==false){
-    const lim=vis.size?Lr.filter(s=>vis.has(s.id)).reduce((m,s)=>s.date<m?s.date:m,"9999"):"0000";
-    xLive().forEach(s=>items.push({s,old:s.date<lim,h:xcard(s)}));
+    const X=xLive().slice().reverse();
+    if(!units.length)X.forEach((s,i)=>items.push({s,old:i>=5,h:xcard(s)}));
+    else{const lim=vis.size?Lr.filter(s=>vis.has(s.id)).reduce((m,s)=>s.date<m?s.date:m,"9999"):"0000";X.forEach(s=>items.push({s,old:s.date<lim,h:xcard(s)}))}
     items.sort((a,b)=>b.s.date.localeCompare(a.s.date)||(b.s.ts-a.s.ts));
   }
+  if(!items.length&&!units.length){$("hist").innerHTML=`<p class="mu" style="text-align:center">Keine Einheit ausgewählt${xLive().length?" – weitere Trainings sind ausgeblendet (＋ oben rechts)":""}.</p>`;return}
   const shown=items.filter(i=>!i.old).map(i=>i.h),older=items.filter(i=>i.old).map(i=>i.h);
   $("hist").innerHTML=shown.join("")+(older.length?`<details class="old"${olderOpen?" open":""} ontoggle="olderOpen=this.open;if(!olderOpen)this.scrollIntoView({block:'nearest'})"><summary>Ältere Einträge (${older.length})</summary>${older.join("")}</details>`:"");
 }
@@ -1663,7 +1666,7 @@ $("wzSave").onclick=()=>{
     if(u===x.unit&&ex===x.ex)return x;
     changed++;return{...x,unit:u,ex,ts:now};
   }).sort(cmp);
-  if(changed){ui.hs=[];saveUi()}
+  if(changed){ui.fs=null;saveUi()}
   plan={...plan,name,ts:now,units};savePlan();$("pw").hidden=true;refresh();kick();
   toast("Plan gespeichert"+(changed?` – ${changed} Einträge angepasst`:"")+".");
 };
@@ -1683,11 +1686,12 @@ document.addEventListener("visibilitychange",()=>{
 // ---------- Vorschlagsliste unter einem Eingabefeld (Gruppen, hervorgehobene Einträge, Filter beim Tippen) ----------
 function sugAttach(inp,groups,onPick){
   const box=document.createElement("div");box.className="sug";box.hidden=true;inp.after(box);
-  const show=()=>{const q=inp.value.trim().toLowerCase();let h="";
-    groups().forEach(g=>{const it=g.items.filter(s=>!q||s.toLowerCase().includes(q)).slice(0,60);
+  let typed=false; // beim Antippen immer die komplette Liste zeigen, erst beim Tippen filtern (auch wenn schon ein Wert drinsteht)
+  const show=()=>{const q=typed?inp.value.trim().toLowerCase():"";let h="";
+    groups().forEach(g=>{const it=g.items.filter(s=>!q||s.toLowerCase().includes(q)).slice(0,300);
       if(it.length)h+=`<div class="sgh">${g.t}</div>`+it.map(s=>`<button type="button" class="sgi${g.hl?" hl":""}" data-v="${esc(s)}"><span>${esc(s)}</span>${g.tag?`<small>${g.tag}</small>`:""}</button>`).join("")});
     box.innerHTML=h;box.hidden=!h};
-  inp.addEventListener("focus",show);inp.addEventListener("input",show);
+  inp.addEventListener("focus",()=>{typed=false;show()});inp.addEventListener("input",()=>{typed=true;show()});
   inp.addEventListener("blur",()=>setTimeout(()=>{box.hidden=true},150));
   box.addEventListener("pointerdown",e=>e.preventDefault()); // Fokus im Feld behalten
   box.addEventListener("click",e=>{const b=e.target.closest(".sgi");if(!b)return;inp.value=b.dataset.v;box.hidden=true;onPick(b.dataset.v)});

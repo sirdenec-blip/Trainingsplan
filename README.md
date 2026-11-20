@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.99.3** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.99.4** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -96,7 +96,7 @@ Rechts in der Zeile mit Notiz und Timer steht ein ＋. Es öffnet ein kleines Me
 
 ## Verlauf
 Sichtbar sind so viele Einträge, wie der Plan Einheiten hat (je Einheit der neueste); alle weiteren unter „Ältere Einträge“ (angeheftete Leiste zum Einklappen). Die letzte gleiche Einheit ist grün gestrichelt umrandet.
-- **Filterzeile:** Einheiten-Knöpfe „Alle · 1 - Push · …“ mit **Mehrfachauswahl** (sind alle gewählt, ist „Alle“ kräftig grün und die Einheiten heller grün; antippen wählt eine Einheit ab bzw. dazu). Bei gewählten Einheiten ist je Einheit der neueste Eintrag sichtbar. Passt die Zeile nicht in die Breite, steht dort ein Knopf mit wechselnder Beschriftung („Alle ▾“, „1 - Push ▾“, „2 Einheiten ▾“), der die Einheiten in eine eigene Zeile darunter aus- und wieder einklappt.
+- **Filterzeile:** Einheiten-Knöpfe „Alle · 1 - Push · …“ mit **Mehrfachauswahl** (sind alle gewählt, ist „Alle“ kräftig grün und die Einheiten heller grün; antippen wählt eine Einheit ab bzw. dazu; „Alle“ schaltet zwischen allen und keiner). Bei gewählten Einheiten ist je Einheit der neueste Eintrag sichtbar. **Keine Einheit gewählt** = nur weitere Trainings: die letzten 5 aktuell, der Rest unter „Ältere Einträge“. Passt die Zeile nicht in die Breite, steht dort ein Knopf mit wechselnder Beschriftung („Alle ▾“, „Keine ▾“, „1 - Push ▾“, „2 Einheiten ▾“), der die Einheiten in eine eigene Zeile darunter aus- und wieder einklappt.
 - Rechts daneben Symbole: **kompakte / ausführliche Ansicht** und **＋ = weitere Trainings im Verlauf anzeigen an/aus** (gesondert gibt es sie unter Auswertungen → „Weitere Trainings“).
 - **Kompakt** (Standard): eine Zeile pro Übung, Gewicht und Sätze in kleinen Bubbles, Notizen als 💬 zum Antippen. **Ausführlich:** Satz-Bubbles mit kleiner Satznummer, Summen mit Ziel (z. B. „Σ 28 / 30“), Notiz sichtbar.
 - Hinter jedem Gewicht die Differenz zur letzten gleichen Einheit (+2,5 / −4, dezent grün bzw. rot getönt), 🏆 bei neuem Bestwert.
@@ -123,6 +123,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.99.4:** Vorschlagslisten zeigen beim Antippen immer die komplette Liste (auch beim Bearbeiten), gefiltert wird erst beim Tippen. Filterzeile erlaubt „Keine“ Einheit – dann nur weitere Trainings (letzte 5 aktuell).
 - **0.99.3:** ＋-Menü: einmalige Übungen (mit Vorschlägen „Im Plan“ / „einzeln“) und weitere Trainings wie Rugby (planunabhängig, eigene Drive-Datei, gedeckt gelb in Verlauf und Kalender, eigene Auswertung). Neue Filterzeile mit Mehrfachauswahl, Symbolen für Ansicht und weitere Trainings, klappt bei Platzmangel in eine zweite Zeile aus. Ausführliche Ansicht mit Satznummern und Ziel bei Summen. Fehlerbehebung: Kalender-Popup-Zeilen sahen seit 0.99.1 wie Plan-Karten aus.
 - **0.99.2:** Debug-Plan erweitert: individueller Plan mit 5 Einheiten (benannt und unbenannt), allen Erfassungsarten, Übungen in mehreren Einheiten und ca. 90 Einträgen, inkl. Einträgen einer nicht vorhandenen Einheit.
 - **0.99.1:** Planmenü als Karten (aktiver Plan mit Plakette „Aktiv“, Kennzahlen als Bubbles, Reihenfolge per Ziehen). Übungskarten: Ziehgriff rechts, lange gedrückt halten zum Verschieben, „Entfernen“ unten rechts. iPhone: Datum und Einheit überschneiden sich nicht mehr; Anmeldung im Safari-Browser per Weiterleitung (vorher blieb das Google-Fenster weiß).
