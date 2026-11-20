@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.99.6** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.99.7** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -125,6 +125,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.99.7:** App und Datenschutzseite werden nicht mehr in Suchmaschinen aufgenommen (`noindex`) – private App, nur über den direkten Link erreichbar.
 - **0.99.6:** Prüfung vor 1.0. Synchronisierung: nie mehr eine zweite Drive-Datei zum selben Plan (vorhandene doppelte werden zusammengeführt und gekennzeichnet), Prüfung des Google-Kontos nach jeder Anmeldung. Datenschutz: Googles Anmelde-Skript wird nur noch im Cloud-Modus geladen (ohne Cloud und auf dem Startbildschirm kein Kontakt zu Google), Trennen widerruft die Freigabe zuverlässig und löscht alle App-Daten auf dem Gerät. Sicherungskopie (ohne Cloud) enthält alle Pläne und weitere Trainings. Stilles Erneuern lädt nicht neu, solange Plan-Assistent, ein Dialog oder ein Timer offen ist oder einmalige Übungen eingetragen sind. Mehrere Tabs übernehmen Änderungen voneinander. Sicherheit: gespeicherte Werte werden vor der Anzeige maskiert, Sicherheitsregel (Content-Security-Policy). Datenschutzerklärung auch offline verfügbar. Name „Weitere Trainings“ für Pläne reserviert.
 - **0.99.5:** Kalender: Tage mit Krafttraining und weiterem Training tragen eine gut sichtbare gelbe Ecke oben links (statt der schmalen Leiste unten); reine „Weitere“-Tage und Legende im selben kräftigeren Gelb.
 - **0.99.4:** Vorschlagslisten zeigen beim Antippen immer die komplette Liste (auch beim Bearbeiten), gefiltert wird erst beim Tippen. Filterzeile erlaubt „Keine“ Einheit – dann nur weitere Trainings (letzte 5 aktuell).
