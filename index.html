@@ -124,6 +124,10 @@ h1.lg{display:flex;align-items:center;gap:8px}.logo{width:34px;height:34px;flex:
 .exn{color:var(--ac);font-weight:600;font-size:.95rem}
 .card.ein{padding:14px 10px}.exb .stw .sb{flex-basis:38px;width:38px} /* Platz für die Bubbles: Wdh.-Feld bleibt breit genug */
 .exb .one{vertical-align:1px}
+.exb{transition:background-color .15s,border-color .15s}
+.exb.act{background:color-mix(in srgb,var(--ac) 10%,var(--card))}@media(prefers-color-scheme:dark){.exb.act{background:color-mix(in srgb,var(--ac) 15%,var(--card))}} /* aktive Übung: blassgrün hinterlegt */
+.exb.done{border-color:var(--ac)}.exk{display:none;color:var(--ac);margin-left:4px}.exb.done .exk{display:inline}
+.exk svg{vertical-align:-2px}
 .ico{width:auto;margin:0 0 0 6px;padding:0 3px;background:none;border:0;color:var(--tx);font-size:.95rem;font-weight:400;line-height:1;opacity:.45;touch-action:manipulation}.ico.on{opacity:1}
 .aux{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.8rem;color:var(--mu);margin-top:6px}
 .aux .ax{border:1px solid var(--bd);border-radius:8px;padding:1px 7px;color:var(--tx);font-variant-numeric:tabular-nums}.aux .ax small{color:var(--mu);font-size:.7rem}
@@ -289,8 +293,8 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 <div class="card ein">
   <div id="editbar" hidden></div>
   <div class="row">
-    <div><label style="margin-top:0">Datum</label><input type="date" id="date"></div>
-    <div><label style="margin-top:0">Einheit</label><select id="unit"></select></div>
+    <div><input type="date" id="date" aria-label="Datum" title="Datum"></div>
+    <div><select id="unit" aria-label="Einheit" title="Einheit"></select></div>
   </div>
   <div id="fields"></div>
   <div class="nrow"><button type="button" class="ico" id="nbtn" title="Notiz" aria-label="Notiz"></button><button type="button" class="ico" id="tbtn" title="Pausentimer an/aus – lange drücken: freier Timer" aria-label="Pausentimer"></button><textarea id="noteIn" rows="2" maxlength="300" placeholder="Notiz, z. B. Schulter zwickt" hidden></textarea><button type="button" class="ico" id="xbtn" title="Einmalige Übung oder anderes Training" aria-label="Hinzufügen"></button>
@@ -333,7 +337,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.99.8";
+const VERSION="0.99.9";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -816,8 +820,8 @@ function build(defs){
       <div class="in g g2" style="margin-top:8px">${stw(i,"r",`<input class="r" data-i="${i}" inputmode="decimal" enterkeyhint="next" placeholder="kg" autocomplete="off">`)}<span>kg</span><button class="add" data-i="${i}" type="button">＋</button></div>`
      :`<div class="in g ${hw&&hr?"g1":hw?"g3":"g4"}">${hw?`${stw(i,"w",`<input class="w" data-i="${i}" inputmode="decimal" value="${esc(st[i].w)}" aria-label="Gewicht in kg">`)}<span>kg${hr?" ×":""}</span>`:""}${hr?`<input class="r" data-i="${i}" inputmode="numeric" enterkeyhint="next" placeholder="Wdh" autocomplete="off"><button class="add" data-i="${i}" type="button">＋</button>`:""}</div>`;
     const ax=hw&&!e.bw,ib=(k,t,s)=>`<button type="button" class="ico${AX.has(k+"|"+e.n)?" on":""}" data-ax="${k}" data-i="${i}" title="${t}" aria-label="${t}">${s}</button>`;
-    return `<div class="exb"><div class="fl lb"><span><b class="exn">${esc(e.n)}</b>${e.one?` <small class="one">einzeln</small><button type="button" class="ico rmo" data-rmone="${i}" title="Aus diesem Training entfernen" aria-label="Entfernen">×</button>`:""}${ax?ib("w","Aufwärmsätze",FL)+ib("p","Scheibenrechner",BB):""}${hr&&!e.s?` <small class="one" title="Beliebig viele Sätze – Enter ohne Zahl = fertig">beliebig</small>`:""}</span><small class="dw" id="dw${i}"></small></div>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}${ax?`<div class="aux" id="aw${i}" hidden></div><div class="aux" id="ap${i}" hidden></div>`:""}</div>`}).join("");
-  cur.forEach((_,i)=>{chips(i);updateDw(i)});
+    return `<div class="exb" data-x="${i}"><div class="fl lb"><span><b class="exn">${esc(e.n)}</b><span class="exk" title="Alle Sätze eingetragen">${CKM}</span>${e.one?` <small class="one">einzeln</small><button type="button" class="ico rmo" data-rmone="${i}" title="Aus diesem Training entfernen" aria-label="Entfernen">×</button>`:""}${ax?ib("w","Aufwärmsätze",FL)+ib("p","Scheibenrechner",BB):""}${hr&&!e.s?` <small class="one" title="Beliebig viele Sätze – Enter ohne Zahl = fertig">beliebig</small>`:""}</span><small class="dw" id="dw${i}"></small></div>${row}${(hr||hp)?`<div class="chips" id="c${i}"></div>`:""}${ax?`<div class="aux" id="aw${i}" hidden></div><div class="aux" id="ap${i}" hidden></div>`:""}</div>`}).join("");
+  actI=-1;cur.forEach((_,i)=>{chips(i);updateDw(i)});
   document.querySelectorAll(".w,.pr").forEach(el=>{
     el.onfocus=()=>el.select();
     el.oninput=()=>{const k=el.dataset.i;if(el.classList.contains("pr"))st[k].pr=el.value;else{st[k].w=el.value;updateDw(+k)}};
@@ -833,6 +837,20 @@ function build(defs){
   document.querySelectorAll(".add").forEach(b=>b.onclick=()=>{commit(+b.dataset.i)});
 }
 const rIn=i=>document.querySelector(`.r[data-i="${i}"]`);
+// Aktive Übung (blassgrün hinterlegt) und erledigte Übung (kräftiger grüner Rand + Haken)
+let actI=-1;
+const CKM=sI('<path d="M5 12.5l4.5 4.5L19 7.5"/>',15);
+function exDone(i){
+  const e=cur[i],r=st[i].reps;if(!e||e.m==="w")return false; // „Nur Gewicht“ ist vorbelegt – kein Fertig-Zustand
+  if(e.s)return r.length>=e.s;
+  if(!r.length)return false;
+  return(e.goal&&sum(r)>=e.goal)||actI!==i; // beliebig viele Sätze: Ziel erreicht oder weiter zur nächsten Übung
+}
+function exMark(){document.querySelectorAll("#fields .exb").forEach(b=>{const i=+b.dataset.x;b.classList.toggle("act",i===actI);b.classList.toggle("done",exDone(i))})}
+function setAct(i){if(i===actI)return;actI=i;exMark()}
+$("fields").addEventListener("focusin",e=>{const b=e.target.closest(".exb");setAct(b?+b.dataset.x:-1)});
+$("fields").addEventListener("pointerdown",e=>{const b=e.target.closest(".exb");if(b)setAct(+b.dataset.x)});
+$("fields").parentElement.addEventListener("focusin",e=>{if(!e.target.closest("#fields"))setAct(-1)}); // Fokus auf Datum, Notiz, Speichern: keine aktive Übung
 
 function chips(i){
   const e=cur[i];if(e.m==="w")return;const r=st[i].reps,n=r.length;
@@ -843,10 +861,11 @@ function chips(i){
   const c=$("c"+i);c.innerHTML=h;
   c.querySelectorAll(".chip[data-k]").forEach(ch=>ch.onclick=()=>{st[i].reps.splice(+ch.dataset.k,1);chips(i)});
   const el=rIn(i);if(el)el.placeholder=(e.s&&n>=e.s)?"fertig":e.m==="p"?"kg":"Wdh.";
+  exMark();
 }
 function commit(i){
   const e=cur[i],el=rIn(i),v=el.value.trim(),r=st[i].reps;
-  $("msg").textContent="";
+  $("msg").textContent="";setAct(i);
   if(v===""){if(!e.s&&r.length)next(i);return}
   if(e.m==="p"){
     const t=v.replace(",",".");
@@ -937,8 +956,8 @@ function setNote(v){$("noteIn").value=v||"";$("noteIn").hidden=true;nUpd()}
 $("nbtn").onclick=()=>{const t=$("noteIn");t.hidden=!t.hidden;if(!t.hidden)t.focus();nUpd()};
 $("noteIn").oninput=()=>{dirty=true;nUpd()};
 function next(i){
-  for(let j=i+1;j<cur.length;j++){const x=document.querySelector(`.w[data-i="${j}"],.pr[data-i="${j}"],.r[data-i="${j}"]`);if(x){x.focus();return}}
-  $("save").focus();
+  for(let j=i+1;j<cur.length;j++){const x=document.querySelector(`.w[data-i="${j}"],.pr[data-i="${j}"],.r[data-i="${j}"]`);if(x){x.focus();setAct(j);return}}
+  $("save").focus();setAct(-1);
 }
 $("unit").onchange=()=>{
   if(editId===null){build();render();return}

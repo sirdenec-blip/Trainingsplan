@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.99.8** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.99.9** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -125,6 +125,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.99.9:** Eingabe: Die Übung, an der du gerade bist, ist blassgrün hinterlegt; erledigte Übungen (alle Sätze eingetragen, bei „beliebig“: Ziel erreicht oder zur nächsten Übung gewechselt) bekommen einen kräftig grünen Rand und einen Haken. Überschriften „Datum“/„Einheit“ entfallen (spart eine Zeile). Datenschutzerklärung mit Kontakt-E-Mail (vor Adress-Sammelprogrammen geschützt).
 - **0.99.8:** Eingabe: jede Übung steht in einer eigenen, dezent grün umrandeten Bubble, der Übungsname ist grün hervorgehoben; „beliebig viele Sätze“ als kleine Plakette „beliebig“. Vorschlagsfelder (einmalige Übung, Sportart) mit kleinem × rechts zum Leeren.
 - **0.99.7:** App und Datenschutzseite werden nicht mehr in Suchmaschinen aufgenommen (`noindex`) – private App, nur über den direkten Link erreichbar.
 - **0.99.6:** Prüfung vor 1.0. Synchronisierung: nie mehr eine zweite Drive-Datei zum selben Plan (vorhandene doppelte werden zusammengeführt und gekennzeichnet), Prüfung des Google-Kontos nach jeder Anmeldung. Datenschutz: Googles Anmelde-Skript wird nur noch im Cloud-Modus geladen (ohne Cloud und auf dem Startbildschirm kein Kontakt zu Google), Trennen widerruft die Freigabe zuverlässig und löscht alle App-Daten auf dem Gerät. Sicherungskopie (ohne Cloud) enthält alle Pläne und weitere Trainings. Stilles Erneuern lädt nicht neu, solange Plan-Assistent, ein Dialog oder ein Timer offen ist oder einmalige Übungen eingetragen sind. Mehrere Tabs übernehmen Änderungen voneinander. Sicherheit: gespeicherte Werte werden vor der Anzeige maskiert, Sicherheitsregel (Content-Security-Policy). Datenschutzerklärung auch offline verfügbar. Name „Weitere Trainings“ für Pläne reserviert.
