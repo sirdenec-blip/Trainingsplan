@@ -123,7 +123,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
-- **0.99.5:** Kalender: Tage mit Krafttraining und weiterem Training tragen eine gut sichtbare gelbe Ecke oben links (statt der schmalen Leiste unten).
+- **0.99.5:** Kalender: Tage mit Krafttraining und weiterem Training tragen eine gut sichtbare gelbe Ecke oben links (statt der schmalen Leiste unten); reine „Weitere“-Tage und Legende im selben kräftigeren Gelb.
 - **0.99.4:** Vorschlagslisten zeigen beim Antippen immer die komplette Liste (auch beim Bearbeiten), gefiltert wird erst beim Tippen. Filterzeile erlaubt „Keine“ Einheit – dann nur weitere Trainings (letzte 5 aktuell).
 - **0.99.3:** ＋-Menü: einmalige Übungen (mit Vorschlägen „Im Plan“ / „einzeln“) und weitere Trainings wie Rugby (planunabhängig, eigene Drive-Datei, gedeckt gelb in Verlauf und Kalender, eigene Auswertung). Neue Filterzeile mit Mehrfachauswahl, Symbolen für Ansicht und weitere Trainings, klappt bei Platzmangel in eine zweite Zeile aus. Ausführliche Ansicht mit Satznummern und Ziel bei Summen. Fehlerbehebung: Kalender-Popup-Zeilen sahen seit 0.99.1 wie Plan-Karten aus.
 - **0.99.2:** Debug-Plan erweitert: individueller Plan mit 5 Einheiten (benannt und unbenannt), allen Erfassungsarten, Übungen in mehreren Einheiten und ca. 90 Einträgen, inkl. Einträgen einer nicht vorhandenen Einheit.

@@ -12,8 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="TTB">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
-:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--dn:#b4533a;--dup:#5e8670;--ddn:#96685c;--xb:#e6dcb0;--xt:#4a4020;--xtx2:#8a6d10;--xc:#d4b54a;--u1:#c7ecd3;--u1t:#0f2a1d;--u2:#9bdcb2;--u2t:#0f2a1d;--u3:#6cc790;--u3t:#0f2a1d;--u4:#3fa86c;--u4t:#fff;--u5:#2a7f50;--u5t:#fff;--u6:#17573a;--u6t:#fff;--bd:#ddd}
-@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--dn:#e8866d;--dup:#8eab98;--ddn:#b8958c;--xb:#5a5232;--xt:#efe3b8;--xtx2:#d9c27a;--xc:#c9ad55;--u1:#1f5a40;--u1t:#fff;--u2:#2c7a57;--u2t:#fff;--u3:#3b9c70;--u3t:#fff;--u4:#5cbf91;--u4t:#0b2a1e;--u5:#8adbb2;--u5t:#0b2a1e;--u6:#bdf0d6;--u6t:#0b2a1e;--bd:#3a3a38}}
+:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#777;--ac:#1d6b4f;--ye:#b8860b;--dn:#b4533a;--dup:#5e8670;--ddn:#96685c;--xb:#e6dcb0;--xt:#4a4020;--xtx2:#8a6d10;--xc:#d4b54a;--xct:#2e2608;--u1:#c7ecd3;--u1t:#0f2a1d;--u2:#9bdcb2;--u2t:#0f2a1d;--u3:#6cc790;--u3t:#0f2a1d;--u4:#3fa86c;--u4t:#fff;--u5:#2a7f50;--u5t:#fff;--u6:#17573a;--u6t:#fff;--bd:#ddd}
+@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#999;--ac:#4cc29a;--ye:#f2c94c;--dn:#e8866d;--dup:#8eab98;--ddn:#b8958c;--xb:#5a5232;--xt:#efe3b8;--xtx2:#d9c27a;--xc:#c9ad55;--xct:#231d06;--u1:#1f5a40;--u1t:#fff;--u2:#2c7a57;--u2t:#fff;--u3:#3b9c70;--u3t:#fff;--u4:#5cbf91;--u4t:#0b2a1e;--u5:#8adbb2;--u5t:#0b2a1e;--u6:#bdf0d6;--u6t:#0b2a1e;--bd:#3a3a38}}
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;max-width:520px;margin:auto}
 h1{font-size:1.3rem;margin:.2rem 0 1rem}
@@ -194,7 +194,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 .one{font-size:.68rem;color:var(--mu);border:1px solid var(--bd);border-radius:8px;padding:0 5px;margin-left:4px;font-weight:400}
 .rmo{margin-left:2px!important;opacity:.6;font-size:1rem}
 .card.xc{padding:9px 14px;border-left:4px solid var(--xb)}.card.xc .h{margin:0}.xsp{display:inline-flex;align-items:center;gap:4px;margin-left:4px;padding:1px 8px;border-radius:10px;background:var(--xb);color:var(--xt);font-size:.82rem;font-weight:600}
-.d.dx{background:var(--xb);color:var(--xt)}
+.d.dx{background:var(--xc);color:var(--xct)} /* Kalender: gleiches Gelb wie die Ecke (einheitlich) */
 /* Tag mit Krafttraining UND weiterem Training: gelbes Dreieck oben links (ca. ein Fünftel der Fläche) */
 .d.hx::before{content:"";position:absolute;left:0;top:0;width:62%;height:62%;border-top-left-radius:8px;background:linear-gradient(135deg,var(--xc) 50%,transparent 50%);pointer-events:none}
 .pop .pln.xl,.pln.xl{display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid var(--bd);font-size:.85rem}.pln.xl span:first-child{color:var(--mu)}
@@ -1218,7 +1218,7 @@ function renderCal(){
   }
   $("cal").innerHTML=h;hidePop();
   $("cmon").textContent=new Date(y,m,1).toLocaleDateString("de-DE",{month:"long",year:"numeric"});
-  $("cleg").innerHTML=plan.units.map((_,k)=>`<span><i style="background:var(--u${k+1})"></i>${esc(uLab(k+1))}</span>`).join("")+(xd.size?`<span><i style="background:var(--xb)"></i>Weitere</span>`:"")
+  $("cleg").innerHTML=plan.units.map((_,k)=>`<span><i style="background:var(--u${k+1})"></i>${esc(uLab(k+1))}</span>`).join("")+(xd.size?`<span><i style="background:var(--xc)"></i>Weitere</span>`:"")
     +`<span style="margin-left:auto">${n?n+" Einheit"+(n>1?"en":""):"keine Einheit"}${xd.size?` · ${xd.size} weitere`:""}</span>`;
 }
 let popDay=null;
