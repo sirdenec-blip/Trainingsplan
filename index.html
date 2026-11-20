@@ -340,7 +340,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.99.10";
+const VERSION="0.99.11";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -408,7 +408,7 @@ function newPlan(p,sessions=[],extra={}){
   idx.plans[plan.id]={...extra,id:plan.id};idx.active=plan.id;persist();
 }
 function removeLocal(id){
-  try{localStorage.removeItem(DKEY(id))}catch(e){}
+  try{localStorage.removeItem(DKEY(id));localStorage.removeItem("ttb_draft_"+id)}catch(e){}
   delete idx.plans[id];
   if(idx.active===id){idx.active=null;plan=null;data=[];const o=plans().find(p=>readDoc(p.id));if(o)openPlan(o.id)}
   saveIdx();
@@ -512,10 +512,18 @@ function drvUp(method,path,m,d){
 const DRV=MOCK||{
   async email(){return(await api("drive/v3/about?fields=user(emailAddress)")).user.emailAddress},
   async folder(){
-    if(idx.folder)return idx.folder;
-    const r=await api(`drive/v3/files?q=${Qs(`name='${FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`)}&fields=files(id)`);
-    idx.folder=r.files.length?r.files[0].id:(await api("drive/v3/files?fields=id",{method:"POST",headers:JH,body:JSON.stringify({name:FOLDER,mimeType:"application/vnd.google-apps.folder"})})).id;
-    saveIdx();return idx.folder;
+    // gemerkten Ordner einmal pro Sitzung prüfen: im Papierkorb oder gelöscht → neu suchen/anlegen
+    // (sonst landeten neue Pläne im gelöschten Ordner und gälten bei Google selbst als gelöscht)
+    if(idx.folder&&!this.fOk){
+      try{if((await api(`drive/v3/files/${idx.folder}?fields=id,trashed`)).trashed)idx.folder=null}catch(x){if(x.status===404)idx.folder=null;else throw x}
+      if(!idx.folder)saveIdx();
+    }
+    if(!idx.folder){ // bei mehreren gleichnamigen Ordnern gilt auf allen Geräten der älteste
+      const r=await api(`drive/v3/files?q=${Qs(`name='${FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`)}&orderBy=createdTime&fields=files(id)`);
+      idx.folder=r.files.length?r.files[0].id:(await api("drive/v3/files?fields=id",{method:"POST",headers:JH,body:JSON.stringify({name:FOLDER,mimeType:"application/vnd.google-apps.folder"})})).id;
+      saveIdx();
+    }
+    this.fOk=true;return idx.folder;
   },
   async list(){
     const f=await this.folder(),r=await api(`drive/v3/files?q=${Qs(`'${f}' in parents and trashed=false`)}&fields=files(id,name,createdTime,modifiedTime,appProperties)&pageSize=500`);
@@ -531,7 +539,7 @@ const DRV=MOCK||{
 };
 
 // ---------- Synchronisierung ----------
-let syncT=null,syncing=false,again=false,netDown=false,syncErr="",lastSync=+(localStorage.getItem("ttb_last")||0);
+let syncT=null,syncing=false,again=false,netDown=false,syncErr="",syncBad=[],lastSync=+(localStorage.getItem("ttb_last")||0);
 function syncSoon(ms=1500){if(idx.mode!=="cloud")return;clearTimeout(syncT);syncT=setTimeout(syncAll,ms)}
 async function syncAll(){
   clearTimeout(syncT);syncT=null;
@@ -546,8 +554,13 @@ async function syncAll(){
       .forEach(r=>{if(rem.has(r.planId))dups.push(r);else rem.set(r.planId,r)});
     rem.forEach(r=>{if(!idx.plans[r.planId])idx.plans[r.planId]={id:r.planId,name:r.name,fileId:r.fileId,...(r.planId===XID?{xtra:true}:{})}}); // Pläne von anderen Geräten
     for(const r of dups)await mergeDup(r);
-    for(const e of Object.values(idx.plans))if(!e.debug&&idx.plans[e.id])await syncPlan(e,rem.get(e.id));
-    lastSync=Date.now();try{localStorage.setItem("ttb_last",lastSync)}catch(x){}netDown=false;syncErr="";
+    // je Plan abfangen: eine nicht lesbare Datei hält die übrigen Pläne nicht auf (Anmeldung/Verbindung bricht weiter ganz ab)
+    const bad=[];
+    for(const e of Object.values(idx.plans))if(!e.debug&&idx.plans[e.id]){
+      try{await syncPlan(e,rem.get(e.id))}
+      catch(x){if(x.auth||x.acct||x instanceof TypeError)throw x;console.warn("Sync "+e.name+":",x);bad.push(`„${e.name}“ ${x.status?"– Google Drive meldet Fehler "+x.status:"in Google Drive nicht lesbar"}`)}
+    }
+    syncBad=bad;lastSync=Date.now();try{localStorage.setItem("ttb_last",lastSync)}catch(x){}netDown=false;syncErr="";
   }catch(x){if(x.acct){}else if(x.auth)dropTok();else if(x instanceof TypeError)netDown=true;else syncErr=x.message;console.warn("Sync:",x)}
   syncing=false;saveIdx();renderSync();
   if(again){again=false;syncSoon(300)}
@@ -654,6 +667,7 @@ function renderSync(){
   else if(acctErr&&!tokValid()){t=W+`Anderes Google-Konto angemeldet · <u>mit ${esc(idx.email||"")} anmelden</u>`;w=true}
   else if(!tokValid()){if(dt){t=W+"Auf dem Gerät gesichert · <u>Google-Verbindung erneuern</u>";w=true}else t=C+`Google Drive${lastSync?" · abgeglichen "+ago(lastSync):""} · <u>aktualisieren</u>`}
   else if(syncErr){t=W+"Synchronisierung fehlgeschlagen · <u>erneut versuchen</u>";w=true}
+  else if(syncBad.length){t=W+esc(syncBad.join(" · "))+" · <u>erneut versuchen</u>";w=true}
   else if(dt)t=C+"Wird gespeichert …";
   else t=C+`In Google Drive gespeichert${lastSync?" · "+ago(lastSync):""}`;
   el.innerHTML=t;el.classList.toggle("warn",w);
@@ -802,7 +816,10 @@ function updateAux(i){
 }
 $("fields").addEventListener("click",e=>{ // ▲▼: Gewicht in 0,25-Schritten
   const okb=e.target.closest("[data-ok]"); // „Nur Gewicht“: Haken = Übung abschließen (erneut tippen = wieder offen)
-  if(okb){const i=+okb.dataset.ok;st[i].ok=!st[i].ok;dirty=true;setAct(i);exMark();if(st[i].ok)next(i);return}
+  if(okb){const i=+okb.dataset.ok;setAct(i);
+    if(!st[i].ok&&!/^\d+(\.\d+)?$/.test(String(st[i].w).trim().replace(",","."))){ // abschließen nur mit gültigem Gewicht (wie Enter)
+      $("msg").textContent=`${cur[i].n}: Gewicht in kg eingeben.`;const we=document.querySelector(`.w[data-i="${i}"]`);if(we){we.classList.add("bad");we.focus()}return}
+    st[i].ok=!st[i].ok;dirty=true;exMark();if(st[i].ok){$("msg").textContent="";next(i)}return}
   const ro=e.target.closest("[data-rmone]"); // einmalige Übung aus diesem Training entfernen
   if(ro){const n=cur[+ro.dataset.rmone].n,f=formVals();delete f.vals[n];delete f.defs[n];oneOff=oneOff.filter(o=>o.n!==n);fillForm(+$("unit").value,f.vals,f.defs);return}
   const a=e.target.closest("button[data-ax]");
@@ -816,7 +833,7 @@ $("fields").addEventListener("click",e=>{ // ▲▼: Gewicht in 0,25-Schritten
   if(k==="w"){st[i].w=el.value;updateDw(i)}
 });
 function build(defs){
-  const u=+$("unit").value;dirty=false;
+  const u=+$("unit").value;dirty=false;$("unit").dataset.prev=u;
   const b0=defs||unitDefs(u);cur=b0.concat(oneOff.filter(o=>!b0.some(p=>p.n===o.n))); // einmalige Übungen hinten anhängen
   st=cur.map(e=>({w:(e.m==="r"||e.m==="p")?"":String(lastW(u,e.n)??(e.one?lastWAny(e.n):null)??(e.bw?"0":"")).replace(".",","),reps:[],pr:""}));
   $("fields").innerHTML=cur.map((e,i)=>{
@@ -829,7 +846,7 @@ function build(defs){
   actI=-1;cur.forEach((_,i)=>{chips(i);updateDw(i)});
   document.querySelectorAll(".w,.pr").forEach(el=>{
     el.onfocus=()=>el.select();
-    el.oninput=()=>{const k=el.dataset.i;if(el.classList.contains("pr"))st[k].pr=el.value;else{st[k].w=el.value;updateDw(+k)}};
+    el.oninput=()=>{const k=el.dataset.i;el.classList.remove("bad");if(el.classList.contains("pr"))st[k].pr=el.value;else{st[k].w=el.value;updateDw(+k)}};
     el.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();const k=+el.dataset.i,r=rIn(k);if(r)return r.focus();
       if(cur[k].m==="w"&&/^\d+(\.\d+)?$/.test(String(st[k].w).trim().replace(",","."))){st[k].ok=true;dirty=true;exMark()} // „Nur Gewicht“: Enter mit Gewicht = erledigt
       next(k)}};
@@ -968,12 +985,15 @@ function next(i){
   $("save").focus();setAct(-1);
 }
 $("unit").onchange=()=>{
-  if(editId===null){build();render();return}
+  if(editId===null){
+    // schon Sätze/Haken/Gewichte eingetragen: erst nachfragen, sonst gingen sie beim Wechsel verloren
+    if((dirty||st.some(x=>x.ok||x.reps.length||String(x.pr).trim()))&&!confirm("Einheit wechseln? Die bisherigen Eingaben dieser Einheit werden verworfen.")){$("unit").value=$("unit").dataset.prev;return}
+    build();render();return}
   // nur beim Bearbeiten eines Eintrags ohne Einheit im Plan möglich: erfasste Werte in die neue Einheit mitnehmen
   const f=formVals();fillForm(+$("unit").value,f.vals,f.defs);render();
 };
 $("date").onchange=()=>{
-  const c=live().find(x=>x.date===$("date").value&&x.id!==editId);
+  const c=!(editId!==null&&$("date").value===editDate)&&live().find(x=>x.date===$("date").value&&x.id!==editId);
   $("msg").textContent=c?`Am ${fmt($("date").value)} gibt es schon einen Eintrag (${uLab(c.unit)}).`:"";
 };
 
@@ -1004,7 +1024,8 @@ $("save").onclick=()=>{
   const dt=$("date").value;
   if(!dt){$("msg").textContent="Bitte ein Datum wählen.";return}
   const clash=live().find(x=>x.date===dt&&x.id!==editId);
-  if(clash){$("msg").textContent=`Am ${fmt(dt)} gibt es schon einen Eintrag (${uLab(clash.unit)}). Pro Tag ist nur ein Eintrag möglich – bitte ein anderes Datum wählen oder den vorhandenen Eintrag bearbeiten.`;return}
+  // Bearbeiten ohne Datumswechsel immer erlaubt (z. B. zwei Einträge am selben Tag nach Offline-Nutzung auf zwei Geräten)
+  if(clash&&!(editId!==null&&dt===editDate)){$("msg").textContent=`Am ${fmt(dt)} gibt es schon einen Eintrag (${uLab(clash.unit)}). Pro Tag ist nur ein Eintrag möglich – bitte ein anderes Datum wählen oder den vorhandenen Eintrag bearbeiten.`;return}
   const note=$("noteIn").value.trim().slice(0,300);wlOff();tStop();
   // Übungen, die nicht zur Einheit gehören (einmalige Übungen), speichern ihre Definition im Eintrag (xd) – für Anzeige und Auswertung
   const xd={};cur.forEach(e=>{if(ex[e.n]!=null&&!unitDefs(+u).some(p=>p.n===e.n)){const o={m:e.m,s:e.s||0};["bw","max","goal","rest"].forEach(k=>{if(e[k]!=null&&e[k]!==false)o[k]=e[k]});xd[e.n]=o}});
@@ -1024,12 +1045,12 @@ $("save").onclick=()=>{
     return;
   }
   data=[...data,{id:newId(),date:$("date").value,unit:+u,ex,ts:Date.now(),...(note?{note}:{}),...(hasXd?{xd}:{})}].sort(cmp);
-  const ok=persist();init();kick();
+  const ok=persist();if(ok)draftDrop();init();kick();
   if(ok)$("note").textContent="✔ Gespeichert.";
   window.scrollTo({top:0,behavior:"smooth"});
 };
 
-let editId=null;
+let editId=null,editDate=null; // editDate: ursprüngliches Datum des bearbeiteten Eintrags
 // Formular für Einheit u aufbauen und mit Werten füllen (vals: Übung → {w, reps, pr}); Übungen, die es in der Einheit
 // nicht gibt, kommen mit ihrer Definition (defs) dazu – so geht beim Bearbeiten nichts verloren
 function fillForm(u,vals,defs){
@@ -1059,7 +1080,7 @@ function edit(id){
   // Eintrag einer Einheit, die es im Plan nicht mehr gibt: Einheit darf neu zugewiesen werden
   const orphan=e.unit>plan.units.length;
   if(![...$("unit").options].some(o=>+o.value===e.unit))$("unit").add(new Option(uLab(e.unit)+(orphan?" (nicht mehr im Plan)":""),e.unit));
-  editId=id;$("date").value=e.date;$("unit").value=e.unit;$("unit").disabled=!orphan;
+  editId=id;editDate=e.date;$("date").value=e.date;$("unit").value=e.unit;$("unit").disabled=!orphan;
   fillForm(e.unit,vals,defs);
   setNote(e.note);
   $("editbar").textContent=`✎ Bearbeite Eintrag vom ${fmt(e.date)} (${uLab(e.unit)})`+(orphan?" – diese Einheit gibt es im Plan nicht mehr: oben bei „Einheit“ eine bestehende zuweisen.":"");
@@ -1428,7 +1449,9 @@ function init(){
   const t=new Date();$("date").value=new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
   $("unit").innerHTML=plan.units.map((_,i)=>`<option value="${i+1}">${esc(uLab(i+1))}</option>`).join("");
   const L=live(),l=L[L.length-1];$("unit").value=l&&l.unit<plan.units.length?l.unit+1:1; // nächste Einheit im Wechsel
-  $("msg").textContent="";$("note").textContent="";setNote("");oneOff=[];build();render();
+  $("msg").textContent="";$("note").textContent="";setNote("");oneOff=[];build();
+  if(editId===null)draftLoad(); // nicht gespeicherte Eingaben (z. B. App im Hintergrund beendet) wiederherstellen
+  render();
 }
 // ---------- Startbildschirm ----------
 // main = noch nicht eingerichtet (Google Drive / ohne Cloud), plan = Plan anlegen, pick = vorhandenen Plan wählen
@@ -1781,6 +1804,32 @@ document.addEventListener("visibilitychange",()=>{
 });
 // Formular in Benutzung (Eingaben, Bearbeiten, Notiz, einmalige Übungen) – dann nichts automatisch neu aufbauen
 function busy(){return!!plan&&(editId!==null||dirty||st.some(x=>x.ok||x.reps.length||String(x.pr).trim())||!!$("noteIn").value.trim()||oneOff.length>0)}
+// ---------- Entwurf: Eingaben eines neuen Eintrags laufend auf dem Gerät sichern (je Plan) ----------
+// Schützt vor Verlust, wenn das System die App im Hintergrund beendet oder die Google-Weiterleitung die Seite neu lädt.
+// Wiederhergestellt beim nächsten Aufbau des Formulars, wenn jünger als 12 Stunden; nach dem Speichern gelöscht.
+const FKEY=id=>"ttb_draft_"+id,DRAFT_MAX=12*36e5;
+function draftSave(){
+  if(!plan||editId!==null)return;
+  try{
+    if(!busy())return localStorage.removeItem(FKEY(plan.id));
+    const f=formVals();
+    localStorage.setItem(FKEY(plan.id),JSON.stringify({t:Date.now(),date:$("date").value,unit:+$("unit").value,vals:f.vals,defs:f.defs,one:oneOff,note:$("noteIn").value}));
+  }catch(x){}
+}
+const draftDrop=id=>{try{localStorage.removeItem(FKEY(id||plan.id))}catch(x){}};
+let draftT=null;const draftSoon=()=>{clearTimeout(draftT);draftT=setTimeout(draftSave,0)}; // nach dem eigentlichen Ereignis-Handler
+["input","change","click","keydown"].forEach(t=>$("save").parentElement.addEventListener(t,draftSoon));
+// Entwurf ins Formular übernehmen (aus init); true = wiederhergestellt
+function draftLoad(){
+  let d=null;try{d=JSON.parse(localStorage.getItem(FKEY(plan.id))||"null")}catch(x){}
+  if(!d)return false;
+  if(!(Date.now()-d.t<DRAFT_MAX)||!(d.unit>=1&&d.unit<=plan.units.length)){draftDrop();return false}
+  if(d.date)$("date").value=d.date;$("unit").value=d.unit;
+  oneOff=Array.isArray(d.one)?d.one:[];
+  fillForm(d.unit,d.vals||{},d.defs||{});setNote(d.note);dirty=true;
+  toast(`Eingaben von ${new Date(d.t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})} Uhr wiederhergestellt.`);
+  return true;
+}
 // ---------- Vorschlagsliste unter einem Eingabefeld (Gruppen, hervorgehobene Einträge, Filter beim Tippen) ----------
 function sugAttach(inp,groups,onPick){
   const box=document.createElement("div");box.className="sug";box.hidden=true;inp.after(box);
@@ -1842,7 +1891,7 @@ $("xoAdd").onclick=()=>{
   const d={n,m:xo.m,one:true};d.s=xo.m==="wr"?(xo.s??3):xo.m==="p"?(xo.s||3):0;
   const lim=(xo.m==="wr"&&(xo.bw||!d.s))||xo.m==="r";
   if(xo.m==="wr"&&xo.bw)d.bw=true;if(lim&&xo.max)d.max=xo.max;if(lim&&xo.goal)d.goal=xo.goal;if(xo.m!=="w"&&xo.rest!=null&&xo.rest!==120)d.rest=xo.rest;
-  const f=formVals();oneOff.push(d);fillForm(+$("unit").value,f.vals,f.defs);$("xo").hidden=true;
+  const f=formVals();oneOff.push(d);fillForm(+$("unit").value,f.vals,f.defs);$("xo").hidden=true;draftSave();
   toast(`„${n}“ für dieses Training hinzugefügt.`);
   const el=document.querySelector(`.lb [data-rmone="${cur.length-1}"]`);if(el)el.closest(".lb").scrollIntoView({block:"center",behavior:"smooth"});
 };

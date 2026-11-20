@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.99.10** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.99.11** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -55,6 +55,11 @@ Plannamen sind eindeutig; „Weitere Trainings“ ist als Name reserviert (Datei
 | Plan gelöscht | Datei im Drive-Papierkorb (30 Tage); andere Geräte entfernen den Plan beim nächsten Abgleich. |
 | Plan gelöscht, auf einem anderen Gerät aber noch offline geändert | Dieses Gerät fragt: Plan behalten (wird neu angelegt) oder auch hier entfernen. |
 | Debug-Plan | Liegt nur auf dem Gerät, wird nie nach Drive übertragen. |
+| App wird während des Trainings beendet oder neu geladen (z. B. vom Handy im Hintergrund, Google-Anmeldung) | Die Eingaben eines neuen Eintrags werden laufend als Entwurf auf dem Gerät gesichert und beim nächsten Öffnen wiederhergestellt („Eingaben von … Uhr wiederhergestellt“), sofern jünger als 12 Stunden. |
+| Ordner „Trainingstagebuch“ in Drive gelöscht | Pläne darin gelten als gelöscht und werden auch auf den Geräten entfernt. Neue Pläne legt die App in einem neuen Ordner an. |
+| Eine Plan-Datei in Drive ist nicht lesbar (z. B. von Hand verändert) | Die übrigen Pläne werden trotzdem abgeglichen; die Statuszeile nennt den betroffenen Plan. |
+
+**Bekannte Grenzen:** Werden Einheiten im Plan-Assistenten verschoben, während ein anderes Gerät offline Einträge anlegt, behalten diese die alte Einheitennummer (und erscheinen ggf. bei der falschen Einheit – per Bearbeiten korrigierbar). Von Hand veränderte Dateien (Sicherung oder Drive) werden nicht auf jeden möglichen Fehler geprüft.
 
 ## Eingabe
 Pro Übung: **Gewicht** (vorausgefüllt vom letzten Mal, ▲▼ in 0,25-kg-Schritten) und pro Satz **Wiederholungen eintippen → ＋ bzw. Enter**. Gespeichert wird z. B. `85x8-9-10`.
@@ -62,7 +67,9 @@ Pro Übung: **Gewicht** (vorausgefüllt vom letzten Mal, ▲▼ in 0,25-kg-Schri
 - Übungen mit fester Satzzahl (z. B. 3): nach dem letzten Satz springt der Cursor zur nächsten Übung.
 - Körpergewichtsübungen (z. B. Klimmzüge): beliebig viele Sätze, fertig mit Enter auf leerem Feld; die Gesamtzahl wird angezeigt (Ziel 24 = 3×8). Gewicht 0 = Körpergewicht, sonst Zusatzgewicht.
 - Falsche Zahl? Antippen entfernt sie, Backspace im leeren Feld löscht die letzte.
-- Datum = heute, Einheit wechselt automatisch (1 → 2 → … → 1). Pro Kalendertag ist ein Eintrag möglich.
+- Datum = heute, Einheit wechselt automatisch (1 → 2 → … → 1). Pro Kalendertag ist ein Eintrag möglich. (Entstehen durch Offline-Nutzung auf zwei Geräten doch zwei Einträge am selben Tag, lassen sich beide normal bearbeiten.)
+- Einheit wechseln, nachdem schon Sätze eingetragen sind: Rückfrage, da die Eingaben dabei verworfen werden.
+- „Nur Gewicht“: abschließen mit Enter im Gewichtsfeld oder dem Haken-Knopf – beides nur mit gültigem Gewicht.
 
 ### ＋ Einmalige Übung oder anderes Training
 Rechts in der Zeile mit Notiz und Timer steht ein ＋. Es öffnet ein kleines Menü:
@@ -125,6 +132,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.99.11:** Prüfung vor 1.0, zweiter Durchgang: Eingaben eines neuen Eintrags werden laufend als Entwurf gesichert und nach Beenden/Neuladen der App wiederhergestellt; Rückfrage beim Einheitenwechsel mit Eingaben; gelöschter Drive-Ordner wird erkannt (neue Pläne landen nicht mehr im Papierkorb); eine nicht lesbare Plan-Datei hält den Abgleich der übrigen nicht mehr auf; zwei Einträge am selben Tag lassen sich bearbeiten; Haken bei „Nur Gewicht“ nur mit gültigem Gewicht; dunkler Startbildschirm der installierten App.
 - **0.99.10:** „Nur Gewicht“-Übungen haben rechts einen Haken-Knopf (an der Stelle des ＋): antippen = Übung abgeschlossen (grüner Rand + Haken), erneut antippen = wieder offen. Enter im Gewichtsfeld schließt die Übung ebenfalls ab.
 - **0.99.9:** Eingabe: Die Übung, an der du gerade bist, ist blassgrün hinterlegt; erledigte Übungen (alle Sätze eingetragen, bei „beliebig“: Ziel erreicht oder zur nächsten Übung gewechselt) bekommen einen kräftig grünen Rand und einen Haken. Überschriften „Datum“/„Einheit“ entfallen (spart eine Zeile). Datenschutzerklärung mit Kontakt-E-Mail (vor Adress-Sammelprogrammen geschützt).
 - **0.99.8:** Eingabe: jede Übung steht in einer eigenen, dezent grün umrandeten Bubble, der Übungsname ist grün hervorgehoben; „beliebig viele Sätze“ als kleine Plakette „beliebig“. Vorschlagsfelder (einmalige Übung, Sportart) mit kleinem × rechts zum Leeren.
