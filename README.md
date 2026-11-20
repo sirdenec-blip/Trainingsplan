@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.95** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.96** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -94,11 +94,12 @@ Sichtbar sind so viele Einträge, wie der Plan Einheiten hat (je Einheit der neu
 Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücken** (1 Sekunde) legt den Plan **„Debug-WKM“** (mit Käfer-Symbol) mit ca. 46 Beispiel-Einträgen an (Steigerung, Deload, Plateau, Lücke, Klimmzüge bis +2,5 kg, krumme Gewichte, Notizen, bearbeitete und gelöschte Einträge) und wechselt dorthin. Er liegt **nur auf diesem Gerät**, wird nie nach Google Drive übertragen und lässt deine Pläne unberührt. Erneuter langer Druck setzt ihn zurück; entfernen über „Plan löschen“.
 
 ## Technik
-- `index.html` (App), `manifest.webmanifest` und `icons/` (Installation als „TTB“), `sw.js` (Service Worker für den Offline-Betrieb).
+- `index.html` (App), `manifest.webmanifest` und `icons/` (Installation als „TTB“), `sw.js` (Service Worker für den Offline-Betrieb), `datenschutz.html` (Datenschutzerklärung, verlinkt auf dem Startbildschirm und im ⓘ-Menü; von Google für die Veröffentlichung verlangt).
 - Gehostet über GitHub Pages (*Settings → Pages → Branch `main`*).
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.96:** Datenschutzerklärung (`datenschutz.html`), verlinkt auf dem Startbildschirm und im ⓘ-Menü – Voraussetzung, um die Google-Anmeldung aus dem Teststatus zu holen.
 - **0.95:** Kalender markiert Trainingstage mit Notiz durch ein kleines Sprechblasen-Symbol in der Ecke.
 - **0.94:** Gewichtsdifferenzen im Verlauf wieder leicht eingefärbt (gedecktes Grün/Rot, unaufdringlich).
 - **0.93:** Planmenü zeigt die Pläne direkt als Liste zum schnellen Wechseln, Knopf „Lokale Daten löschen & Google trennen“, einfarbige Symbole auch für Debug-Plan, Auswertungen, Statuszeile und Timer.

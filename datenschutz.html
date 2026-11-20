@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datenschutz – TTB Trainingstagebuch</title>
+<link rel="icon" href="icons/icon-192.png">
+<style>
+:root{--bg:#f6f6f4;--card:#fff;--tx:#1c1c1a;--mu:#666;--ac:#1d6b4f;--bd:#ddd}
+@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#222221;--tx:#eee;--mu:#aaa;--ac:#4cc29a;--bd:#3a3a38}}
+body{margin:0 auto;padding:16px;max-width:680px;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,sans-serif}
+h1{font-size:1.4rem;display:flex;align-items:center;gap:10px;margin:.4rem 0 1rem}h1 img{width:40px;height:40px}
+h2{font-size:1.05rem;margin:1.6rem 0 .4rem}
+a{color:var(--ac)}p,li{margin:.35rem 0}.mu{color:var(--mu);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:6px 18px 14px}
+</style>
+</head>
+<body>
+<h1><img src="icons/icon-192.png" alt="">Datenschutz</h1>
+<div class="card">
+<p><b>TTB – Trainingstagebuch</b> ist eine private, nicht kommerzielle Web-App zum Dokumentieren von Krafttraining: <a href="./">sirdenec-blip.github.io/Trainingsplan</a>.</p>
+
+<h2>Kurz gesagt</h2>
+<ul>
+<li>Deine Trainingsdaten gehören dir und liegen <b>nur auf deinem Gerät und in deinem eigenen Google Drive</b>.</li>
+<li>Es gibt <b>keinen eigenen Server</b>, keine Datenbank des Entwicklers, kein Tracking, keine Werbung, keine Analyse-Werkzeuge und keine Cookies zu Werbezwecken.</li>
+<li>Der Entwickler hat <b>keinen Zugriff</b> auf deine Daten.</li>
+</ul>
+
+<h2>Welche Daten verarbeitet die App?</h2>
+<ul>
+<li><b>Trainingsdaten</b>, die du selbst eingibst: Trainingspläne (Übungen, Sätze, Pausen), Trainingseinträge (Datum, Gewichte, Wiederholungen) und freiwillige Notizen.</li>
+<li><b>Einstellungen</b> der Oberfläche (z. B. Ansicht des Verlaufs, Pausentimer an/aus).</li>
+<li>Bei Nutzung von Google Drive: deine <b>E-Mail-Adresse</b> des Google-Kontos (nur zur Anzeige, mit welchem Konto die App verbunden ist) und ein <b>zeitlich begrenzter Zugangsschlüssel</b> von Google (ca. 1 Stunde gültig).</li>
+</ul>
+
+<h2>Wo werden die Daten gespeichert?</h2>
+<ul>
+<li><b>Auf deinem Gerät</b> im Speicher des Browsers bzw. der installierten App (localStorage) – als Arbeitskopie, damit die App auch ohne Internet funktioniert.</li>
+<li><b>In deinem Google Drive</b> (wenn du „Mit Google Drive starten“ wählst): im Ordner „Trainingstagebuch“, eine Datei pro Trainingsplan. Die Übertragung erfolgt direkt zwischen deinem Gerät und Google, verschlüsselt (HTTPS).</li>
+<li>Im Modus „Ohne Cloud nutzen“ bleiben alle Daten ausschließlich auf deinem Gerät.</li>
+</ul>
+
+<h2>Zugriff auf Google Drive</h2>
+<p>Die App nutzt nur die eingeschränkte Google-Berechtigung <b>„drive.file“</b>: Sie kann ausschließlich die Dateien sehen und bearbeiten, die sie selbst angelegt hat. Auf deine übrigen Dateien in Google Drive hat sie keinen Zugriff. Die Nutzung von Daten aus Google-APIs erfolgt gemäß der <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, einschließlich der Anforderungen zur eingeschränkten Nutzung (Limited Use). Daten werden nicht an Dritte weitergegeben, nicht verkauft und nicht für Werbung oder andere Zwecke als die Funktion der App verwendet.</p>
+<p>Die Verbindung kannst du jederzeit trennen: in der App unter „Plan wechseln → Lokale Daten löschen &amp; Google trennen“ oder in deinem Google-Konto unter <a href="https://myaccount.google.com/connections" rel="noopener">Drittanbieter-Apps mit Kontozugriff</a>.</p>
+
+<h2>Eingebundene Dienste</h2>
+<ul>
+<li><b>GitHub Pages</b> (GitHub, Inc.) stellt die App-Dateien bereit. Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie die IP-Adresse (siehe <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">Datenschutzerklärung von GitHub</a>).</li>
+<li><b>Google</b> (Google Ireland Ltd.) für die Anmeldung und Google Drive, nur wenn du die Cloud-Speicherung nutzt (siehe <a href="https://policies.google.com/privacy" rel="noopener">Datenschutzerklärung von Google</a>).</li>
+</ul>
+
+<h2>Löschen deiner Daten</h2>
+<ul>
+<li><b>Einzelne Pläne:</b> in der App unter „Plan wechseln → Plan löschen“ (die Datei wandert in den Papierkorb von Google Drive).</li>
+<li><b>Alles auf dem Gerät:</b> „Lokale Daten löschen &amp; Google trennen“ oder die Browserdaten der Seite löschen.</li>
+<li><b>In Google Drive:</b> den Ordner „Trainingstagebuch“ in deinem Drive löschen.</li>
+</ul>
+
+<h2>Kontakt</h2>
+<p>Fragen zum Datenschutz: über das Projekt auf GitHub, <a href="https://github.com/sirdenec-blip/Trainingsplan" rel="noopener">github.com/sirdenec-blip/Trainingsplan</a>.</p>
+<p class="mu">Stand: November 2026</p>
+</div>
+<p><a href="./">← Zurück zur App</a></p>
+</body>
+</html>

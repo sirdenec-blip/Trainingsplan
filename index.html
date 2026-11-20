@@ -17,6 +17,7 @@
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;max-width:520px;margin:auto}
 h1{font-size:1.3rem;margin:.2rem 0 1rem}
+a{color:var(--ac)}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
 label{display:block;font-size:.85rem;color:var(--mu);margin:12px 0 4px}
 input,select,button{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
@@ -192,7 +193,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 <div class="infp" id="infp" hidden>
   <div class="fi" id="planind"></div>
   <div class="fi" id="fileind"></div>
-  <div>created by Claude and JD</div>
+  <div>created by Claude and JD · <a href="datenschutz.html">Datenschutz</a></div>
   <div class="ver" id="ver"></div>
 </div>
 <div class="pbar"><button type="button" class="pn" id="pname" title="Plan wechseln"></button><span class="sst" id="sst"></span></div>
@@ -241,7 +242,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.95";
+const VERSION="0.96";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -1141,7 +1142,7 @@ function showStart(v){
   $("start").hidden=false;$("stMsg").textContent="";const b=$("stb");
   if(v==="main")b.innerHTML=`<p>Dein Trainingstagebuch fürs Krafttraining. Pläne und Einträge werden automatisch in <b>deinem Google Drive</b> gesichert – auf all deinen Geräten aktuell und auch ohne Empfang im Studio nutzbar.</p>`
     +(cloudOk()?`<button data-st="g">Mit Google Drive starten</button>`:`<button disabled style="opacity:.5">Mit Google Drive starten</button><p class="mu">Die Google-Anbindung ist noch nicht eingerichtet.</p>`)
-    +`<button class="lnk" data-st="local">Ohne Cloud nutzen</button>`;
+    +`<button class="lnk" data-st="local">Ohne Cloud nutzen</button><p class="mu" style="text-align:center;margin:18px 0 0;font-size:.8rem"><a href="datenschutz.html">Datenschutz</a></p>`;
   else if(v==="plan")b.innerHTML=`<p>Welchen Trainingsplan möchtest du anlegen?</p><button data-st="wkm">WKM <small>(2 Einheiten mit je 3 Übungen)</small></button><button class="sec" data-st="ind">Individuell</button>`
     +(plans().some(p=>readDoc(p.id))?`<button class="sec" data-st="pick">Bestehenden Plan öffnen</button>`:"");
   else b.innerHTML=`<p>Welchen Trainingsplan möchtest du öffnen?</p>`+planRows("open")+`<button class="sec" data-st="plan">Neuen Plan erstellen</button>`;
