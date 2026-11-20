@@ -13,7 +13,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 
 ## Versionierung
 - Konstante `const VERSION="…"` in `index.html`, angezeigt im ⓘ-Menü.
-- Aktuell: **0.96** (Testversion PWA + Drive-Sync). Vom Nutzer bestätigt: Google-Anmeldung in der installierten Android-App, Offline-Speichern mit automatischem Nachholen, Anmeldung am PC im Browser und Synchronisierung Handy ↔ PC in beide Richtungen. Offen bis 1.0: Test auf dem iPhone (Safari + installierte App; Nutzer testet später), stilles Erneuern nach > 1 h. **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
+- Aktuell: **0.97** (Testversion PWA + Drive-Sync). Vom Nutzer bestätigt: Google-Anmeldung in der installierten Android-App, Offline-Speichern mit automatischem Nachholen, Anmeldung am PC im Browser und Synchronisierung Handy ↔ PC in beide Richtungen. Offen bis 1.0: Test auf dem iPhone (Safari + installierte App; Nutzer testet später), stilles Erneuern nach > 1 h. **1.0** = fertige, vom Nutzer abgenommene PWA. Kleine Schritte +0.01, größere Pakete nächste Zehnerstelle.
 - Wenn der Nutzer „gleiche Versionsnummer“ sagt, Version nicht erhöhen.
 - Bei jeder Version: `VERSION` und `CACHE` in `sw.js` anpassen, README aktualisieren (Versionszeile + „## Versionen“ + betroffene Abschnitte).
 - Vor größeren Umbauten: Konzept/Optionen knapp vorlegen und nachfragen.
@@ -30,7 +30,9 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 - Keine Rückwärtskompatibilität zu Ständen vor 0.90 nötig (laut Nutzer keine echte Nutzung davor); alte Schlüssel `trainingsplan_v1/_plan_v1/_file` werden beim Start entfernt.
 
 ## Datenmodell
-- **Plan:** `{id, name, ts, units:[{exs:[{n, m, s, bw?, max?, goal?, rest?}]}]}`, 1–6 Einheiten, Name eindeutig.
+- **Plan:** `{id, name, ts, units:[{name?, exs:[{n, m, s, bw?, max?, goal?, rest?}]}]}`, 1–6 Einheiten, Planname eindeutig.
+  - Einheit `name`: optional; Anzeige überall über `uLab(u)` = „3 - Hypertrophie“ (Nummer = Position, immer vorangestellt) bzw. „Einheit 3“. Einträge referenzieren die Einheit über ihre **Nummer** → beim Verschieben/Löschen von Einheiten im Assistenten werden Einträge umnummeriert (mit neuem `ts`, damit der Abgleich greift); Einträge gelöschter Einheiten bekommen eine Nummer hinter dem Plan (bleiben sichtbar als „Einheit N“).
+  - `max`/`goal` nur bei Körpergewicht oder „Nur Wdh.“.
   - `m`: `"wr"` Gewicht + Wdh. · `"w"` nur Gewicht · `"r"` nur Wdh. · `"p"` Pyramidensatz.
   - `s`: Sätze (0 = beliebig viele), `bw`: Körpergewichtsübung.
   - `rest`: Pause in Sekunden (fehlt = 120 für alle Übungen; 0 = aus), nur gespeichert, wenn abweichend. „Nur Gewicht“ hat bewusst keine Pause (kein Satz-Ereignis – vom Nutzer so entschieden).
@@ -41,6 +43,7 @@ Entwickelt von JD mit Claude. Kommunikation mit dem Nutzer auf **Deutsch**, Ober
 - **Start:** „Mit Google Drive starten“ (Standard, groß) → vorhandene Pläne wählen (bei genau einem direkt öffnen) oder Plan anlegen (WKM/Individuell). „Ohne Cloud nutzen“ nur als kleiner Link mit vorherigem Hinweis-Popup zu den Grenzen; später verbindbar (gleichnamige Pläne werden zusammengeführt).
 - **Plan wechseln** (Knopf unten und Planname unter dem Titel): oben direkt die **Liste aller Pläne** (antippen = wechseln), darunter „＋ Neuen Plan erstellen“ (WKM / Individuell / Aus bestehendem Plan übernehmen = Übungen ohne Einträge) und „Plan löschen“ (Bestätigung). Unten „Lokale Daten löschen & Google trennen“ (lokaler Modus: „Lokale Daten löschen“); im lokalen Modus zusätzlich „Sicherungskopie teilen“/„Sicherung einspielen“.
 - Debug-Plan heißt „Debug-WKM“; der Käfer wird nur als Symbol davor angezeigt (`pName()`), nicht im Namen gespeichert.
+- **Plan-Assistent** (vom Nutzer festgelegt, 0.97): Einheiten als Bubbles oben (antippen = bearbeiten, aktive hervorgehoben; gedrückt halten 0,45 s + ziehen = verschieben; × = entfernen; ＋ = neu), Feld „Name von Einheit N“. Übungen als abgegrenzte Karten mit Ziehgriff ⇅ am Rand (ziehen = umsortieren, auf Bubble = in andere Einheit), Erfassungsart als Knöpfe + Schalter „Körpergewicht“, Sätze/Pause/Max/Ziel, Namensvorschläge (`<datalist>` aus allen Plänen), Speicher-Leiste sticky unten, ohne Bestätigungsdialog. Umbenennen einer Übung: Rückfrage, ob bisherige Einträge mit umbenannt werden. **Nicht gewünscht:** Übungen zu einzeiligen Zusammenfassungen einklappen (Vorschlag A abgelehnt).
 - **Statuszeile** unter dem Titel statt Export-Erinnerung (gespeichert / offline / Verbindung erneuern / nur auf diesem Gerät).
 - **Kein Ton / keine akustische Benachrichtigung** (ausdrücklicher Nutzerwunsch). Timer-Ende: grüne Leiste + Vibration (Android).
 - Datum = heute, Einheit = nächste im Wechsel, bei jeder Aktualisierung.

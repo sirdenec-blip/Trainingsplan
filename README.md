@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.96** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.97** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -72,12 +72,18 @@ Pro Übung: **Gewicht** (vorausgefüllt vom letzten Mal, ▲▼ in 0,25-kg-Schri
 
 ## Eigener Trainingsplan (Plan-Assistent)
 Über *Individuell*, *Aus bestehendem Plan übernehmen* oder **✎ Plan bearbeiten**:
-- Name des Plans (eindeutig) und Anzahl der Einheiten (1–6).
-- Pro Einheit beliebig viele Übungen, jeweils mit Art der Erfassung:
-  - **Gewicht + Wiederholungen** (Standard 3 Sätze, 1–10 wählbar); mit Haken **Körpergewichtsübung**: Zusatzgewicht, beliebig viele Sätze.
-  - **Nur Gewicht** (z. B. `85`), **Nur Wiederholungen** (z. B. `x60-45`), **Pyramidensatz** (feste Wiederholungen, Gewicht je Satz, z. B. `8@60-70-80`).
+- **Name des Plans** (eindeutig).
+- **Einheiten als Bubbles** (1–6): antippen = diese Einheit bearbeiten (die aktive ist grün hervorgehoben), **gedrückt halten und ziehen** = Reihenfolge ändern, **×** = Einheit entfernen, **＋** = neue Einheit.
+- **Einheiten benennen** (optional): Ein eigener Name wird überall in der App mit vorangestellter Nummer angezeigt, z. B. „3 - Hypertrophie“ (Einheitenauswahl, Filter im Verlauf, Verlauf, Kalender). Ohne Namen heißt sie „Einheit 3“. Beim Verschieben passt sich die Nummer automatisch an.
+- **Übungen als Karten**, jede mit:
+  - **Ziehgriff ⇅** am linken Rand: gedrückt halten und ziehen = Reihenfolge ändern; auf die Bubble einer anderen Einheit ziehen = in diese Einheit verschieben.
+  - Name mit **Vorschlägen** aus allen deinen Plänen (verhindert Tippfehler-Doppel wie „Bankdrücken“/„Bankdrucken“).
+  - Art der Erfassung als Knöpfe: **Gewicht + Wdh.** (Standard 3 Sätze, 1–10 wählbar), **Nur Gewicht** (z. B. `85`), **Nur Wdh.** (z. B. `x60-45`), **Pyramide** (feste Wiederholungen, Gewicht je Satz, z. B. `8@60-70-80`); dazu der Schalter **Körpergewicht** (Zusatzgewicht, beliebig viele Sätze).
   - **Pause** für den Pausentimer (0:30 bis 5:00 oder aus; Standard 2:00), außer bei „Nur Gewicht“.
-- Bestehende Einträge bleiben bei Planänderungen erhalten.
+  - Bei Körpergewicht und „Nur Wdh.“ optional **Max./Satz** (z. B. 12) und **Ziel Σ** (z. B. 24, Ziellinie in der Auswertung).
+- **Speichern/Abbrechen** stehen immer sichtbar unten.
+- **Bestehende Einträge bleiben erhalten:** Verschiebst oder löschst du Einheiten, werden die bisherigen Einträge automatisch mit umnummeriert (Einträge einer gelöschten Einheit bleiben unter eigener Nummer erhalten). Benennst du eine Übung um, fragt die App, ob auch die bisherigen Einträge umbenannt werden sollen – empfohlen, damit Verlauf, Bestwerte und Diagramme zusammenbleiben.
+- Auswertungen fassen eine Übung über **alle Einheiten** zusammen (nach Namen). Nur „zuletzt … kg“ in der Eingabe und die +/−-Differenz im Verlauf vergleichen mit derselben Einheit.
 
 ## Verlauf
 Sichtbar sind so viele Einträge, wie der Plan Einheiten hat (je Einheit der neueste); alle weiteren unter „Ältere Einträge“ (angeheftete Leiste zum Einklappen). Die letzte gleiche Einheit ist grün gestrichelt umrandet.
@@ -99,6 +105,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.97:** Neuer Plan-Assistent: Einheiten als Bubbles (antippen, gedrückt halten zum Verschieben, × entfernen), Einheiten benennbar („3 - Hypertrophie“, überall in der App), Übungen als Karten mit Ziehgriff (auch in andere Einheit), Erfassungsart als Knöpfe, Max./Satz und Ziel einstellbar, Namensvorschläge, Speichern immer sichtbar, Einträge werden beim Verschieben/Löschen von Einheiten und Umbenennen von Übungen automatisch angepasst.
 - **0.96:** Datenschutzerklärung (`datenschutz.html`), verlinkt auf dem Startbildschirm und im ⓘ-Menü – Voraussetzung, um die Google-Anmeldung aus dem Teststatus zu holen.
 - **0.95:** Kalender markiert Trainingstage mit Notiz durch ein kleines Sprechblasen-Symbol in der Ecke.
 - **0.94:** Gewichtsdifferenzen im Verlauf wieder leicht eingefärbt (gedecktes Grün/Rot, unaufdringlich).
