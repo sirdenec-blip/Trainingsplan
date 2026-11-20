@@ -148,7 +148,11 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 .dh{flex:0 0 30px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--mu);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 .wmc{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 0 6px}
 .mc{width:auto;margin:0;padding:3px 8px;font-size:.76rem;font-weight:400;background:transparent;color:var(--tx);border:1px solid var(--bd);border-radius:14px}
-.mc.on{background:var(--ac);color:#fff;border-color:var(--ac)}.mc.tg.on{background:transparent;color:var(--ac);border-color:var(--ac);font-weight:600}
+.mc.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.wset{margin:10px 0 0;padding-top:8px;border-top:1px dashed var(--bd)}
+.bwt{display:flex;align-items:center;gap:8px;margin:2px 0 6px 6px;font-size:.85rem;color:var(--tx)}.bwt input{width:18px;height:18px;margin:0;flex:0 0 18px;accent-color:var(--ac)}
+@media(prefers-color-scheme:dark){.bwt input{color-scheme:dark}}.bwt small{color:var(--mu);font-size:.75rem}
+.wu .we.drag{border:2px solid var(--ac);padding:4px 8px 4px 2px}.we.drag .wmc,.we.drag .wset{display:none}
 .wu .wsr{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:8px 0 0 6px;font-size:.82rem;color:var(--mu)}
 .wu .wsr label{display:flex;align-items:center;gap:5px;margin:0;font-size:.82rem;color:var(--mu)}
 .wu .wsr select{width:auto;padding:6px 4px}.wl{width:3.2em;padding:6px 4px;text-align:center}
@@ -262,7 +266,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.97";
+const VERSION="0.98";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -779,7 +783,13 @@ function next(i){
   for(let j=i+1;j<cur.length;j++){const x=document.querySelector(`.w[data-i="${j}"],.pr[data-i="${j}"],.r[data-i="${j}"]`);if(x){x.focus();return}}
   $("save").focus();
 }
-$("unit").onchange=()=>{build();render()};
+$("unit").onchange=()=>{
+  if(editId===null){build();render();return}
+  // nur beim Bearbeiten eines Eintrags ohne Einheit im Plan möglich: erfasste Werte in die neue Einheit mitnehmen
+  const vals={},defs={};
+  cur.forEach((d,i)=>{const s=st[i];if(String(s.w).trim()!==""||s.reps.length||String(s.pr).trim()!==""){vals[d.n]={w:s.w,reps:s.reps,pr:s.pr};defs[d.n]=d}});
+  fillForm(+$("unit").value,vals,defs);render();
+};
 $("date").onchange=()=>{
   const c=live().find(x=>x.date===$("date").value&&x.id!==editId);
   $("msg").textContent=c?`Am ${fmt($("date").value)} gibt es schon einen Eintrag (${uLab(c.unit)}).`:"";
@@ -789,6 +799,9 @@ $("save").onclick=()=>{
   const u=$("unit").value,ex={};let err="";
   cur.forEach((e,i)=>{
     const hp=e.m==="p",hw=e.m==="wr"||e.m==="w",hr=e.m==="wr"||e.m==="r",w=String(st[i].w).trim().replace(",","."),r=st[i].reps,ok=!hw||/^\d+(\.\d+)?$/.test(w);
+    // Beim Bearbeiten sind Übungen ohne eingetragene Sätze optional (z. B. nach Zuweisung einer anderen Einheit) – sie entfallen
+    if(editId!==null&&(hr||hp)&&!r.length)return;
+    if(editId!==null&&e.m==="w"&&editNames&&!editNames.has(e.n))return; // vorbelegtes Gewicht nicht ungefragt ergänzen
     const we=document.querySelector(`.w[data-i="${i}"]`);if(we)we.classList.toggle("bad",!ok);
     if(hp){
       const pr=String(st[i].pr).trim(),pok=/^\d+$/.test(pr)&&+pr>=1,pe=document.querySelector(`.pr[data-i="${i}"]`);
@@ -803,6 +816,7 @@ $("save").onclick=()=>{
     else if(hr&&!e.s&&!r.length)err=err||`${e.n}: mindestens 1 Satz nötig.`;
     else ex[e.n]=(hw?String(+w):"")+(hr?"x"+r.join("-"):"");
   });
+  if(!err&&!Object.keys(ex).length)err="Mindestens eine Übung mit Sätzen eintragen.";
   $("msg").textContent=err;
   if(err)return;
   const dt=$("date").value;
@@ -830,22 +844,34 @@ $("save").onclick=()=>{
 };
 
 let editId=null;
-function edit(id){
-  const e=live().find(x=>x.id===id);if(!e)return;
-  const base=unitDefs(e.unit).slice();
-  Object.keys(e.ex).forEach(k=>{if(!base.some(p=>p.n===k)){const pv=parseVal(e.ex[k]);base.push({n:k,m:pv.pyr?"p":pv.reps?(pv.w!=null?"wr":"r"):"w",s:pv.pyr?pv.pyr.ws.length:0})}});
-  if(![...$("unit").options].some(o=>+o.value===e.unit))$("unit").add(new Option(uLab(e.unit),e.unit));
-  editId=id;$("date").value=e.date;$("unit").value=e.unit;$("unit").disabled=true;build(base);
+// Formular für Einheit u aufbauen und mit Werten füllen (vals: Übung → {w, reps, pr}); Übungen, die es in der Einheit
+// nicht gibt, kommen mit ihrer Definition (defs) dazu – so geht beim Bearbeiten nichts verloren
+function fillForm(u,vals,defs){
+  const base=unitDefs(u).slice();
+  Object.keys(vals).forEach(k=>{if(!base.some(p=>p.n===k)&&defs[k])base.push(defs[k])});
+  build(base);
   base.forEach((p,i)=>{
-    const v=e.ex[p.n];if(!v)return;
-    const pv=parseVal(v);
-    if(pv.w!=null){st[i].w=pv.w.replace(".",",");const we=document.querySelector(`.w[data-i="${i}"]`);if(we)we.value=st[i].w}
-    if(pv.reps)st[i].reps=pv.reps;
-    if(pv.pyr){st[i].pr=String(pv.pyr.r);st[i].reps=pv.pyr.ws;const pe=document.querySelector(`.pr[data-i="${i}"]`);if(pe)pe.value=pv.pyr.r}
+    const v=vals[p.n];if(!v)return;
+    if(v.w!=null){st[i].w=v.w;const we=document.querySelector(`.w[data-i="${i}"]`);if(we)we.value=v.w}
+    if(v.reps)st[i].reps=v.reps.slice();
+    if(v.pr!=null&&v.pr!==""){st[i].pr=String(v.pr);const pe=document.querySelector(`.pr[data-i="${i}"]`);if(pe)pe.value=v.pr}
     chips(i);updateDw(i);
   });
+}
+let editNames=null; // Übungen des bearbeiteten Eintrags
+function edit(id){
+  const e=live().find(x=>x.id===id);if(!e)return;
+  const vals={},defs={};editNames=new Set(Object.keys(e.ex));
+  Object.entries(e.ex).forEach(([k,v])=>{const pv=parseVal(v);
+    vals[k]=pv.pyr?{pr:pv.pyr.r,reps:pv.pyr.ws}:{w:pv.w!=null?pv.w.replace(".",","):null,reps:pv.reps};
+    defs[k]={n:k,m:pv.pyr?"p":pv.reps?(pv.w!=null?"wr":"r"):"w",s:pv.pyr?pv.pyr.ws.length:0}});
+  // Eintrag einer Einheit, die es im Plan nicht mehr gibt: Einheit darf neu zugewiesen werden
+  const orphan=e.unit>plan.units.length;
+  if(![...$("unit").options].some(o=>+o.value===e.unit))$("unit").add(new Option(uLab(e.unit)+(orphan?" (nicht mehr im Plan)":""),e.unit));
+  editId=id;$("date").value=e.date;$("unit").value=e.unit;$("unit").disabled=!orphan;
+  fillForm(e.unit,vals,defs);
   setNote(e.note);
-  $("editbar").textContent=`✎ Bearbeite Eintrag vom ${fmt(e.date)} (${uLab(e.unit)})`;
+  $("editbar").textContent=`✎ Bearbeite Eintrag vom ${fmt(e.date)} (${uLab(e.unit)})`+(orphan?" – diese Einheit gibt es im Plan nicht mehr: oben bei „Einheit“ eine bestehende zuweisen.":"");
   $("editbar").hidden=false;$("cancel").hidden=false;$("editbar").parentElement.classList.add("editing");$("save").textContent="Änderung speichern";
   $("msg").textContent="";$("note").textContent="";
   render();window.scrollTo({top:0,behavior:"smooth"});
@@ -1302,11 +1328,11 @@ function wizRender(){
   const U=wz.units,c=Math.max(0,Math.min(wz.cur,U.length-1)),u=U[c];wz.cur=c;
   const sel=(cls,b,vals,cur,lab)=>`<select class="${cls}" data-b="${b}">${vals.map(v=>`<option value="${v}"${v===cur?" selected":""}>${lab?lab(v):v}</option>`).join("")}</select>`;
   const card=(e,b)=>{
-    const sets=(e.m==="wr"&&!e.bw)||e.m==="p",lim=(e.m==="wr"&&e.bw)||e.m==="r";
+    const wr=e.m==="wr",lim=(wr&&(e.bw||!e.s))||e.m==="r",N10=[1,2,3,4,5,6,7,8,9,10];
     return `<div class="we" data-b="${b}">
     <div class="weh"><span class="dh" data-dh="${b}" title="Gedrückt halten und ziehen: verschieben (auch auf eine andere Einheit)">${DH}</span><input class="wn" data-b="${b}" list="exnames" maxlength="40" placeholder="Übung" value="${esc(e.n)}" autocomplete="off"><button type="button" class="x" data-act="del" data-b="${b}" title="Übung entfernen">✕</button></div>
-    <div class="wmc">${MODES.map(([k,t])=>`<button type="button" class="mc${e.m===k?" on":""}" data-m="${k}" data-b="${b}">${t}</button>`).join("")}${e.m==="wr"?`<button type="button" class="mc tg${e.bw?" on":""}" data-bw="${b}">${e.bw?"✓ ":""}Körpergewicht</button>`:""}</div>
-    ${e.m!=="w"?`<div class="wsr">${sets?`<label>Sätze ${sel("ws",b,[1,2,3,4,5,6,7,8,9,10],e.s||3)}</label>`:`<span>beliebig viele Sätze</span>`}<label>Pause ${sel("wp",b,RESTS,restOf(e),restL)}</label>${lim?`<label>Max./Satz <input class="wl" data-k="max" data-b="${b}" inputmode="numeric" placeholder="–" value="${e.max||""}"></label><label>Ziel Σ <input class="wl" data-k="goal" data-b="${b}" inputmode="numeric" placeholder="–" value="${e.goal||""}"></label>`:""}</div>`:""}
+    <div class="wmc">${MODES.map(([k,t])=>`<button type="button" class="mc${e.m===k?" on":""}" data-m="${k}" data-b="${b}">${t}</button>`).join("")}</div>
+    ${e.m!=="w"?`<div class="wset">${wr?`<label class="bwt"><input type="checkbox" data-bw="${b}"${e.bw?" checked":""}>Körpergewichtsübung <small>(Gewicht = Zusatzgewicht)</small></label>`:""}<div class="wsr">${wr?`<label>Sätze ${sel("ws",b,[0,...N10],e.s??3,v=>v||"beliebig")}</label>`:e.m==="p"?`<label>Sätze ${sel("ws",b,N10,e.s||3)}</label>`:`<span>beliebig viele Sätze</span>`}<label>Pause ${sel("wp",b,RESTS,restOf(e),restL)}</label>${lim?`<label>Max./Satz <input class="wl" data-k="max" data-b="${b}" inputmode="numeric" placeholder="–" value="${e.max||""}"></label><label>Ziel Σ <input class="wl" data-k="goal" data-b="${b}" inputmode="numeric" placeholder="–" value="${e.goal||""}"></label>`:""}</div></div>`:""}
     </div>`};
   $("wzb").innerHTML=`<label style="margin-top:0">Name des Plans</label><input id="wzName" maxlength="40" value="${esc(wz.name)}">
   <div class="sub">Einheiten <span style="font-size:.75rem">· antippen = bearbeiten · gedrückt halten = verschieben</span></div>
@@ -1324,7 +1350,7 @@ $("wzb").addEventListener("input",e=>{const t=e.target;
   else if(t.classList.contains("wl")){const v=parseInt(t.value,10);curEx(t.dataset.b)[t.dataset.k]=v>0?v:undefined}
 });
 $("wzb").addEventListener("change",e=>{const t=e.target;
-  if(t.classList.contains("ws"))curEx(t.dataset.b).s=+t.value;
+  if(t.classList.contains("ws")){curEx(t.dataset.b).s=+t.value;wizRender()} // „beliebig“ blendet Max./Ziel ein
   else if(t.classList.contains("wp"))curEx(t.dataset.b).rest=+t.value;
 });
 $("wzb").addEventListener("click",e=>{
@@ -1334,7 +1360,7 @@ $("wzb").addEventListener("click",e=>{
   if(t.closest("[data-uadd]")){U.push({name:"",o:null,exs:[wzEx()]});wz.cur=U.length-1;return wizRender()}
   const ub=t.closest(".ub[data-u]");if(ub){wz.cur=+ub.dataset.u;return wizRender()}
   const m=t.closest("[data-m]");if(m){const ex=curEx(m.dataset.b);ex.m=m.dataset.m;if(ex.m!=="wr")ex.bw=false;if(((ex.m==="wr"&&!ex.bw)||ex.m==="p")&&!ex.s)ex.s=3;return wizRender()}
-  const bw=t.closest("[data-bw]");if(bw){const ex=curEx(bw.dataset.bw);ex.bw=!ex.bw;if(!ex.bw&&!ex.s)ex.s=3;return wizRender()}
+  const bw=t.closest("input[data-bw]");if(bw){const ex=curEx(bw.dataset.bw);ex.bw=bw.checked;if(ex.bw)ex.s=0;else if(!ex.s)ex.s=3;return wizRender()}
   const a=t.closest("button[data-act]");if(!a)return;
   const ex=U[wz.cur].exs;
   if(a.dataset.act==="add"){ex.push(wzEx());wizRender();const ins=$("wzb").querySelectorAll(".wn");ins[ins.length-1].focus()}
@@ -1354,29 +1380,33 @@ $("wzb").addEventListener("pointerdown",e=>{
   if(h){e.preventDefault();dragStart({...st,type:"ex",from:+h.dataset.dh,el:h.closest(".we")})}
   else if(ub&&!e.target.closest(".ubx")){drg={...st,type:"unit",from:+ub.dataset.u,el:ub,wait:setTimeout(()=>dragStart({...st,type:"unit",from:+ub.dataset.u,el:ub}),450)}}
 });
+// Übung: Karte klappt beim Ziehen auf eine schmale Zeile zusammen und rückt live an die Zielstelle (andere Karten weichen aus)
 function dragStart(d){if(drg)clearTimeout(drg.wait);drg={...d,active:true,to:null};d.el.classList.add("drag");try{navigator.vibrate&&navigator.vibrate(15)}catch(x){}}
 function dragMarks(){$("wzb").querySelectorAll(".tgt,.ta,.tb").forEach(x=>x.classList.remove("tgt","ta","tb"))}
 document.addEventListener("pointermove",e=>{
   if(!drg)return;
   if(!drg.active){if(Math.hypot(e.clientX-drg.x,e.clientY-drg.y)>8){clearTimeout(drg.wait);drg=null}return}
   e.preventDefault();
-  drg.el.style.transform=`translate(${drg.type==="unit"?e.clientX-drg.x:0}px,${e.clientY-drg.y}px)`;
+  if(drg.type==="unit")drg.el.style.transform=`translate(${e.clientX-drg.x}px,${e.clientY-drg.y}px)`;
   drg.el.style.pointerEvents="none";const t=document.elementFromPoint(e.clientX,e.clientY);drg.el.style.pointerEvents="";
   dragMarks();drg.to=null;
   const ub=t&&t.closest(".ub[data-u]"),we=t&&t.closest(".we");
   if(drg.type==="unit"){if(ub&&+ub.dataset.u!==drg.from){drg.to=+ub.dataset.u;ub.classList.add("tgt")}}
   else if(ub&&+ub.dataset.u!==wz.cur){drg.to={unit:+ub.dataset.u};ub.classList.add("tgt")}
-  else if(we&&we!==drg.el){const r=we.getBoundingClientRect(),b=+we.dataset.b,after=e.clientY>r.top+r.height/2;drg.to={pos:after?b+1:b};we.classList.add(after?"ta":"tb")}
+  else if(we&&we!==drg.el&&we.parentNode===drg.el.parentNode){ // live einsortieren: nur über die Mitte der Nachbarkarte hinweg (kein Flackern)
+    const r=we.getBoundingClientRect(),mid=r.top+r.height/2,below=!!(drg.el.compareDocumentPosition(we)&Node.DOCUMENT_POSITION_FOLLOWING);
+    if(below&&e.clientY>mid)we.after(drg.el);else if(!below&&e.clientY<mid)we.before(drg.el);
+  }
   if(drg.type==="ex"){const pw=$("pw");if(e.clientY<80)pw.scrollBy(0,-14);else if(e.clientY>innerHeight-110)pw.scrollBy(0,14)}
 },{passive:false});
 document.addEventListener("pointerup",()=>{
   if(!drg)return;clearTimeout(drg.wait);const d=drg;drg=null;if(!d.active)return;
   wzJust=Date.now();
   if(d.type==="unit"&&d.to!=null){const u=wz.units.splice(d.from,1)[0];wz.units.splice(d.to,0,u);wz.cur=d.to}
-  else if(d.type==="ex"&&d.to){
-    const ex=wz.units[wz.cur].exs,it=ex.splice(d.from,1)[0];
-    if(d.to.unit!=null){wz.units[d.to.unit].exs.push(it);toast(`„${it.n.trim()||"Übung"}“ nach ${wLab(d.to.unit)} verschoben.`)}
-    else{let p=d.to.pos;if(p>d.from)p--;ex.splice(p,0,it)}
+  else if(d.type==="ex"){
+    const ex=wz.units[wz.cur].exs;
+    if(d.to&&d.to.unit!=null){const it=ex.splice(d.from,1)[0];wz.units[d.to.unit].exs.push(it);toast(`„${it.n.trim()||"Übung"}“ nach ${wLab(d.to.unit)} verschoben.`)}
+    else{const p=[...d.el.parentNode.querySelectorAll(".we")].indexOf(d.el);if(p>=0&&p!==d.from)ex.splice(p,0,ex.splice(d.from,1)[0])}
   }
   wizRender();
 });
@@ -1390,8 +1420,9 @@ $("wzSave").onclick=()=>{
       const n=e.n.trim();if(!n)continue;
       if(seen.has(n.toLowerCase())){wz.cur=a;wizRender();return wzm(`${wLab(a)}: „${n}“ kommt doppelt vor.`)}
       seen.add(n.toLowerCase());
-      const o={n,m:e.m},lim=(e.m==="wr"&&e.bw)||e.m==="r";
-      o.s=(e.m==="wr"&&!e.bw)||e.m==="p"?e.s||3:0;
+      const o={n,m:e.m};
+      o.s=e.m==="wr"?(e.s??3):e.m==="p"?(e.s||3):0; // 0 = beliebig viele Sätze
+      const lim=(e.m==="wr"&&(e.bw||!o.s))||e.m==="r";
       if(e.m==="wr"&&e.bw)o.bw=true;
       if(lim&&e.max)o.max=e.max;
       if(lim&&e.goal)o.goal=e.goal;
