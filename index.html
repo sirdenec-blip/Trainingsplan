@@ -24,7 +24,11 @@ input,select,button{font:inherit;width:100%;padding:10px;border-radius:8px;borde
 input.bad{border-color:#c33}
 button{background:var(--ac);color:#fff;border:0;margin-top:14px;font-weight:600}
 button.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);margin-top:8px;font-weight:400}
-.row{display:flex;gap:8px}.row>*{flex:1}
+.row{display:flex;gap:8px}.row>*{flex:1;min-width:0}
+/* iPhone/Safari: Datumsfeld hat sonst eine feste Mindestbreite und andere Höhe als die Auswahl daneben (Überschneidung) */
+input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;min-height:46px;text-align:left}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
+.row select{min-height:46px}
 .in{display:flex;gap:8px;align-items:center}
 .in .w{flex:0 0 84px;text-align:center}
 .in .r{flex:1}
@@ -142,7 +146,11 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 .ub.add{width:auto;margin:0;padding:5px 14px;background:transparent;font-weight:600}
 .ub.drag,.we.drag{position:relative;z-index:5;opacity:.9;box-shadow:0 8px 20px rgba(0,0,0,.4)}
 .ub.tgt{outline:2px dashed var(--ac);outline-offset:2px}
-.wu .we{border:1px solid var(--bd);border-top:1px solid var(--bd);border-radius:12px;padding:8px 10px 10px 4px;margin-bottom:10px;background:var(--bg)}
+.wu .we{border:1px solid var(--bd);border-top:1px solid var(--bd);border-radius:12px;padding:8px 4px 8px 10px;margin-bottom:10px;background:var(--bg);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.wu .we input{user-select:text;-webkit-user-select:text}
+.wdel{display:flex;justify-content:flex-end;margin:6px 6px 0 0}
+.wdx{width:auto;margin:0;padding:4px 6px;background:none;border:0;color:#c33;font-size:.78rem;font-weight:400;display:inline-flex;align-items:center;gap:4px;opacity:.85}
+.we.drag .wdel{display:none}
 .wu .we.ta{box-shadow:0 4px 0 -1px var(--ac)}.wu .we.tb{box-shadow:0 -4px 0 -1px var(--ac)}
 .weh{display:flex;gap:4px;align-items:center}.weh .wn{flex:1;min-width:0}
 .dh{flex:0 0 30px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--mu);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
@@ -152,7 +160,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 .wset{margin:10px 0 0;padding-top:8px;border-top:1px dashed var(--bd)}
 .bwt{display:flex;align-items:center;gap:8px;margin:2px 0 6px 6px;font-size:.85rem;color:var(--tx)}.bwt input{width:18px;height:18px;margin:0;flex:0 0 18px;accent-color:var(--ac)}
 @media(prefers-color-scheme:dark){.bwt input{color-scheme:dark}}.bwt small{color:var(--mu);font-size:.75rem}
-.wu .we.drag{border:2px solid var(--ac);padding:4px 8px 4px 2px}.we.drag .wmc,.we.drag .wset{display:none}
+.wu .we.drag{border:2px solid var(--ac);padding:4px 2px 4px 8px}.we.drag .wmc,.we.drag .wset{display:none}
 .wu .wsr{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:8px 0 0 6px;font-size:.82rem;color:var(--mu)}
 .wu .wsr label{display:flex;align-items:center;gap:5px;margin:0;font-size:.82rem;color:var(--mu)}
 .wu .wsr select{width:auto;padding:6px 4px}.wl{width:3.2em;padding:6px 4px;text-align:center}
@@ -162,7 +170,15 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 .pn{width:auto;margin:0;padding:0;background:none;border:0;color:var(--tx);font-weight:600;font-size:.85rem}
 .sst{color:var(--mu);cursor:pointer}.sst u{color:var(--ac);text-decoration:none;font-weight:600}.sst.warn{color:var(--ye)}
 .lnk{width:auto;display:block;margin:16px auto 0;background:none;border:0;color:var(--mu);font-weight:400;font-size:.85rem;text-decoration:underline}
-.pl{display:block;text-align:left;background:transparent;color:var(--tx);border:1px solid var(--bd);margin-top:8px;font-weight:400}.pl b{display:block}.pl small{color:var(--mu);font-size:.8rem}.pl.on{border:2px solid var(--ac);padding:9px}.pl.dl b{color:#c33}
+/* Plan-Karten im Planmenü (0.99.1): aktiver Plan grün getönt mit Leiste links und Plakette „Aktiv“, Kennzahlen als Bubbles */
+.pl{position:relative;margin-top:8px;padding:10px 10px 10px 14px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.pl.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 13%,var(--bg));box-shadow:inset 4px 0 0 var(--ac)}
+.plh{display:flex;align-items:center;gap:8px}.plh b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.pill{flex:0 0 auto;font-size:.7rem;font-weight:600;color:#fff;background:var(--ac);border-radius:10px;padding:2px 9px}
+.plm{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.plm .bb{font-size:.72rem;color:var(--mu);line-height:1.6}
+.pl .dh{margin:-6px -4px -6px 0}.pl.drag{z-index:5;box-shadow:0 8px 20px rgba(0,0,0,.4);opacity:.95}
+.pl.dl{border-color:#c33}.pl.dl b{color:#c33}
+.row2{display:flex;gap:8px}.row2 button{margin-top:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 #pm{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:25;padding:16px;overflow:auto}#pm[hidden]{display:none}#pm>div{max-width:520px;margin:4vh auto}
 #start .mu,#pm .mu{line-height:1.4}
 .toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;width:max-content;max-width:calc(100% - 32px);background:var(--tx);color:var(--bg);padding:10px 14px;border-radius:10px;font-size:.85rem;line-height:1.4;box-shadow:0 4px 14px rgba(0,0,0,.25)}.toast[hidden]{display:none}
@@ -266,7 +282,7 @@ body{padding-top:calc(16px + var(--tb,0px))}html{scroll-padding-top:calc(var(--t
 </div>
 
 <script>
-const VERSION="0.99";
+const VERSION="0.99.1";
 // Übung: n = Name, m = "wr" (Gewicht + Wdh.) | "w" (nur Gewicht) | "r" (nur Wdh.) | "p" (Pyramidensatz: Gewicht je Satz, feste Wdh.),
 // bw = Körpergewichtsübung, s = Anzahl Sätze (0 = beliebig viele), max/goal optional
 const WKM_PLAN={name:"WKM",ts:0,units:[
@@ -307,7 +323,9 @@ const readDoc=id=>{try{const d=JSON.parse(localStorage.getItem(DKEY(id))||"null"
 const writeDoc=d=>{try{localStorage.setItem(DKEY(d.plan.id),JSON.stringify(d));return true}catch(e){return false}};
 const docOf=()=>({app:"TTB",version:DOCV,plan,sessions:data});
 function docMeta(d){const L=d.sessions.filter(x=>!x.del);return{name:d.plan.name,n:L.length,last:L.reduce((a,x)=>x.date>a?x.date:a,"")||null}}
-const plans=()=>Object.values(idx.plans).sort((a,b)=>(b.last||"").localeCompare(a.last||"")||a.name.localeCompare(b.name));
+// Reihenfolge der Pläne: wie im Planmenü per Ziehen festgelegt (idx.order, nur auf diesem Gerät), übrige nach letztem Training
+const plans=()=>{const o=idx.order||[],pos=id=>{const i=o.indexOf(id);return i<0?1e9:i};
+  return Object.values(idx.plans).sort((a,b)=>pos(a.id)-pos(b.id)||(b.last||"").localeCompare(a.last||"")||a.name.localeCompare(b.name))};
 const anyDirty=()=>Object.values(idx.plans).some(e=>e.dirty&&!e.debug);
 const nameTaken=(n,except)=>Object.values(idx.plans).some(e=>e.id!==except&&e.name.trim().toLowerCase()===n.trim().toLowerCase());
 function uniqueName(n,except){let x=n,k=2;while(nameTaken(x,except))x=n+" "+k++;return x}
@@ -352,6 +370,9 @@ function dropTok(){tok=null;try{localStorage.removeItem(TKEY)}catch(e){}}
 // Installierte App (Android und iPhone): Das Google-Anmeldefenster öffnet dort in einem eigenen Overlay ohne Verbindung
 // zur App und bleibt am Ende weiß hängen. Deshalb dort Anmeldung per Weiterleitung im selben Fenster.
 const appMode=()=>navigator.standalone===true||matchMedia("(display-mode: standalone)").matches;
+// iPhone/iPad: auch im Browser (Safari) schließt sich das Google-Fenster nicht zuverlässig (bleibt weiß) → ebenfalls Weiterleitung
+const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const useRedirect=()=>appMode()||isIOS();
 const RURI=location.origin+location.pathname.replace(/index\.html$/,"");
 const SKEY="ttb_st";
 if(/[#&](access_token|error)=/.test(location.hash)){ // Rückkehr von der Google-Anmeldeseite (Weiterleitung)
@@ -376,7 +397,7 @@ function tokenClient(){
 function auth(after,silent){
   if(tokValid())return Promise.resolve();
   if(MOCK)return MOCK.auth().then(t=>setTok(t,3600));
-  if(appMode()){
+  if(useRedirect()){
     const s=uid();localStorage.setItem(SKEY,s);if(after)sessionStorage.setItem("ttb_after",after);
     location.href="https://accounts.google.com/o/oauth2/v2/auth?"+new URLSearchParams({client_id:CLIENT_ID,redirect_uri:RURI,response_type:"token",scope:SCOPE,include_granted_scopes:"true",state:s,
       ...(silent?{prompt:"none"}:idx.email?{}:{prompt:"select_account"}),...(idx.email?{login_hint:idx.email}:{})});
@@ -471,11 +492,11 @@ function adopt(m){
   if(editId===null&&!dirty&&st.every(x=>!x.reps.length))init();else render();
 }
 // nach einer Änderung per Klick: abgelaufenen Google-Zugang gleich mit erneuern (Fenster blitzt kurz auf)
-function kick(){if(idx.mode==="cloud"&&!tokValid()&&navigator.onLine&&cloudOk()&&!appMode())auth().then(()=>syncSoon(200)).catch(()=>renderSync())}
+function kick(){if(idx.mode==="cloud"&&!tokValid()&&navigator.onLine&&cloudOk()&&!useRedirect())auth().then(()=>syncSoon(200)).catch(()=>renderSync())}
 // Installierte App: abgelaufenen Zugang still erneuern (Weiterleitung mit prompt=none), aber nur wenn gerade nichts eingegeben wird.
 // Höchstens alle 30 Minuten versuchen, damit bei abgemeldetem Google-Konto keine Schleife entsteht.
 function silentRenew(){
-  if(idx.mode!=="cloud"||tokValid()||!appMode()||!navigator.onLine||!CLIENT_ID||MOCK)return false;
+  if(idx.mode!=="cloud"||tokValid()||!useRedirect()||!navigator.onLine||!CLIENT_ID||MOCK)return false;
   if(plan&&(editId!==null||dirty||st.some(x=>x.reps.length)||$("noteIn").value.trim()))return false;
   const last=+(localStorage.getItem("ttb_silent")||0);if(Date.now()-last<30*60e3)return false;
   localStorage.setItem("ttb_silent",Date.now());auth(null,true);return true;
@@ -1207,21 +1228,24 @@ $("stb").addEventListener("click",e=>{
   else showStart(a);
 });
 // ---------- Pläne verwalten: laden, neu erstellen (WKM / Individuell / übernehmen), löschen ----------
-function planRows(act){
+// Plan-Karten: aktiver Plan grün getönt mit Leiste und Plakette „Aktiv“, Kennzahlen als Bubbles; drag = Griff ⇅ rechts (Reihenfolge)
+function planRows(act,drag){
   const ps=plans().filter(p=>act!=="copy"||readDoc(p.id));
   if(!ps.length)return `<p class="mu">Keine Pläne vorhanden.</p>`;
-  return ps.map(p=>{
+  return `<div class="pls">`+ps.map(p=>{
     const on=plan&&p.id===plan.id,loc=!!readDoc(p.id);
     const inf=[p.n!=null?`${p.n} ${p.n===1?"Eintrag":"Einträge"}`:"",p.last?"zuletzt "+fmt(p.last):"",
-      p.debug||idx.mode!=="cloud"?"nur auf diesem Gerät":!loc?"noch nicht auf diesem Gerät geladen":""].filter(Boolean).join(" · ");
-    return `<button type="button" class="pl${on?" on":""}${act==="del"?" dl":""}" data-pid="${p.id}" data-pa="${act}"><b>${pName(p,p.debug)}${on?" ✓":""}</b><small>${inf||"noch keine Einträge"}</small></button>`}).join("");
+      p.debug||idx.mode!=="cloud"?"nur auf diesem Gerät":!loc?"noch nicht geladen":""].filter(Boolean);
+    return `<div class="pl${on?" on":""}${act==="del"?" dl":""}" role="button" tabindex="0" data-pid="${p.id}" data-pa="${act}"${drag?" data-drag":""}>
+      <div class="plh"><b>${pName(p,p.debug)}</b>${on?`<span class="pill">Aktiv</span>`:""}${drag?`<span class="dh" title="Ziehen: Reihenfolge ändern – oder Karte lange gedrückt halten">${DH}</span>`:""}</div>
+      <div class="plm">${(inf.length?inf:["noch keine Einträge"]).map(t=>`<span class="bb">${t}</span>`).join("")}</div></div>`}).join("")+`</div>`;
 }
 function pmOpen(v){$("pm").hidden=false;pmView(v||"main")}
 function pmClose(){$("pm").hidden=true}
 function pmView(v){
   const b=$("pmb"),cl=idx.mode==="cloud",back=`<button class="sec" data-pm="main">Zurück</button>`;
-  if(v==="main")b.innerHTML=`<div class="sub" style="margin-top:0">Plan wechseln (antippen)</div>`+planRows("open")
-    +`<button data-pm="new">＋ Neuen Plan erstellen</button><button class="sec" data-pm="del">Plan löschen</button>`
+  if(v==="main")b.innerHTML=`<div class="sub" style="margin-top:0">Antippen = wechseln · ziehen = Reihenfolge</div>`+planRows("open",true)
+    +`<div class="row2"><button data-pm="new">＋ Neuer Plan</button><button class="sec" data-pm="del">${TRASH} Löschen</button></div>`
     +`<div class="sub">Speicherung</div><p class="mu" style="margin:0">${cl?`Google Drive${idx.email?" ("+esc(idx.email)+")":""}, Ordner „${FOLDER}“ – eine Datei pro Plan, automatisch abgeglichen.`:"Nur auf diesem Gerät – keine automatische Sicherung."}</p>`
     +(!cl&&cloudOk()?`<button data-pm="connect">Mit Google Drive verbinden</button>`:"")
     +(!cl?`<button class="sec" data-pm="backup">Sicherungskopie teilen</button><button class="sec" data-pm="restore">Sicherung einspielen</button>`:"")
@@ -1231,6 +1255,7 @@ function pmView(v){
   else if(v==="del")b.innerHTML=`<div class="sub" style="margin-top:0">Welchen Plan löschen?</div>`+planRows("del")+back;
 }
 $("pmb").addEventListener("click",e=>{
+  if(Date.now()-wzJust<350)return; // Klick direkt nach dem Ziehen ignorieren
   const b=e.target.closest("[data-pm],[data-pid]");if(!b)return;
   if(b.dataset.pid)return planAct(b.dataset.pa,b.dataset.pid);
   const a=b.dataset.pm;
@@ -1306,6 +1331,7 @@ const RESTS=[0,30,45,60,90,120,150,180,240,300],restL=s=>s?Math.floor(s/60)+":"+
 const wzEx=()=>({n:"",m:"wr",s:3}),wzm=t=>{$("wzm").textContent=t};
 const MODES=[["wr","Gewicht + Wdh."],["w","Nur Gewicht"],["r","Nur Wdh."],["p","Pyramide"]];
 const DH=sI('<path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4"/>',18);
+const TRASH=sI('<path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5"/>',15);
 const wLab=i=>{const n=(wz.units[i].name||"").trim();return n?`${i+1} - ${n}`:`Einheit ${i+1}`};
 const curEx=b=>wz.units[wz.cur].exs[+b];
 // m: "edit" = aktiven Plan bearbeiten, "new" = neuer leerer Plan, "copy" = neuer Plan mit den Übungen von src
@@ -1330,9 +1356,10 @@ function wizRender(){
   const card=(e,b)=>{
     const wr=e.m==="wr",lim=(wr&&(e.bw||!e.s))||e.m==="r",N10=[1,2,3,4,5,6,7,8,9,10];
     return `<div class="we" data-b="${b}">
-    <div class="weh"><span class="dh" data-dh="${b}" title="Gedrückt halten und ziehen: verschieben (auch auf eine andere Einheit)">${DH}</span><input class="wn" data-b="${b}" list="exnames" maxlength="40" placeholder="Übung" value="${esc(e.n)}" autocomplete="off"><button type="button" class="x" data-act="del" data-b="${b}" title="Übung entfernen">✕</button></div>
+    <div class="weh"><input class="wn" data-b="${b}" list="exnames" maxlength="40" placeholder="Übung" value="${esc(e.n)}" autocomplete="off"><span class="dh" data-dh="${b}" title="Ziehen: verschieben (auch auf eine andere Einheit) – oder die Karte lange gedrückt halten">${DH}</span></div>
     <div class="wmc">${MODES.map(([k,t])=>`<button type="button" class="mc${e.m===k?" on":""}" data-m="${k}" data-b="${b}">${t}</button>`).join("")}</div>
     ${e.m!=="w"?`<div class="wset">${wr?`<label class="bwt"><input type="checkbox" data-bw="${b}"${e.bw?" checked":""}>Körpergewichtsübung <small>(Gewicht = Zusatzgewicht)</small></label>`:""}<div class="wsr">${wr?`<label>Sätze ${sel("ws",b,[0,...N10],e.s??3,v=>v||"beliebig")}</label>`:e.m==="p"?`<label>Sätze ${sel("ws",b,N10,e.s||3)}</label>`:`<span>beliebig viele Sätze</span>`}<label>Pause ${sel("wp",b,RESTS,restOf(e),restL)}</label>${lim?`<label>Max./Satz <input class="wl" data-k="max" data-b="${b}" inputmode="numeric" placeholder="–" value="${e.max||""}"></label><label>Ziel Σ <input class="wl" data-k="goal" data-b="${b}" inputmode="numeric" placeholder="–" value="${e.goal||""}"></label>`:""}</div></div>`:""}
+    <div class="wdel"><button type="button" class="wdx" data-act="del" data-b="${b}">${TRASH} Entfernen</button></div>
     </div>`};
   $("wzb").innerHTML=`<label style="margin-top:0">Name des Plans</label><input id="wzName" maxlength="40" value="${esc(wz.name)}">
   <div class="sub">Einheiten <span style="font-size:.75rem">· antippen = bearbeiten · gedrückt halten = verschieben</span></div>
@@ -1372,16 +1399,28 @@ function wzDelUnit(i){
   wz.units.splice(i,1);if(wz.cur>=i&&wz.cur>0)wz.cur--;wizRender();
 }
 // ---------- Ziehen: Einheiten-Bubbles (gedrückt halten) und Übungen (Griff ⇅) ----------
-$("wzb").addEventListener("contextmenu",e=>{if(e.target.closest(".ub,.dh"))e.preventDefault()});
+// ---------- Ziehen ----------
+// Einheiten-Bubbles: gedrückt halten + ziehen. Übungskarten und Pläne (Planmenü): am Griff ⇅ sofort, oder Karte lange gedrückt halten.
+// Karte klappt (Übung) zusammen und folgt dem Finger stufenlos; sie wird live einsortiert, die übrigen gleiten weich zur Seite (FLIP).
+const LONG=450,noDrag="input,select,textarea,label,.wdx,.ubx"; // lange drücken geht überall auf der Karte außer auf Eingabefeldern und „Entfernen“
+$("wzb").addEventListener("contextmenu",e=>{if(e.target.closest(".ub,.dh,.we"))e.preventDefault()});
+$("pmb").addEventListener("contextmenu",e=>{if(e.target.closest(".pl[data-drag]"))e.preventDefault()});
+function pressDrag(e,d){ // Griff = sofort ziehen, sonst erst nach langem Drücken (kurzes Antippen bleibt ein normaler Tipp)
+  const st={x:e.clientX,y:e.clientY,...d};
+  if(e.target.closest(".dh")){e.preventDefault();dragStart(st)}
+  else drg={...st,wait:setTimeout(()=>dragStart(st),LONG)};
+}
 $("wzb").addEventListener("pointerdown",e=>{
   if(drg)return;
-  const h=e.target.closest(".dh"),ub=e.target.closest(".ub[data-u]");
-  const st={x:e.clientX,y:e.clientY};
-  if(h){e.preventDefault();dragStart({...st,type:"ex",from:+h.dataset.dh,el:h.closest(".we")})}
-  else if(ub&&!e.target.closest(".ubx")){drg={...st,type:"unit",from:+ub.dataset.u,el:ub,wait:setTimeout(()=>dragStart({...st,type:"unit",from:+ub.dataset.u,el:ub}),450)}}
+  const ub=e.target.closest(".ub[data-u]"),we=e.target.closest(".we");
+  if(ub&&!e.target.closest(".ubx")){const st={x:e.clientX,y:e.clientY,type:"unit",from:+ub.dataset.u,el:ub};drg={...st,wait:setTimeout(()=>dragStart(st),LONG)}}
+  else if(we&&(e.target.closest(".dh")||!e.target.closest(noDrag)))pressDrag(e,{type:"ex",from:+we.dataset.b,el:we,sel:".we",sc:$("pw")});
 });
-// Übung ziehen: Karte klappt auf eine schmale Zeile zusammen und folgt dem Finger stufenlos; sie wird live an der Zielstelle
-// einsortiert, die übrigen Karten gleiten weich zur Seite (FLIP-Animation). Am oberen/unteren Rand scrollt die Liste gleichmäßig.
+$("pmb").addEventListener("pointerdown",e=>{
+  if(drg)return;const pl=e.target.closest(".pl[data-drag]");
+  if(pl)pressDrag(e,{type:"pl",from:-1,el:pl,sel:".pl",sc:$("pm")});
+});
+document.addEventListener("touchmove",e=>{if(drg&&drg.active)e.preventDefault()},{passive:false}); // während des Ziehens nicht scrollen
 const curY=el=>{const m=getComputedStyle(el).transform;return m&&m!=="none"?new DOMMatrixReadOnly(m).m42:0};
 function flip(els,fn){ // Positionen merken → ändern → von alter zu neuer Position gleiten
   const old=els.map(s=>s.getBoundingClientRect().top);
@@ -1389,27 +1428,27 @@ function flip(els,fn){ // Positionen merken → ändern → von alter zu neuer P
   els.forEach((s,i)=>{s.style.transition="none";s.style.transform="";const d=old[i]-s.getBoundingClientRect().top;if(Math.abs(d)<1)return;
     s.style.transform=`translateY(${d}px)`;s.offsetHeight;s.style.transition="transform .16s ease-out";s.style.transform=""});
 }
-const exSibs=()=>[...drg.el.parentNode.querySelectorAll(".we")].filter(s=>s!==drg.el);
-function exPlace(y){const el=drg.el,nat=el.getBoundingClientRect().top-curY(el);el.style.transform=`translateY(${y-drg.grab-nat}px)`}
-function exMove(y){
-  const el=drg.el,sib=exSibs();let k=0;
+const lSibs=()=>[...drg.el.parentNode.querySelectorAll(drg.sel)].filter(s=>s!==drg.el);
+function lPlace(y){const el=drg.el,nat=el.getBoundingClientRect().top-curY(el);el.style.transform=`translateY(${y-drg.grab-nat}px)`}
+function lMove(y){
+  const el=drg.el,sib=lSibs();let k=0;
   for(const s of sib){const r=s.getBoundingClientRect();if(r.top-curY(s)+r.height/2<y)k++} // Zielplatz nach Ruhe-Positionen
-  let nx=el.nextElementSibling;while(nx&&!nx.classList.contains("we"))nx=nx.nextElementSibling;
+  let nx=el.nextElementSibling;while(nx&&!nx.matches(drg.sel))nx=nx.nextElementSibling;
   const want=sib[k]||null;
   if(want!==nx&&!(want===null&&!nx))flip(sib,()=>{if(want)want.before(el);else sib[sib.length-1].after(el)});
-  exPlace(y);
+  lPlace(y);
 }
-function exTick(){ // Rand-Scrollen, auch wenn der Finger stillsteht
-  if(!drg||!drg.active||drg.type!=="ex")return;
+function lTick(){ // Rand-Scrollen, auch wenn der Finger stillsteht
+  if(!drg||!drg.active||drg.type==="unit")return;
   const y=drg.lastY;let d=0;if(y<90)d=-Math.ceil((90-y)/6);else if(y>innerHeight-120)d=Math.ceil((y-innerHeight+120)/6);
-  if(d){$("pw").scrollBy(0,d);exMove(y)}
-  requestAnimationFrame(exTick);
+  if(d){drg.sc.scrollBy(0,d);lMove(y)}
+  requestAnimationFrame(lTick);
 }
 function dragStart(d){
   if(drg)clearTimeout(drg.wait);drg={...d,active:true,to:null};
-  if(d.type==="ex"){
-    flip(exSibs(),()=>d.el.classList.add("drag")); // Zusammenklappen: übrige Karten rücken weich nach
-    drg.grab=d.el.getBoundingClientRect().height/2;drg.lastY=d.y;exPlace(d.y);requestAnimationFrame(exTick);
+  if(d.type!=="unit"){
+    flip(lSibs(),()=>d.el.classList.add("drag")); // Übung klappt zusammen: übrige Karten rücken weich nach
+    drg.grab=d.el.getBoundingClientRect().height/2;drg.lastY=d.y;lPlace(d.y);requestAnimationFrame(lTick);
   }else d.el.classList.add("drag");
   try{navigator.vibrate&&navigator.vibrate(15)}catch(x){}
 }
@@ -1424,20 +1463,21 @@ document.addEventListener("pointermove",e=>{
   const ub=t&&t.closest(".ub[data-u]");
   if(drg.type==="unit"){if(ub&&+ub.dataset.u!==drg.from){drg.to=+ub.dataset.u;ub.classList.add("tgt")}return}
   drg.lastY=e.clientY;
-  if(ub&&+ub.dataset.u!==wz.cur){drg.to={unit:+ub.dataset.u};ub.classList.add("tgt")}
-  exMove(e.clientY);
+  if(drg.type==="ex"&&ub&&+ub.dataset.u!==wz.cur){drg.to={unit:+ub.dataset.u};ub.classList.add("tgt")}
+  lMove(e.clientY);
 },{passive:false});
 document.addEventListener("pointerup",()=>{
   if(!drg)return;clearTimeout(drg.wait);const d=drg;drg=null;if(!d.active)return;
   wzJust=Date.now();
   if(d.type==="unit"){if(d.to!=null){const u=wz.units.splice(d.from,1)[0];wz.units.splice(d.to,0,u);wz.cur=d.to}return wizRender()}
+  const glide=fn=>{d.el.style.transition="transform .15s ease-out";d.el.style.transform="";setTimeout(fn,160)}; // weich an den Platz
+  if(d.type==="pl"){idx.order=[...d.el.parentNode.querySelectorAll(".pl")].map(x=>x.dataset.pid);saveIdx();return glide(()=>pmView("main"))}
   const ex=wz.units[wz.cur].exs;
   if(d.to&&d.to.unit!=null){const it=ex.splice(d.from,1)[0];wz.units[d.to.unit].exs.push(it);toast(`„${it.n.trim()||"Übung"}“ nach ${wLab(d.to.unit)} verschoben.`);return wizRender()}
   const p=[...d.el.parentNode.querySelectorAll(".we")].indexOf(d.el);if(p>=0&&p!==d.from)ex.splice(p,0,ex.splice(d.from,1)[0]);
-  d.el.style.transition="transform .15s ease-out";d.el.style.transform=""; // weich an den Platz gleiten, dann neu aufbauen
-  setTimeout(wizRender,160);
+  glide(wizRender);
 });
-document.addEventListener("pointercancel",()=>{if(!drg)return;clearTimeout(drg.wait);const a=drg.active;drg=null;if(a)wizRender()});
+document.addEventListener("pointercancel",()=>{if(!drg)return;clearTimeout(drg.wait);const d=drg;drg=null;if(d.active)d.type==="pl"?pmView("main"):wizRender()});
 // ---------- Speichern ----------
 $("wzSave").onclick=()=>{
   const name=wz.name.trim()||"Mein Trainingsplan",units=[],ren=[];

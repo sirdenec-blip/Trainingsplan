@@ -1,6 +1,6 @@
 # TTB – Trainingstagebuch
 
-Aktuelle Version: **0.99** (Testversion; steht auch im ⓘ-Menü oben rechts)
+Aktuelle Version: **0.99.1** (Testversion; steht auch im ⓘ-Menü oben rechts)
 
 Trainingstagebuch fürs Krafttraining. Läuft im Browser und lässt sich als App „TTB“ auf dem Handy installieren (Android und iPhone). Pläne und Einträge werden automatisch in **deinem Google Drive** gesichert – auf allen Geräten aktuell und auch ohne Empfang im Studio nutzbar.
 
@@ -25,7 +25,7 @@ Danach erscheint „TTB“ mit dem Feuerfuchs-Symbol auf dem Startbildschirm, oh
 - Beim Öffnen und beim Zurückkehren in die App holt sie Änderungen von anderen Geräten.
 - Zwei Geräte gleichzeitig: Es wird pro Eintrag zusammengeführt (gleiche ID = gleicher Eintrag, neuere Änderung gewinnt, Löschungen werden mitgenommen). Vor jedem Hochladen liest die App den aktuellen Stand aus Drive – es wird nie blind überschrieben.
 - **Google-Zugang:** Google erlaubt Web-Apps ohne eigenen Server nur einen Zugang für ca. eine Stunde. Bis zur Erneuerung ist alles auf dem Gerät gesichert.
-  - **Installierte App (Android/iPhone):** Anmeldung per Weiterleitung im selben Fenster (die App wechselt kurz zur Google-Seite und kommt zurück). Ein abgelaufener Zugang wird beim Öffnen oder Zurückkehren zur App still erneuert, solange gerade nichts eingegeben wird (kurzes Neuladen). Klappt das nicht, zeigt die Statuszeile „Google-Verbindung erneuern“.
+  - **Installierte App (Android/iPhone) und iPhone/iPad im Browser:** Anmeldung per Weiterleitung im selben Fenster (die App wechselt kurz zur Google-Seite und kommt zurück). Ein abgelaufener Zugang wird beim Öffnen oder Zurückkehren zur App still erneuert, solange gerade nichts eingegeben wird (kurzes Neuladen). Klappt das nicht, zeigt die Statuszeile „Google-Verbindung erneuern“.
   - **Im Browser-Tab:** Beim nächsten „Speichern“ blitzt kurz ein Google-Fenster auf (bei mehreren Google-Konten: einmal antippen).
 
 **Statuszeile** unter dem Titel (neben dem Plannamen), z. B.:
@@ -36,9 +36,9 @@ Danach erscheint „TTB“ mit dem Feuerfuchs-Symbol auf dem Startbildschirm, oh
 
 ## Trainingspläne verwalten
 Der aktive Plan steht unter dem Titel (antippen) und unten gibt es **⇄ Plan wechseln**:
-- Oben direkt die **Liste aller Pläne** mit Anzahl Einträge und letztem Training – antippen wechselt sofort.
-- **＋ Neuen Plan erstellen:** *WKM*, *Individuell* (Plan-Assistent) oder *Aus bestehendem Plan übernehmen* – kopiert Übungen, Sätze und Pausen, nicht die Trainingseinträge; danach öffnet sich der Assistent zum Anpassen (mindestens der Name).
-- **Plan löschen:** mit Bestätigung. Im Cloud-Modus wandert die Datei in den **Papierkorb von Google Drive** (30 Tage wiederherstellbar) und der Plan verschwindet auf allen Geräten.
+- Oben direkt die **Pläne als Karten**: der aktive grün hervorgehoben mit Plakette „Aktiv“, darunter Anzahl Einträge und letztes Training. Antippen wechselt sofort; **Reihenfolge** per Ziehgriff ⇅ rechts oder lange gedrückt halten (gilt auf diesem Gerät).
+- **＋ Neuer Plan:** *WKM*, *Individuell* (Plan-Assistent) oder *Aus bestehendem Plan übernehmen* – kopiert Übungen, Sätze und Pausen, nicht die Trainingseinträge; danach öffnet sich der Assistent zum Anpassen (mindestens der Name).
+- **Löschen:** Plan auswählen, mit Bestätigung. Im Cloud-Modus wandert die Datei in den **Papierkorb von Google Drive** (30 Tage wiederherstellbar) und der Plan verschwindet auf allen Geräten.
 
 Außerdem im selben Menü: **Lokale Daten löschen & Google trennen** – löscht nur die Kopien auf dem Gerät und trennt die Google-Verbindung (vorher wird synchronisiert; ohne Verbindung wird das verweigert, damit nichts verloren geht). In Google Drive bleibt alles erhalten. Im Modus ohne Cloud heißt der Knopf „Lokale Daten löschen“; zusätzlich gibt es **Sicherungskopie teilen** und **Sicherung einspielen**.
 
@@ -76,11 +76,12 @@ Pro Übung: **Gewicht** (vorausgefüllt vom letzten Mal, ▲▼ in 0,25-kg-Schri
 - **Einheiten als Bubbles** (1–6): antippen = diese Einheit bearbeiten (die aktive ist grün hervorgehoben), **gedrückt halten und ziehen** = Reihenfolge ändern, **×** = Einheit entfernen, **＋** = neue Einheit.
 - **Einheiten benennen** (optional): Ein eigener Name wird überall in der App mit vorangestellter Nummer angezeigt, z. B. „3 - Hypertrophie“ (Einheitenauswahl, Filter im Verlauf, Verlauf, Kalender). Ohne Namen heißt sie „Einheit 3“. Beim Verschieben passt sich die Nummer automatisch an.
 - **Übungen als Karten**, jede mit:
-  - **Ziehgriff ⇅** am linken Rand: gedrückt halten und ziehen = Reihenfolge ändern (die Karte klappt zu einer schmalen Zeile zusammen, folgt dem Finger stufenlos, und die übrigen Karten gleiten weich zur Seite; am Rand scrollt die Liste mit); auf die Bubble einer anderen Einheit ziehen = in diese Einheit verschieben.
+  - **Verschieben:** am **Ziehgriff ⇅ rechts** neben dem Namen ziehen oder die **Karte lange gedrückt halten** (überall außer in Eingabefeldern) = Reihenfolge ändern (die Karte klappt zu einer schmalen Zeile zusammen, folgt dem Finger stufenlos, und die übrigen Karten gleiten weich zur Seite; am Rand scrollt die Liste mit); auf die Bubble einer anderen Einheit ziehen = in diese Einheit verschieben.
   - Name mit **Vorschlägen** aus allen deinen Plänen (verhindert Tippfehler-Doppel wie „Bankdrücken“/„Bankdrucken“).
   - Art der Erfassung als Knöpfe: **Gewicht + Wdh.**, **Nur Gewicht** (z. B. `85`), **Nur Wdh.** (z. B. `x60-45`), **Pyramide** (feste Wiederholungen, Gewicht je Satz, z. B. `8@60-70-80`).
   - Darunter, durch eine Linie abgesetzt, die Einstellungen: bei Gewicht + Wdh. das Häkchen **Körpergewichtsübung** (Gewicht = Zusatzgewicht) und die **Sätze**: **beliebig** (fortlaufend erfassen, Enter auf leerem Feld = fertig, Summe wird angezeigt) oder 1–10 (Standard 3).
   - **Pause** für den Pausentimer (0:30 bis 5:00 oder aus; Standard 2:00), außer bei „Nur Gewicht“.
+  - **Entfernen** steht unten rechts in der Karte (weit weg vom Ziehgriff, mit Rückfrage).
   - Bei Körpergewicht, „beliebig“ und „Nur Wdh.“ optional **Max./Satz** (z. B. 12) und **Ziel Σ** (z. B. 24, Ziellinie in der Auswertung).
 - **Speichern/Abbrechen** stehen immer sichtbar unten.
 - **Bestehende Einträge bleiben erhalten:** Verschiebst oder löschst du Einheiten, werden die bisherigen Einträge automatisch mit umnummeriert (Einträge einer gelöschten Einheit bleiben unter eigener Nummer erhalten). Benennst du eine Übung um, fragt die App, ob auch die bisherigen Einträge umbenannt werden sollen – empfohlen, damit Verlauf, Bestwerte und Diagramme zusammenbleiben.
@@ -107,6 +108,7 @@ Im ⓘ-Menü steht hinter der Versionsnummer ein kleiner Käfer. **Lange drücke
 - Google-Anbindung: OAuth-Client-ID (Typ „Webanwendung“) in `index.html` (`CLIENT_ID`), Berechtigung `drive.file`. Ohne Client-ID ist nur „Ohne Cloud nutzen“ möglich.
 
 ## Versionen
+- **0.99.1:** Planmenü als Karten (aktiver Plan mit Plakette „Aktiv“, Kennzahlen als Bubbles, Reihenfolge per Ziehen). Übungskarten: Ziehgriff rechts, lange gedrückt halten zum Verschieben, „Entfernen“ unten rechts. iPhone: Datum und Einheit überschneiden sich nicht mehr; Anmeldung im Safari-Browser per Weiterleitung (vorher blieb das Google-Fenster weiß).
 - **0.99:** Ziehen von Übungen wieder flüssig: Karte folgt dem Finger stufenlos, die anderen Karten gleiten weich zur Seite, gleichmäßiges Rand-Scrollen.
 - **0.98:** Ziehen von Übungen: Karte klappt zusammen und rückt live an die Zielstelle (auch ganz oben/unten sicher). Körpergewicht als Häkchen in eigener Zeile, Erfassungsart und Einstellungen optisch getrennt, Sätze „beliebig“ bei Gewicht + Wdh. Einträge einer nicht mehr vorhandenen Einheit lassen sich beim Bearbeiten einer bestehenden Einheit zuweisen.
 - **0.97:** Neuer Plan-Assistent: Einheiten als Bubbles (antippen, gedrückt halten zum Verschieben, × entfernen), Einheiten benennbar („3 - Hypertrophie“, überall in der App), Übungen als Karten mit Ziehgriff (auch in andere Einheit), Erfassungsart als Knöpfe, Max./Satz und Ziel einstellbar, Namensvorschläge, Speichern immer sichtbar, Einträge werden beim Verschieben/Löschen von Einheiten und Umbenennen von Übungen automatisch angepasst.
